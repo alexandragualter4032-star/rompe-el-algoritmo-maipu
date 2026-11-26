@@ -1,57 +1,63 @@
-import { ARTISTS } from '../data/artists.js';
+import { ARTIST_ORIGINS } from '../data/artistOrigins.js';
 import { CHILE_OUTLINE } from '../data/chileOutline.js';
+import { WORLD_LAND_PATH } from '../data/worldOutline.js';
 
-const GROUPS = [
-  { label: 'Maipú', ids: ['akrilla'], color: '#ff2e63' },
-  { label: 'Santiago (comuna sin precisar)', ids: ['princesaalba', 'soulfia', 'javieramena', 'rubio', 'chinipng'], color: '#08d9d6' },
-  { label: 'Viña del Mar', ids: ['monlaferte'], color: '#ffe66d' },
-];
+function worldPoint({ lat, lon }) {
+  return { x: (lon + 180) / 360 * 960, y: (90 - lat) / 180 * 480 };
+}
 
-const OTHER_IDS = ['anatijoux', 'franciscavalenzuela', 'snailmail', 'paramore', 'tricot'];
+function chilePoint({ lat, lon }) {
+  return {
+    x: 37 + ((lon + 76) / 10) * 156,
+    y: 15 + ((-16 - lat) / 40) * 382,
+  };
+}
 
-export function OriginMap({ discovered, revealAll = false }) {
-  const visible = (id) => revealAll || discovered.has(id);
-  const names = (ids) => ids.filter(visible).map((id) => ARTISTS.find((artist) => artist.id === id)?.name).filter(Boolean);
+export function OriginMap({ artist }) {
+  const places = ARTIST_ORIGINS[artist.id] || [];
+  const world = places.some((place) => place.country !== 'Chile');
+
+  if (!places.length) return null;
 
   return <section className="origin-map-section" aria-labelledby="origin-map-title">
-    <h3 id="origin-map-title">📍 ¿De dónde vienen?</h3>
-    <p>Mapa de Chile con las ciudades conocidas. Maipú tiene pin propio; cuando solo se conoce «Santiago», no se inventa una comuna.</p>
-    <div className="origin-map-layout">
-      <svg className="origin-map-svg" viewBox="0 0 520 420" role="img"
-        aria-label="Mapa de Chile. Ampliación de la zona central con pines en Viña del Mar, Maipú y Santiago.">
-        <rect x="1" y="1" width="518" height="418" rx="18" className="map-background" />
-        <path d={CHILE_OUTLINE} className="chile-outline" />
-        <circle cx="122" cy="174" r="7" className="map-zone-dot" />
-        <path d="M 130 174 L 230 174" className="map-connector" />
-        <rect x="230" y="72" width="278" height="245" rx="16" className="map-inset" />
-        <text x="245" y="100" className="map-title">ZONA CENTRAL AMPLIADA</text>
-        <path d="M 245 150 H 492 M 245 205 H 492 M 335 115 V 302 M 425 115 V 302" className="map-grid" />
-        <circle cx="310" cy="128" r="7" fill="#ffe66d" />
-        <path d="M 317 128 L 329 128" className="map-leader" />
-        <text x="335" y="133" className="map-label">Viña del Mar</text>
-        <circle cx="437" cy="200" r="7" fill="#08d9d6" />
-        <path d="M 444 200 L 456 185" className="map-leader" />
-        <text x="458" y="180" className="map-label">Santiago</text>
-        <circle cx="424" cy="211" r="7" fill="#ff2e63" />
-        <path d="M 420 217 L 395 245" className="map-leader" />
-        <text x="345" y="258" className="map-label">Maipú</text>
-        <text x="40" y="32" className="map-title">CHILE</text>
-      </svg>
-      <div className="origin-map-places">
-        {GROUPS.map((group) => {
-          const found = names(group.ids);
-          return <div className="origin-place" key={group.label}>
-            <span className="origin-place-dot" style={{ background: group.color }} />
-            <div><strong>{group.label}</strong>
-              <small>{found.length ? found.join(', ') : 'Artista por descubrir'}
-                {found.length < group.ids.length && ` · ${group.ids.length - found.length} pendiente(s)`}</small></div>
-          </div>;
+    <h3 id="origin-map-title">📍 Origen y vínculos de {artist.name}</h3>
+    <p>{world
+      ? 'Mapamundi con las localidades mencionadas en su origen o trayectoria.'
+      : 'Mapa de Chile con una ubicación aproximada; no indica una dirección personal.'}</p>
+    <div className={`origin-map-layout ${world ? 'world-layout' : 'chile-layout'}`}>
+      {world ? <svg className="origin-map-svg world-map" viewBox="0 0 960 480" role="img"
+        aria-label={`Mapamundi con localidades vinculadas a ${artist.name}`}>
+        <title>Localidades vinculadas a {artist.name}</title>
+        <rect width="960" height="480" rx="18" className="map-background" />
+        <path d="M0 120H960 M0 240H960 M0 360H960 M240 0V480 M480 0V480 M720 0V480" className="map-grid" />
+        <path d={WORLD_LAND_PATH} className="world-land" />
+        {places.map((place) => {
+          const { x, y } = worldPoint(place);
+          return <g key={place.label}>
+            <circle cx={x} cy={y} r="11" className="map-pin-halo" />
+            <circle cx={x} cy={y} r="6" className="map-pin" />
+          </g>;
         })}
-        <div className="origin-place origin-place-other"><span className="origin-place-dot" />
-          <div><strong>Fuera de este mapa</strong><small>{names(OTHER_IDS).join(', ') || 'Artistas por descubrir'}</small></div>
-        </div>
+      </svg> : <svg className="origin-map-svg chile-map" viewBox="0 0 230 420" role="img"
+        aria-label={`Mapa esquemático de Chile con una ubicación aproximada para ${artist.name}`}>
+        <title>Ubicación aproximada en Chile</title>
+        <rect width="230" height="420" rx="18" className="map-background" />
+        <path d={CHILE_OUTLINE} className="chile-outline" />
+        {places.map((place) => {
+          const { x, y } = chilePoint(place);
+          return <g key={place.label}>
+            <circle cx={x} cy={y} r="12" className="map-pin-halo" />
+            <circle cx={x} cy={y} r="6" className="map-pin" />
+          </g>;
+        })}
+      </svg>}
+      <div className="origin-map-places" aria-label="Localidades">
+        {places.map((place) => <div className="origin-place" key={place.label}>
+          <span className="origin-place-dot" />
+          <div><strong>{place.label}</strong><small>Ubicación aproximada</small></div>
+        </div>)}
       </div>
     </div>
-    <small className="map-credit">Contorno: <a href="https://www.naturalearthdata.com/about/terms-of-use/" target="_blank" rel="noopener noreferrer">Natural Earth</a> (dominio público). Pines de la zona central ampliados para que se puedan distinguir.</small>
+    <small className="map-credit">Mapas esquemáticos basados en datos de <a href="https://www.naturalearthdata.com/about/terms-of-use/" target="_blank" rel="noopener noreferrer">Natural Earth</a> (dominio público). Las ubicaciones son aproximadas.</small>
   </section>;
 }

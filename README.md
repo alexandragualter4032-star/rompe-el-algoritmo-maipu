@@ -2,7 +2,7 @@
 
 Juego educativo de música y pensamiento crítico. Sus 12 niveles presentan proyectos musicales liderados por mujeres; cada nivel combina cuestionario, retroalimentación, material audiovisual y minijuego de ritmo.
 
-**Estado:** prototipo funcional en desarrollo. [Abrir demo pública en GitHub Pages](https://alexandragualter4032-star.github.io/rompe-el-algoritmo-maipu/). La aplicación completa con progreso se ejecuta localmente con Bun.
+**Estado:** prototipo funcional en desarrollo. El workflow de Pages está preparado; falta que una persona administradora habilite GitHub Actions como fuente de publicación. La aplicación completa con progreso se ejecuta localmente con Bun.
 
 ## Funcionalidades
 
@@ -54,7 +54,7 @@ Vite usa `http://localhost:5175/` y envía las llamadas `/api` al servidor confi
 
 En el primer inicio, el servidor genera `data/admin.key`. Inicia sesión en **Docente / administración** usando esa clave. Guárdala fuera del repositorio. La base `data/game.sqlite` contiene códigos y avances; ambos archivos están ignorados por Git.
 
-El panel crea códigos de estudiante y los muestra una sola vez para descargar. La base guarda hashes de los códigos. Cada estudiante puede retomar desde la pregunta pendiente o reiniciar la fase de ritmo. Las sesiones docentes duran ocho horas y las estudiantiles hasta siete días. Los códigos tienen vencimiento configurable y se pueden revocar.
+El panel crea códigos de estudiante y los muestra una sola vez para descargar. La base guarda hashes de los códigos. En esta versión, entrar con un código guarda el avance; el vencimiento impide volver a entrar, pero no borra automáticamente el registro ni el progreso. La retención y el borrado automáticos están pendientes. Cada estudiante puede retomar desde la pregunta pendiente o reiniciar la fase de ritmo. Las sesiones docentes duran ocho horas y las estudiantiles hasta siete días.
 
 No hace falta pedir nombres reales. El progreso es para retroalimentación: el servidor valida formato y sesión, pero el navegador envía el puntaje, así que no sirve como nota formal ni como ranking resistente a manipulación.
 
@@ -73,7 +73,7 @@ No guardes secretos, base de datos, códigos descargados ni datos de estudiantes
 
 Los archivos de imagen están en `public/images/`; las rutas y enlaces de reproducción viven en `src/data/artists.js`. El inventario está en [docs/medios.md](docs/medios.md). Los doce niveles cuentan con foto y portada. Los videos se reproducen desde YouTube: el proyecto no contiene copias de canciones. Las portadas pueden representar un disco distinto de la canción que acompaña el nivel; esos casos están identificados en la guía de medios.
 
-El mapa del menú marca Maipú, Santiago y Viña del Mar cuando ese origen se indica en los datos. El contorno proviene de Natural Earth, en dominio público. La base del mapa es esquemática; no representa comunas ni direcciones exactas.
+Cada nivel muestra el mapa en la ficha de la artista. Para localidades en Chile aparece el mapa del país; si hay un lugar de origen o trayectoria fuera de Chile, aparece un mapamundi. Las marcas son aproximadas y no representan domicilios.
 
 ## Decisiones pedagógicas
 
@@ -81,13 +81,11 @@ La revisión basada en el capítulo de Richard E. Mayer y en práctica de recupe
 
 ## Despliegue y pendientes
 
-### Demo estática en GitHub Pages
+### Despliegue en Vercel
 
-El workflow `.github/workflows/pages.yml` compila y publica automáticamente cada cambio en `main`. Esta demo no ejecuta Bun ni una API: inicio de sesión, administración y guardado de progreso están desactivados. Para usar el juego con códigos y progreso se necesita alojar la API y una base persistente; consulta la sección de Vercel.
+Vercel es el destino previsto. El proyecto actual aún necesita adaptar la API y cambiar SQLite local por PostgreSQL persistente antes de activar el progreso en línea. Las funciones de Vercel tienen sistema de archivos de solo lectura, con `/tmp` temporal, así que ese disco no sirve para guardar progreso.
 
-### Sitio completo en Vercel
-
-El proyecto actual no se puede publicar completo en Vercel con solo apuntar el repositorio: la aplicación espera el servidor HTTP `server.ts` y una base SQLite en disco. Las funciones de Vercel usan un sistema de archivos de solo lectura, con `/tmp` temporal; no es almacenamiento persistente. Vercel ofrece runtime Bun en beta, pero la arquitectura todavía debe adaptarse a funciones serverless.
+La hoja de ruta detallada de base de datos, modo de guardado por curso y publicación está en [docs/base-de-datos-y-vercel.md](docs/base-de-datos-y-vercel.md).
 
 Pendientes para el despliegue completo:
 
@@ -97,7 +95,7 @@ Pendientes para el despliegue completo:
 4. Revisar autenticación docente, limitación de intentos, cookies `Secure`, sesiones, CORS/CSRF y límites de solicitudes detrás de proxy.
 5. Definir respaldos, retención y eliminación de códigos/progresos; probar recuperación.
 6. Revisar privacidad: el juego apunta a cursos escolares, así que publicar solo los datos mínimos y evitar nombres de estudiantes.
-7. Confirmar autorización/licencias de fotos, portadas y música antes de difundir el sitio. Los archivos de imagen entregados se incorporan como medios del proyecto; GitHub Pages y este repositorio son públicos.
+7. Confirmar autorización/licencias de fotos, portadas y música antes de difundir el sitio. Los archivos de imagen entregados se incorporan como medios del proyecto; el repositorio es público.
 8. Elegir dominio, región del servidor/base de datos, HTTPS y política de costos.
 9. Completar accesibilidad con teclado/lector de pantalla y probar móvil, navegadores y autoplay.
 10. Sincronizar patrones del minijuego con una canción, su BPM y el desplazamiento del primer pulso; BPM por sí solo no define las notas.
@@ -111,11 +109,11 @@ Vercel admite despliegue de sitios y funciones, y puede conectarse a Postgres me
 ```text
 src/react/       Componentes y pantallas React
 src/components/  Motor de fases y minijuegos
-src/data/        Artistas, preguntas, hechos y mapa
+src/data/        Artistas, preguntas, hechos y mapas
 src/server/      API, autenticación y base SQLite
 public/images/   Fotos y portadas
 public/music/    Carpeta opcional de audio local
-docs/            Medios y revisión pedagógica
+docs/            Medios, pedagogía y ruta de datos/Vercel
 tests/           Pruebas API y de flujo
 ```
 

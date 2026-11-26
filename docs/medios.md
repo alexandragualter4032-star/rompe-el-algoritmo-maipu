@@ -40,3 +40,9 @@ La portada del nivel de Soulfia corresponde al [single «Ten Cuidao’»](https:
 Los doce niveles ya tienen foto de artista y portada de disco o single en `public/images/`. Los archivos fueron proporcionados por el usuario.
 
 Las notas del minijuego de ritmo aún no siguen el BPM ni los golpes de estos videos. Para sincronizar cada nivel hace falta seleccionar un fragmento concreto, medir su pulso y diseñar una secuencia de notas. Las listas y álbumes completos contienen canciones con tempos diferentes.
+
+## Mapas de origen
+
+El mapa aparece dentro del nivel de cada artista, no en el menú de campaña. Usa un mapa esquemático de Chile para lugares chilenos y un mapamundi cuando se incluyen lugares fuera de Chile. Las coordenadas marcan ciudades o zonas generales; no indican domicilio ni ubicación actual.
+
+Los contornos se basan en [Natural Earth](https://www.naturalearthdata.com/about/terms-of-use/), cuyos datos son de dominio público. Referencias para lugares internacionales: [Ana Tijoux, nacida en Lille](https://www.kcrw.com/shows/live-from/stories/ana-tijoux-vida-video-interview), [Francisca Valenzuela, criada en San Francisco](https://www.fmdos.cl/especial-de-las-dos/francisca-valenzuela-2/amp/), [Snail Mail / Ellicott City](https://www.thebanner.com/culture/arts/snail-mail-to-return-to-baltimore-to-play-five-nights-at-ottobar-for-valentine-fest-33FSB6RNK5AA3HV4G7HYK7RVJM/), [Paramore / Franklin, Tennessee](https://capitol.tn.gov/Bills/113/Bill/HJR0916.pdf), [tricot / Kioto](https://www.youtube.com/channel/UC8Xp4bKmRn8cmAzi0cc66KQ) y [Mon Laferte / Viña del Mar y México](https://www.bmi.com/spotlight/bmi-latin-spotlight-mon-laferte).

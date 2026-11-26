@@ -364,7 +364,6 @@ export function Game({ role, initialProgress, student, debugLevel, onExit }) {
               {item.isMaipuLocal && <em>Maipú</em>}</button>;
           })}
         </div></div>
-        <OriginMap discovered={discovered} revealAll={role === 'debug'} />
       </div>}
 
       {screen === 'gallery' && <div className="gallery-screen">
@@ -390,6 +389,7 @@ export function Game({ role, initialProgress, student, debugLevel, onExit }) {
         pausedRef={pausedRef} onVisibilityChange={onVisibilityChange} onShowModal={setModal}
         onProgress={onQuestionProgress} onComplete={onQuestionsComplete}
         onSuccess={onRhythmSuccess} onRetry={onRhythmRetry} />}
+      {screen === 'questions' && <OriginMap artist={artist} />}
     </main>
 
     <div ref={dvdLayer} className="dvd-layer hidden" />

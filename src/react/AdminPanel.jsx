@@ -79,6 +79,13 @@ export function AdminPanel({ onDebug, onLogout }) {
         <div><strong>{totalCompleted}</strong><span>Niveles completados en total</span></div>
       </section>
 
+      <section className="admin-card" aria-labelledby="privacy-note-title">
+        <h2 id="privacy-note-title">Privacidad y guardado</h2>
+        <p>Esta versión guarda el avance cuando un estudiante entra con código. No escribas nombres, apellidos, RUT, correos ni números de lista en las etiquetas.</p>
+        <p>Si necesitas saber a quién corresponde un código, conserva esa relación fuera de la aplicación, en un registro privado del curso. La aplicación no necesita conocer la identidad del estudiante.</p>
+        <p className="admin-hint">Próximo ajuste: cada curso podrá elegir entre jugar sin guardar o guardar para retomar, con una fecha clara para borrar el progreso.</p>
+      </section>
+
       {error && <p className="auth-error" role="alert">{error}</p>}
       {notice && <p className="admin-notice" role="status">{notice}</p>}
 

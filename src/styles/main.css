@@ -375,16 +375,14 @@ body {
   width: 100%;
   max-width: 520px;
 }
+.chile-layout .origin-map-svg { max-width: 250px; }
+.world-map { aspect-ratio: 2 / 1; }
 
 .map-background { fill: #11202e; stroke: rgba(255, 255, 255, 0.14); }
-.chile-outline { fill: #29a89f; stroke: #c8faf4; stroke-width: 1.5; }
-.map-zone-dot { fill: #ffcf55; stroke: #fff; stroke-width: 2; }
-.map-connector, .map-leader { fill: none; stroke: #c8faf4; stroke-width: 1.5; }
-.map-connector { stroke-dasharray: 5 5; }
-.map-inset { fill: #182e3c; stroke: #83c9c4; stroke-width: 1.5; }
+.chile-outline, .world-land { fill: #29a89f; stroke: #c8faf4; stroke-width: 1; }
+.map-pin-halo { fill: rgba(255, 207, 85, 0.35); }
+.map-pin { fill: #ffcf55; stroke: #fff; stroke-width: 2; }
 .map-grid { fill: none; stroke: rgba(255, 255, 255, 0.12); stroke-width: 1; }
-.map-title { fill: #c8faf4; font: 700 14px sans-serif; letter-spacing: 1px; }
-.map-label { fill: #fff; font: 700 12px sans-serif; }
 
 .origin-map-places {
   display: grid;

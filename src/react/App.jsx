@@ -62,7 +62,7 @@ export function App() {
 
   if (staticDemo) return <main className="auth-screen">
     <div className="auth-card">
-      <div className="school-pill">🎧 Demo pública • GitHub Pages</div>
+      <div className="school-pill">🎧 Modo de prueba sin guardar</div>
       <h1 className="game-title">ROMPE EL ALGORITMO</h1>
       <p className="game-subtitle">Descubre artistas, responde preguntas y haz que suene su música.</p>
       <p className="auth-note">Esta versión es una demostración. No tiene inicio de sesión, panel docente ni guardado de progreso.</p>
