@@ -1,16 +1,16 @@
-// Banco extenso de Datos Curiosos 100% reales y verificables (8 a 10 por artista)
+// Banco de datos curiosos. Revisar cada afirmación antes de usarla para evaluación formal.
 // Distintos a las preguntas de cada nivel.
 
 export const FACTS = {
   akrilla: [
-    'El nombre real de AKRILLA es Fernanda Sepúlveda y nació y creció en la comuna de Maipú.',
+    'El nombre real de AKRIILA es Fernanda Sepúlveda y nació y creció en la comuna de Maipú.',
     'Antes de dedicarse de lleno al urbano, aprendió a tocar guitarra y exploró música en su pieza en Maipú.',
     'Su primer álbum de estudio se titula "Epistolares" (2024) y fue destacado por la crítica musical chilena.',
     'En 2024 fue seleccionada para presentarse en el festival Primavera Sound de Barcelona, llevando el urbano de Maipú a Europa.',
     'Ha colaborado con artistas como Princesa Alba, Gianluca, Young Cister y Taichu.',
     'Su estética visual mezcla referencias de anime, cultura callejera chilena y moda futurista.',
     'Antes de lanzar su primer disco ya había participado en escenarios masivos como Lollapalooza Chile.',
-    'El nombre "AKRILLA" juega con la sonoridad del acrílico y la fuerza de una marca propia.',
+    'El álbum completo "Epistolares" se puede escuchar en el canal oficial de AKRIILA en YouTube.',
     'Muchas de sus primeras maquetas fueron grabadas de forma casera con recursos mínimos en Santiago.',
   ],
   princesaalba: [

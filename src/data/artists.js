@@ -2,12 +2,13 @@
   {
     id: 'akrilla',
     level: 1,
-    name: 'AKRILLA',
+    name: 'AKRIILA',
     origin: 'Maipú, Santiago (Chile)',
     isMaipuLocal: true,
     genre: 'Urbano / Trap / Reggaetón Experimental',
     tagline: 'Desde las calles de Maipú para el mundo: rompiendo el molde del género urbano.',
     albumTitle: 'Epistolares',
+    video: { provider: 'youtube', id: '-BDQEPBs7J0', title: 'epistolares; de mi, para ti (álbum completo)' },
     themeClass: 'theme-akrilla',
     colors: {
       primary: '#ff2e63',
@@ -18,9 +19,11 @@
     symbols: ['🚇', '🎤', '⚡', '🎧', '🌆'],
     decorLabel: 'ESTACIÓN MAIPÚ • ZONA URBANA',
     files: {
-      audio: './public/music/akrilla.mp3',
-      photo: './public/images/akrilla_foto.jpg',
-      face: './public/images/akrilla_cara.png',
+      audio: './music/akrilla.mp3',
+      photo: './images/akrilla_retrato.jpg',
+      face: './images/akrilla_retrato.jpg',
+      faceCrop: { scale: 2.4, origin: 'center top' },
+      albumCover: './images/akrilla_epistolares.jpg',
     },
     synth: {
       bpm: 108,
@@ -44,6 +47,8 @@
     genre: 'Pop Urbano',
     tagline: 'Brillo, cancha y pop chileno hecho con autogestión y actitud.',
     albumTitle: 'Besitos, cuídate',
+    video: { provider: 'youtube', id: 'YR1kd_6adE4', title: 'besitos, cuídate (visualizador oficial)',
+      playlistUrl: 'https://www.youtube.com/playlist?list=OLAK5uy_kR-tNnZqmPseZ31U0hCA7ll8fyGu8WS6w' },
     themeClass: 'theme-princesaalba',
     colors: {
       primary: '#ff66b3',
@@ -54,9 +59,11 @@
     symbols: ['👑', '💖', '✨', '⚽', '💅'],
     decorLabel: 'POP URBANO • BRILLO & CANCHA',
     files: {
-      audio: './public/music/princesaalba.mp3',
-      photo: './public/images/princesaalba_foto.jpg',
-      face: './public/images/princesaalba_cara.png',
+      audio: './music/princesaalba.mp3',
+      photo: './images/princesaalba_foto.jpg',
+      face: './images/princesaalba_foto.jpg',
+      faceCrop: { scale: 2.4, origin: 'center 20%' },
+      albumCover: './images/princesaalba_besitos_cuidate.jpg',
     },
     synth: {
       bpm: 114,
@@ -80,6 +87,8 @@
     genre: 'R&B / Pop Urbano',
     tagline: 'Voz poderosa del R&B chileno que conquistó escenarios desde la independencia.',
     albumTitle: 'Brujerías de Cantina',
+    featuredSingle: "Ten Cuidao'",
+    video: { provider: 'youtube', id: 'uEPlTgRC2-A', title: "Ten Cuidao' (single de Soulfia)" },
     themeClass: 'theme-soulfia',
     colors: {
       primary: '#b565ff',
@@ -90,9 +99,11 @@
     symbols: ['🔮', '🌙', '✨', '🎙️', '💜'],
     decorLabel: 'NEÓN R&B • VIBRA NOCTURNA',
     files: {
-      audio: './public/music/soulfia.mp3',
-      photo: './public/images/soulfia_foto.jpg',
-      face: './public/images/soulfia_cara.png',
+      audio: './music/soulfia.mp3',
+      photo: './images/soulfia_foto.jpg',
+      face: './images/soulfia_foto.jpg',
+      faceCrop: { scale: 2, origin: 'center 20%' },
+      singleCover: './images/soulfia_ten_cuidao.jpg',
     },
     synth: {
       bpm: 102,
@@ -116,6 +127,7 @@
     genre: 'Hip-Hop / Rap Consciente',
     tagline: 'Rimas con historia, memoria y fuerza frente a una industria dominada por hombres.',
     albumTitle: '1977',
+    video: { provider: 'youtube', id: 'yiQ7S38nKog', title: '1977 (video oficial)' },
     themeClass: 'theme-anatijoux',
     colors: {
       primary: '#f77f00',
@@ -126,9 +138,11 @@
     symbols: ['📻', '✊', '🎤', '🔥', '🥁'],
     decorLabel: 'HIP-HOP CONSCIENTE • VINILO & RIMA',
     files: {
-      audio: './public/music/anatijoux.mp3',
-      photo: './public/images/anatijoux_foto.jpg',
-      face: './public/images/anatijoux_cara.png',
+      audio: './music/anatijoux.mp3',
+      photo: './images/anatijoux_foto.jpg',
+      face: './images/anatijoux_foto.jpg',
+      faceCrop: { scale: 2.2, origin: 'center top' },
+      albumCover: './images/anatijoux_1977.jpg',
     },
     synth: {
       bpm: 96,
@@ -152,6 +166,8 @@
     genre: 'Electropop / Synth-Pop',
     tagline: 'Pionera del electropop latinoamericano hecha a punta de sintetizadores y autogestión.',
     albumTitle: 'Mena',
+    featuredAlbum: 'Esquemas Juveniles',
+    video: { provider: 'youtube', id: 'OORCSsbHU6Y', title: 'Hasta la verdad (del disco Mena)' },
     themeClass: 'theme-javieramena',
     colors: {
       primary: '#00f5d4',
@@ -162,9 +178,11 @@
     symbols: ['🎹', '🌌', '⚡', '💿', '🕹️'],
     decorLabel: 'SYNTH-POP • LUCES DE NEÓN',
     files: {
-      audio: './public/music/javieramena.mp3',
-      photo: './public/images/javieramena_foto.jpg',
-      face: './public/images/javieramena_cara.png',
+      audio: './music/javieramena.mp3',
+      photo: './images/javieramena_foto.jpg',
+      face: './images/javieramena_foto.jpg',
+      faceCrop: { scale: 2.2, origin: 'center top' },
+      albumCover: './images/javieramena_esquemas_juveniles.jpg',
     },
     synth: {
       bpm: 124,
@@ -187,7 +205,8 @@
     origin: 'Chile / EE.UU.',
     genre: 'Pop-Rock / Alternativo',
     tagline: 'Piano, rock y la creación de Ruidosa para abrir espacios a mujeres en festivales.',
-    albumTitle: 'Tajo Abierto',
+    albumTitle: 'Buen Soldado',
+    video: { provider: 'youtube', id: '9WQHGQR69JI', title: 'Buen Soldado (canción)' },
     themeClass: 'theme-franciscavalenzuela',
     colors: {
       primary: '#ff4d6d',
@@ -198,9 +217,11 @@
     symbols: ['🎹', '📢', '🎸', '🌟', '✊'],
     decorLabel: 'FESTIVAL RUIDOSA • POP-ROCK',
     files: {
-      audio: './public/music/franciscavalenzuela.mp3',
-      photo: './public/images/franciscavalenzuela_foto.jpg',
-      face: './public/images/franciscavalenzuela_cara.png',
+      audio: './music/franciscavalenzuela.mp3',
+      photo: './images/franciscavalenzuela_foto.jpg',
+      face: './images/franciscavalenzuela_foto.jpg',
+      faceCrop: { scale: 2.1, origin: 'center 20%' },
+      albumCover: './images/franciscavalenzuela_buen_soldado.jpg',
     },
     synth: {
       bpm: 120,
@@ -223,7 +244,8 @@
     origin: 'Viña del Mar, Chile / México',
     genre: 'Rock Alternativo / Retro-Teatral',
     tagline: 'Intensidad escénica, estética retro y una carrera construida contra todo pronóstico.',
-    albumTitle: 'Norma',
+    albumTitle: 'Mon Laferte, Vol. 1',
+    video: { provider: 'youtube', id: 'y73MCzGi3s4', title: 'Si tú me quisieras (de Mon Laferte, Vol. 1)' },
     themeClass: 'theme-monlaferte',
     colors: {
       primary: '#e63946',
@@ -234,9 +256,11 @@
     symbols: ['🌹', '🎭', '💋', '🎸', '🕯️'],
     decorLabel: 'ESCENARIO RETRO-TEATRAL • PASIÓN',
     files: {
-      audio: './public/music/monlaferte.mp3',
-      photo: './public/images/monlaferte_foto.jpg',
-      face: './public/images/monlaferte_cara.png',
+      audio: './music/monlaferte.mp3',
+      photo: './images/monlaferte_foto.webp',
+      face: './images/monlaferte_foto.webp',
+      faceCrop: { scale: 1.8, origin: 'center 34%' },
+      albumCover: './images/monlaferte_vol_1.jpg',
     },
     synth: {
       bpm: 112,
@@ -260,6 +284,7 @@
     genre: 'Art-Pop / Electrónica Experimental',
     tagline: 'Capas sonoras, visuales hipnóticos y experimentación sin pedir permiso.',
     albumTitle: 'Pez',
+    video: { provider: 'youtube', id: 'JAp31z8WWqw', title: 'IR (video oficial)' },
     themeClass: 'theme-rubio',
     colors: {
       primary: '#72efdd',
@@ -270,9 +295,11 @@
     symbols: ['🐟', '🌊', '🔮', '🎛️', '🦋'],
     decorLabel: 'ART-POP EXPERIMENTAL • ONDAS',
     files: {
-      audio: './public/music/rubio.mp3',
-      photo: './public/images/rubio_foto.jpg',
-      face: './public/images/rubio_cara.png',
+      audio: './music/rubio.mp3',
+      photo: './images/rubio_foto.jpg',
+      face: './images/rubio_foto.jpg',
+      faceCrop: { scale: 2, origin: 'center 18%' },
+      albumCover: './images/rubio_pez.jpg',
     },
     synth: {
       bpm: 118,
@@ -296,6 +323,7 @@
     genre: 'Art-Rock / Indie Pictórico',
     tagline: 'Pintura, guitarras indie y poesía visual que no encaja en listas comerciales.',
     albumTitle: 'El Día Libre de Polux',
+    video: { provider: 'youtube', id: 'pLsB8OtfpJU', title: 'Venenos (video oficial)' },
     themeClass: 'theme-chinipng',
     colors: {
       primary: '#ff9f1c',
@@ -306,9 +334,11 @@
     symbols: ['🎨', '🖼️', '🎸', '🖍️', '🌿'],
     decorLabel: 'ART-ROCK PICTÓRICO • LIENZO INDIE',
     files: {
-      audio: './public/music/chinipng.mp3',
-      photo: './public/images/chinipng_foto.jpg',
-      face: './public/images/chinipng_cara.png',
+      audio: './music/chinipng.mp3',
+      photo: './images/chinipng_foto.jpg',
+      face: './images/chinipng_foto.jpg',
+      faceCrop: { scale: 2.1, origin: 'center 18%' },
+      albumCover: './images/chinipng_polux.jpg',
     },
     synth: {
       bpm: 122,
@@ -332,6 +362,7 @@
     genre: 'Indie Rock / Rock Alternativo',
     tagline: 'Guitarras crudas y honestidad adolescente que desafió las etiquetas de la prensa.',
     albumTitle: 'Lush',
+    video: { provider: 'youtube', id: 's7tnTucP1UM', title: 'Pristine (video oficial)' },
     themeClass: 'theme-snailmail',
     colors: {
       primary: '#56cfe1',
@@ -342,9 +373,11 @@
     symbols: ['🐌', '✉️', '🎸', '📼', '🌙'],
     decorLabel: 'INDIE ROCK • CASSETTE & GUITARRA',
     files: {
-      audio: './public/music/snailmail.mp3',
-      photo: './public/images/snailmail_foto.jpg',
-      face: './public/images/snailmail_cara.png',
+      audio: './music/snailmail.mp3',
+      photo: './images/snailmail_foto.jpg',
+      face: './images/snailmail_foto.jpg',
+      faceCrop: { scale: 2, origin: 'center 30%' },
+      albumCover: './images/snailmail_lush.jpg',
     },
     synth: {
       bpm: 126,
@@ -368,6 +401,7 @@
     genre: 'Pop-Punk / Rock Alternativo',
     tagline: 'Hayley Williams liderando una banda en una escena rockera que dudaba de las mujeres.',
     albumTitle: 'After Laughter',
+    video: { provider: 'youtube', playlistId: 'PLZ1s4Pon2Ch9FHr--ORsKmLzn6LTLEnlt', title: 'After Laughter (disco completo)' },
     themeClass: 'theme-paramore',
     colors: {
       primary: '#ff5400',
@@ -378,9 +412,11 @@
     symbols: ['🔥', '⚡', '🎸', '🧡', '🤘'],
     decorLabel: 'POP-PUNK • ENERGÍA DE ESTADIO',
     files: {
-      audio: './public/music/paramore.mp3',
-      photo: './public/images/paramore_foto.jpg',
-      face: './public/images/paramore_cara.png',
+      audio: './music/paramore.mp3',
+      photo: './images/paramore_foto.jpg',
+      face: './images/paramore_foto.jpg',
+      faceCrop: { scale: 2.4, origin: '80% 42%' },
+      albumCover: './images/paramore_after_laughter.jpg',
     },
     synth: {
       bpm: 136,
@@ -404,6 +440,7 @@
     genre: 'Math-Rock / Rock Alternativo',
     tagline: 'Precisión geométrica, guitarras frenéticas y sello propio desde Japón.',
     albumTitle: 'T H E',
+    video: { provider: 'youtube', playlistId: 'PLRvZ7cdgjmKRTu1WDbvLmHQtQfy2wdWsX', title: 'T H E (disco completo)' },
     themeClass: 'theme-tricot',
     colors: {
       primary: '#ff0055',
@@ -414,9 +451,11 @@
     symbols: ['🔺', '◼️', '⚡', '🎸', '🇯🇵'],
     decorLabel: 'MATH-ROCK JAPONÉS • GEOMETRÍA PURA',
     files: {
-      audio: './public/music/tricot.mp3',
-      photo: './public/images/tricot_foto.jpg',
-      face: './public/images/tricot_cara.png',
+      audio: './music/tricot.mp3',
+      photo: './images/tricot_foto.jpg',
+      face: './images/tricot_foto.jpg',
+      faceCrop: { scale: 1.8, origin: 'center 36%' },
+      albumCover: './images/tricot_the.jpg',
     },
     synth: {
       bpm: 142,

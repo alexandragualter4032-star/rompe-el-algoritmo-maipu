@@ -30,7 +30,7 @@ export function getPhotoFallbackSvg(artist) {
     <circle cx="200" cy="175" r="74" fill="${bg}" stroke="${secondary}" stroke-width="5" />
     <text x="200" y="195" font-size="64" text-anchor="middle">${symbol}</text>
     <text x="200" y="295" font-family="sans-serif" font-size="32" font-weight="900" fill="#ffffff" text-anchor="middle">${artist.name}</text>
-    <text x="200" y="328" font-family="sans-serif" font-size="15" font-weight="700" fill="${secondary}" text-anchor="middle">${artist.albumTitle.toUpperCase()}</text>
+    <text x="200" y="328" font-family="sans-serif" font-size="15" font-weight="700" fill="${secondary}" text-anchor="middle">${(artist.featuredSingle || artist.featuredAlbum || artist.albumTitle).toUpperCase()}</text>
     <text x="200" y="356" font-family="sans-serif" font-size="12" fill="#ffffffaa" text-anchor="middle">${artist.genre}</text>
   </svg>`;
   return encodeSvg(svg);

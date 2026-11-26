@@ -8,7 +8,7 @@ body.theme-default {
   --border-glow: rgba(8, 217, 214, 0.45);
 }
 
-/* 1. AKRILLA — Urbano / Callejero Maipú */
+/* 1. AKRIILA — Urbano / Callejero Maipú */
 body.theme-akrilla {
   --bg-main: linear-gradient(135deg, #16071b 0%, #2a0a24 45%, #071b24 100%);
   --primary: #ff2e63;

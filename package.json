@@ -1,0 +1,21 @@
+{
+  "name": "rompe-el-algoritmo-maipu",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 5175",
+    "build": "vite build",
+    "test": "bun test --timeout=30000",
+    "preview": "vite preview --host 127.0.0.1 --port 5176",
+    "serve": "bun server.ts"
+  },
+  "dependencies": {
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^6.3.0",
+    "playwright-core": "^1.65.1",
+    "vite": "^8.4.0"
+  }
+}

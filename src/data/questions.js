@@ -6,8 +6,8 @@ export const QUESTIONS = {
   akrilla: [
     {
       id: 'akrilla-1',
-      context: 'AKRILLA (Fernanda Sepúlveda) creció en Maipú y desde su pieza empezó a mezclar trap, reggaetón y sonidos experimentales, demostrando que no hace falta venir de grandes estudios para sonar fuerte.',
-      question: '¿Por qué es tan importante para la escena chilena que una referente como AKRILLA haya surgido desde Maipú?',
+      context: 'AKRIILA (Fernanda Sepúlveda) creció en Maipú y desde su pieza empezó a mezclar trap, reggaetón y sonidos experimentales, demostrando que no hace falta venir de grandes estudios para sonar fuerte.',
+      question: '¿Por qué es tan importante para la escena chilena que una referente como AKRIILA haya surgido desde Maipú?',
       options: [
         'Porque demuestra que el talento urbano de comunas periféricas puede llegar a grandes escenarios sin perder su identidad.',
         'Porque en Maipú está prohibido escuchar música pop internacional.',
@@ -15,12 +15,12 @@ export const QUESTIONS = {
         'Porque Maipú tiene las únicas radios de trap del continente.',
       ],
       correctIndex: 0,
-      feedback: '¡Exacto! AKRILLA representa el orgullo de Maipú y abre camino para jóvenes de cualquier comuna.',
+      feedback: '¡Exacto! AKRIILA representa el orgullo de Maipú y abre camino para jóvenes de cualquier comuna.',
     },
     {
       id: 'akrilla-2',
-      context: 'En entrevistas sobre el movimiento urbano chileno, AKRILLA ha comentado que al principio muchos dudaban de que una mujer pudiera producir o liderar un proyecto de trap oscuro y experimental sin depender de un hombre.',
-      question: 'Según lo que ha vivido AKRILLA, ¿qué prejuicio de género enfrentan las mujeres en el género urbano?',
+      context: 'En entrevistas sobre el movimiento urbano chileno, AKRIILA ha comentado que al principio muchos dudaban de que una mujer pudiera producir o liderar un proyecto de trap oscuro y experimental sin depender de un hombre.',
+      question: 'Según lo que ha vivido AKRIILA, ¿qué prejuicio de género enfrentan las mujeres en el género urbano?',
       options: [
         'Se asume que solo pueden cantar coros suaves y no liderar ni producir sus propios proyectos.',
         'Se les exige tocar guitarra acústica antes de grabar reggaetón.',
@@ -32,8 +32,8 @@ export const QUESTIONS = {
     },
     {
       id: 'akrilla-3',
-      context: 'Los algoritmos de streaming suelen recomendar en automático las mismas 10 canciones comerciales de siempre, dejando ocultas propuestas frescas como las de AKRILLA.',
-      question: '¿Cómo afecta el algoritmo de las plataformas a artistas emergentes como AKRILLA?',
+      context: 'Los algoritmos de streaming suelen recomendar en automático las mismas 10 canciones comerciales de siempre, dejando ocultas propuestas frescas como las de AKRIILA.',
+      question: '¿Cómo afecta el algoritmo de las plataformas a artistas emergentes como AKRIILA?',
       options: [
         'Prioriza canciones virales de grandes sellos y reduce la visibilidad de propuestas nuevas o distintas.',
         'Regala entradas a conciertos a quienes escuchan menos música.',
@@ -45,8 +45,8 @@ export const QUESTIONS = {
     },
     {
       id: 'akrilla-4',
-      context: 'En su disco "Epistolares", AKRILLA eligió letras muy personales y una estética propia, en vez de copiar la fórmula repetitiva de los hits virales de turno.',
-      question: '¿Qué mensaje deja la apuesta artística de AKRILLA frente a la presión comercial?',
+      context: 'En su disco "Epistolares", AKRIILA eligió letras muy personales y una estética propia, en vez de copiar la fórmula repetitiva de los hits virales de turno.',
+      question: '¿Qué mensaje deja la apuesta artística de AKRIILA frente a la presión comercial?',
       options: [
         'Que ser auténtica y contar historias reales conecta más que seguir una receta viral.',
         'Que todas las canciones deben durar exactamente 1 minuto.',
@@ -54,14 +54,14 @@ export const QUESTIONS = {
         'Que solo importa tener millones de seguidores antes de grabar.',
       ],
       correctIndex: 0,
-      feedback: '¡Así es! La autenticidad de AKRILLA la llevó incluso a festivales internacionales.',
+      feedback: '¡Así es! La autenticidad de AKRIILA la llevó incluso a festivales internacionales.',
     },
     {
       id: 'akrilla-5',
       context: 'Cuando una persona busca "urbano chileno" en una app de música, las primeras listas oficiales suelen estar llenas casi exclusivamente de hombres.',
       question: '¿Qué puedes hacer tú como oyente para ayudar a romper esa brecha en las plataformas?',
       options: [
-        'Buscar, guardar en playlists y compartir activamente a artistas mujeres como AKRILLA.',
+        'Buscar, guardar en playlists y compartir activamente a artistas mujeres como AKRIILA.',
         'Dejar el celular en silencio todo el día.',
         'Escuchar únicamente la lista "Top 10 Global" todos los días.',
         'Bloquear todas las canciones que tengan menos de un millón de visitas.',

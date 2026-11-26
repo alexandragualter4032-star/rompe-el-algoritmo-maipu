@@ -15,6 +15,8 @@ export class Phase1Controller {
     onVisibilityChange,
     onShowModal,
     onComplete,
+    onProgress,
+    checkpoint,
   }) {
     this.container = container;
     this.dvdLayer = dvdLayer;
@@ -25,14 +27,20 @@ export class Phase1Controller {
     this.onVisibilityChange = onVisibilityChange;
     this.onShowModal = onShowModal;
     this.onComplete = onComplete;
+    this.onProgress = onProgress;
 
-    this.questions = (QUESTIONS[artist.id] || []).filter((q) => !answeredIds.has(q.id));
-    if (this.questions.length === 0) {
-      this.questions = [...(QUESTIONS[artist.id] || [])];
-    }
+    this.questions = [...(QUESTIONS[artist.id] || [])];
+    this.optionOrders = this.questions.map((question) => {
+      const order = question.options.map((_, index) => index);
+      for (let index = order.length - 1; index > 0; index -= 1) {
+        const swap = Math.floor(Math.random() * (index + 1));
+        [order[index], order[swap]] = [order[swap], order[index]];
+      }
+      return order;
+    });
 
-    this.qIndex = 0;
-    this.visibility = 0;
+    this.qIndex = Math.min(this.questions.length, Math.max(0, checkpoint?.questionIndex || 0));
+    this.visibility = Math.max(0, checkpoint?.visibility || 0);
     this.visibilityGoal = 350;
 
     // Estado por pregunta
@@ -62,7 +70,7 @@ export class Phase1Controller {
       onShowFactModal: (fact, onClose) => {
         this.addVisibility(35);
         this.onShowModal({
-          badge: `✨ Dato Curioso Real • ${this.artist.name}`,
+          badge: `✨ Dato sobre ${this.artist.name}`,
           title: '¡Atrapaste el rostro luminoso! (+35 Visibilidad)',
           body: `<p class="fact-text">${fact}</p>`,
           buttonText: '¡Genial, seguir jugando!',
@@ -109,6 +117,12 @@ export class Phase1Controller {
         <aside class="artist-stage-card">
           <div class="decor-chip">${this.artist.decorLabel}</div>
           <div id="artist-photo-slot" class="artist-photo-frame"></div>
+          ${this.artist.files.singleCover || this.artist.files.albumCover ? `
+            <div class="album-cover-card">
+              <div id="album-cover-slot" class="album-cover-image"></div>
+              <div><small>${this.artist.featuredSingle ? 'Single destacado' : 'Disco destacado'}</small><strong>${this.artist.featuredSingle || this.artist.featuredAlbum || this.artist.albumTitle}</strong></div>
+            </div>
+          ` : ''}
           <div class="artist-meta">
             <h2>${this.artist.name}</h2>
             <p class="artist-origin">${this.artist.origin} • ${this.artist.genre}</p>
@@ -140,7 +154,7 @@ export class Phase1Controller {
               ${this.shieldActive ? '<span class="buff-pill">📤 Escudo activo</span>' : ''}
             </div>
             <div id="options-list" class="options-list"></div>
-            <div id="q-feedback" class="q-feedback hidden"></div>
+            <div id="q-feedback" class="q-feedback hidden" role="status" aria-live="polite"></div>
           </div>
 
           <div class="wildcards-bar">
@@ -161,6 +175,17 @@ export class Phase1Controller {
       )
     );
 
+    if (this.artist.files.singleCover || this.artist.files.albumCover) {
+      this.container.querySelector('#album-cover-slot').appendChild(
+        createArtistImage(
+          this.artist.files.singleCover || this.artist.files.albumCover,
+          getPhotoFallbackSvg(this.artist),
+          `Portada de ${this.artist.featuredSingle || this.artist.featuredAlbum || this.artist.albumTitle}`,
+          'album-cover-img'
+        )
+      );
+    }
+
     this.renderOptions(q);
     this.updateWildcardButtons();
   }
@@ -169,12 +194,13 @@ export class Phase1Controller {
     const list = this.container.querySelector('#options-list');
     list.innerHTML = '';
 
-    q.options.forEach((optText, idx) => {
+    this.optionOrders[this.qIndex].forEach((idx, visualIndex) => {
+      const optText = q.options[idx];
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'option-btn';
       btn.dataset.index = String(idx);
-      btn.innerHTML = `<span class="opt-letter">${String.fromCharCode(65 + idx)}</span><span>${optText}</span>`;
+      btn.innerHTML = `<span class="opt-letter">${String.fromCharCode(65 + visualIndex)}</span><span>${optText}</span>`;
 
       if (this.eliminatedOptions.has(idx)) {
         btn.disabled = true;
@@ -246,6 +272,7 @@ export class Phase1Controller {
     this.shieldActive = false;
     this.doublePointsActive = false;
     this.questionLocked = false;
+    this.onProgress?.({ questionIndex: this.qIndex, visibility: this.visibility });
     this.render();
   }
 

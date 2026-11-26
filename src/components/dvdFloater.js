@@ -15,6 +15,10 @@ export class DvdFloater {
     this.y = 90 + Math.random() * 140;
     this.vx = (Math.random() > 0.5 ? 1 : -1) * 235;
     this.vy = (Math.random() > 0.5 ? 1 : -1) * 190;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      this.vx = 0;
+      this.vy = 0;
+    }
     this.size = 88;
     this.colorIdx = 0;
 
@@ -52,6 +56,11 @@ export class DvdFloater {
       `Rostro de ${this.artist.name}`,
       'dvd-face-img'
     );
+    if (this.artist.files.faceCrop) {
+      btn.classList.add('has-face-crop');
+      img.style.transform = `scale(${this.artist.files.faceCrop.scale})`;
+      img.style.transformOrigin = this.artist.files.faceCrop.origin;
+    }
 
     const badge = document.createElement('span');
     badge.className = 'dvd-badge';

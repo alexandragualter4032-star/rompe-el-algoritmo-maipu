@@ -7,51 +7,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="./src/styles/main.css" />
-  <link rel="stylesheet" href="./src/styles/themes.css" />
 </head>
 <body class="theme-default">
-  <div id="app">
-    <!-- Top Global Bar -->
-    <header id="top-bar" class="top-bar hidden">
-      <div class="top-bar-left">
-        <button id="btn-home" class="icon-btn" title="Volver al menú">🏠 Menú</button>
-        <div class="level-badge">
-          <span id="hud-level">Nivel 1/12</span>
-          <span id="hud-artist" class="hud-artist-name">AKRILLA</span>
-        </div>
-      </div>
-
-      <div class="top-bar-center">
-        <div class="visibility-meter-wrap">
-          <div class="visibility-labels">
-            <span>📡 Visibilidad</span>
-            <span id="hud-visibility-text">0 / 350</span>
-          </div>
-          <div class="visibility-bar">
-            <div id="hud-visibility-fill" class="visibility-fill" style="width: 0%"></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="top-bar-right">
-        <button id="btn-mute" class="icon-btn" title="Silenciar / Activar sonido">🔊</button>
-        <button id="btn-pause" class="pause-btn" title="Pausar / Reanudar (Esc o P)">
-          <span id="pause-icon">⏸️</span> <span id="pause-label">Pausa</span>
-        </button>
-      </div>
-    </header>
-
-    <!-- Main Screen Container -->
-    <main id="screen-container" class="screen-container"></main>
-
-    <!-- DVD Floating Face Layer (Phase 1 only) -->
-    <div id="dvd-layer" class="dvd-layer hidden"></div>
-
-    <!-- Modal Overlay (Explanations, Facts, Wildcard Minigames, Pause) -->
-    <div id="modal-overlay" class="modal-overlay hidden"></div>
-  </div>
-
-  <script type="module" src="./src/main.js"></script>
+  <div id="app"></div>
+  <script type="module" src="/src/main.jsx"></script>
 </body>
 </html>

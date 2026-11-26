@@ -54,7 +54,7 @@ export class Phase2Controller {
         <div class="rhythm-sidebar">
           <div id="rhythm-art" class="rhythm-art-box"></div>
           <h3>${this.artist.name}</h3>
-          <p class="rhythm-song-tag">🎵 ${this.artist.albumTitle}</p>
+          <p class="rhythm-song-tag">🎵 ${this.artist.featuredSingle || this.artist.featuredAlbum || this.artist.albumTitle}</p>
           <div class="rhythm-stats">
             <div class="stat-box"><span>Combo</span><strong id="r-combo">0</strong></div>
             <div class="stat-box"><span>Aciertos</span><strong id="r-hits">0</strong></div>
@@ -73,7 +73,7 @@ export class Phase2Controller {
           <div class="song-time-wrap">
             <span>⏱️ Tiempo restante: <strong id="r-time-left">${this.artist.rhythm.durationSec}s</strong></span>
           </div>
-          <div id="r-feedback-banner" class="r-feedback-banner">Prepárate...</div>
+          <div id="r-feedback-banner" class="r-feedback-banner" role="status" aria-live="polite">Prepárate...</div>
         </div>
 
         <div class="rhythm-board-wrap">
@@ -100,9 +100,10 @@ export class Phase2Controller {
     const artBox = this.container.querySelector('#rhythm-art');
     artBox.appendChild(
       createArtistImage(
-        this.artist.files.photo,
+        this.artist.files.singleCover || this.artist.files.albumCover || this.artist.files.photo,
         getPhotoFallbackSvg(this.artist),
-        this.artist.name,
+        this.artist.files.singleCover || this.artist.files.albumCover
+          ? `Portada de ${this.artist.featuredSingle || this.artist.featuredAlbum || this.artist.albumTitle}` : this.artist.name,
         'rhythm-art-img'
       )
     );
