@@ -2,7 +2,7 @@
 
 Juego educativo de música y pensamiento crítico. Sus 12 niveles presentan proyectos musicales liderados por mujeres; cada nivel combina cuestionario, retroalimentación, material audiovisual y minijuego de ritmo.
 
-**Estado:** prototipo funcional en desarrollo. La aplicación se ejecuta localmente con Bun. El repositorio no tiene todavía una publicación web con progreso compartido.
+**Estado:** prototipo funcional en desarrollo. [Abrir demo pública en GitHub Pages](https://alexandragualter4032-star.github.io/rompe-el-algoritmo-maipu/). La aplicación completa con progreso se ejecuta localmente con Bun.
 
 ## Funcionalidades
 
@@ -83,7 +83,7 @@ La revisión basada en el capítulo de Richard E. Mayer y en práctica de recupe
 
 ### Demo estática en GitHub Pages
 
-GitHub Pages puede servir el `dist/` de Vite como demo sin cuenta. No ejecuta `server.ts`, la API, el inicio de sesión ni SQLite. El modo de prueba puede servir para mostrar la interfaz, pero el progreso no se guarda y el panel docente no funciona. Para usar Pages se requiere configurar la ruta base de Vite y una acción de GitHub Pages.
+El workflow `.github/workflows/pages.yml` compila y publica automáticamente cada cambio en `main`. Esta demo no ejecuta Bun ni una API: inicio de sesión, administración y guardado de progreso están desactivados. Para usar el juego con códigos y progreso se necesita alojar la API y una base persistente; consulta la sección de Vercel.
 
 ### Sitio completo en Vercel
 

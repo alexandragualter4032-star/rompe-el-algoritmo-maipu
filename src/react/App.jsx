@@ -3,8 +3,10 @@ import { api } from './api.js';
 import { AdminPanel } from './AdminPanel.jsx';
 import { Game } from './Game.jsx';
 
+const staticDemo = import.meta.env.VITE_STATIC_DEMO === 'true';
+
 export function App() {
-  const [auth, setAuth] = useState(null);
+  const [auth, setAuth] = useState(staticDemo ? { role: 'guest' } : null);
   const [loginMode, setLoginMode] = useState(new URLSearchParams(location.search).has('admin') ? 'admin' : 'student');
   const [demo, setDemo] = useState(false);
   const [debugLevel, setDebugLevel] = useState(null);
@@ -13,6 +15,7 @@ export function App() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
+    if (staticDemo) return;
     api('/api/me').then(setAuth).catch(() => setAuth({ role: 'guest' }));
   }, []);
 
@@ -56,6 +59,18 @@ export function App() {
   }
 
   if (demo) return <Game role="demo" onExit={() => setDemo(false)} />;
+
+  if (staticDemo) return <main className="auth-screen">
+    <div className="auth-card">
+      <div className="school-pill">🎧 Demo pública • GitHub Pages</div>
+      <h1 className="game-title">ROMPE EL ALGORITMO</h1>
+      <p className="game-subtitle">Descubre artistas, responde preguntas y haz que suene su música.</p>
+      <p className="auth-note">Esta versión es una demostración. No tiene inicio de sesión, panel docente ni guardado de progreso.</p>
+      <button className="primary-btn" type="button" onClick={() => setDemo(true)}>
+        ▶ Probar el juego
+      </button>
+    </div>
+  </main>;
 
   return <main className="auth-screen">
     <div className="auth-card">
