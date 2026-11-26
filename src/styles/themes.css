@@ -1,0 +1,122 @@
+/* Estética única por artista: cada nivel transforma fondo, paleta, luces y textura */
+
+body.theme-default {
+  --bg-main: radial-gradient(circle at 20% 20%, #241038 0%, #0d0816 70%);
+  --primary: #ff2e63;
+  --secondary: #08d9d6;
+  --accent: #ffe66d;
+  --border-glow: rgba(8, 217, 214, 0.45);
+}
+
+/* 1. AKRILLA — Urbano / Callejero Maipú */
+body.theme-akrilla {
+  --bg-main: linear-gradient(135deg, #16071b 0%, #2a0a24 45%, #071b24 100%);
+  --primary: #ff2e63;
+  --secondary: #08d9d6;
+  --accent: #eaeaea;
+  --border-glow: rgba(255, 46, 99, 0.6);
+  background-image: radial-gradient(rgba(8, 217, 214, 0.12) 1px, transparent 1px), var(--bg-main);
+  background-size: 24px 24px, 100% 100%;
+}
+
+/* 2. Princesa Alba — Pop Urbano brillante */
+body.theme-princesaalba {
+  --bg-main: linear-gradient(135deg, #33092b 0%, #59114d 50%, #1c092b 100%);
+  --primary: #ff66b3;
+  --secondary: #ffe66d;
+  --accent: #ffffff;
+  --border-glow: rgba(255, 102, 179, 0.6);
+}
+
+/* 3. Soulfia — R&B Nocturno neón */
+body.theme-soulfia {
+  --bg-main: radial-gradient(circle at top right, #3a125c 0%, #140c24 65%);
+  --primary: #b565ff;
+  --secondary: #ffd166;
+  --accent: #f8edeb;
+  --border-glow: rgba(181, 101, 255, 0.55);
+}
+
+/* 4. Ana Tijoux — Hip-Hop cálido / vinilo */
+body.theme-anatijoux {
+  --bg-main: linear-gradient(145deg, #21130b 0%, #3d1d0c 55%, #140d09 100%);
+  --primary: #f77f00;
+  --secondary: #fcbf49;
+  --accent: #eae2b7;
+  --border-glow: rgba(247, 127, 0, 0.55);
+}
+
+/* 5. Javiera Mena — Electropop Synth-Pop */
+body.theme-javieramena {
+  --bg-main: linear-gradient(160deg, #071329 0%, #180c36 55%, #07222b 100%);
+  --primary: #f15bb5;
+  --secondary: #00f5d4;
+  --accent: #fee440;
+  --border-glow: rgba(0, 245, 212, 0.55);
+}
+
+/* 6. Francisca Valenzuela — Pop-Rock Ruidosa */
+body.theme-franciscavalenzuela {
+  --bg-main: linear-gradient(135deg, #240d1a 0%, #102038 100%);
+  --primary: #ff4d6d;
+  --secondary: #4cc9f0;
+  --accent: #fff0f3;
+  --border-glow: rgba(255, 77, 109, 0.55);
+}
+
+/* 7. Mon Laferte — Retro-Teatral */
+body.theme-monlaferte {
+  --bg-main: radial-gradient(circle at center, #3b0b12 0%, #170508 75%);
+  --primary: #e63946;
+  --secondary: #f4a261;
+  --accent: #f1faee;
+  --border-glow: rgba(230, 57, 70, 0.6);
+}
+
+/* 8. Rubio — Art-Pop Experimental */
+body.theme-rubio {
+  --bg-main: linear-gradient(145deg, #08121f 0%, #1d1033 60%, #071c21 100%);
+  --primary: #9d4edd;
+  --secondary: #72efdd;
+  --accent: #e0aaff;
+  --border-glow: rgba(114, 239, 221, 0.5);
+}
+
+/* 9. chini.png — Art-Rock Pictórico */
+body.theme-chinipng {
+  --bg-main: linear-gradient(135deg, #161c18 0%, #262115 55%, #112422 100%);
+  --primary: #ff9f1c;
+  --secondary: #2ec4b6;
+  --accent: #cbf3f0;
+  --border-glow: rgba(255, 159, 28, 0.55);
+}
+
+/* 10. Snail Mail — Indie Rock */
+body.theme-snailmail {
+  --bg-main: linear-gradient(150deg, #0f1928 0%, #261425 100%);
+  --primary: #ff758f;
+  --secondary: #56cfe1;
+  --accent: #f8f9fa;
+  --border-glow: rgba(86, 207, 225, 0.55);
+}
+
+/* 11. Paramore — Pop-Punk Energía */
+body.theme-paramore {
+  --bg-main: linear-gradient(135deg, #260a10 0%, #3d1406 55%, #14080e 100%);
+  --primary: #ff5400;
+  --secondary: #ffbd00;
+  --accent: #ffffff;
+  --border-glow: rgba(255, 84, 0, 0.6);
+}
+
+/* 12. tricot — Math-Rock Geométrico Japonés */
+body.theme-tricot {
+  --bg-main: linear-gradient(135deg, #0c0d14 0%, #1a0b1c 50%, #071a21 100%);
+  --primary: #ff0055;
+  --secondary: #00e5ff;
+  --accent: #ffee00;
+  --border-glow: rgba(0, 229, 255, 0.6);
+  background-image: linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px), var(--bg-main);
+  background-size: 36px 36px, 36px 36px, 100% 100%;
+}

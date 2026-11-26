@@ -1,0 +1,4701 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rompe el Algoritmo — Colegio San Nicolás de Maipú</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
+  <style>
+:root {
+  --bg-main: #0f0a1a;
+  --bg-card: rgba(22, 16, 38, 0.88);
+  --primary: #ff2e63;
+  --secondary: #08d9d6;
+  --accent: #ffe66d;
+  --text-main: #f8f9fa;
+  --text-muted: #c7c9d9;
+  --border-glow: rgba(255, 46, 99, 0.45);
+  --font-display: 'Outfit', sans-serif;
+  --font-body: 'Space Grotesk', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--text-main);
+  background: var(--bg-main);
+  min-height: 100vh;
+  overflow-x: hidden;
+  transition: background 0.5s ease, color 0.3s ease;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* Top Global Bar */
+.top-bar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 1.4rem;
+  background: rgba(10, 8, 18, 0.88);
+  backdrop-filter: blur(12px);
+  border-bottom: 2px solid var(--border-glow);
+}
+
+.top-bar-left,
+.top-bar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.top-bar-center {
+  flex: 1;
+  max-width: 420px;
+}
+
+.level-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 0.35rem 0.8rem;
+  border-radius: 999px;
+  font-family: var(--font-display);
+  font-size: 0.92rem;
+}
+
+.hud-artist-name {
+  color: var(--secondary);
+  font-weight: 800;
+}
+
+.visibility-meter-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.visibility-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.visibility-bar {
+  height: 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.visibility-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  transition: width 0.35s ease;
+}
+
+.icon-btn,
+.pause-btn {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-main);
+  padding: 0.45rem 0.9rem;
+  border-radius: 10px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.2s ease;
+}
+
+.pause-btn {
+  border-color: var(--secondary);
+  background: rgba(8, 217, 214, 0.16);
+}
+
+.icon-btn:hover,
+.pause-btn:hover {
+  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.16);
+}
+
+/* Main Container */
+.screen-container {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 3rem;
+}
+
+/* Buttons */
+.primary-btn {
+  border: none;
+  border-radius: 14px;
+  padding: 0.9rem 1.6rem;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #fff;
+  background: linear-gradient(135deg, var(--primary), #ff6b35);
+  box-shadow: 0 8px 24px var(--border-glow);
+  cursor: pointer;
+  transition: transform 0.15s ease, filter 0.2s ease;
+}
+
+.primary-btn:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.08);
+}
+
+.secondary-btn {
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 14px;
+  padding: 0.85rem 1.4rem;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-main);
+  background: rgba(255, 255, 255, 0.08);
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.secondary-btn:hover {
+  background: rgba(255, 255, 255, 0.16);
+  transform: translateY(-1px);
+}
+
+/* Home Screen */
+.home-screen {
+  text-align: center;
+  padding-top: 1.5rem;
+}
+
+.school-pill {
+  display: inline-block;
+  padding: 0.45rem 1rem;
+  border-radius: 999px;
+  background: rgba(8, 217, 214, 0.14);
+  border: 1px solid var(--secondary);
+  color: var(--secondary);
+  font-weight: 700;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.game-title {
+  font-family: var(--font-display);
+  font-size: clamp(2.4rem, 5vw, 4rem);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  background: linear-gradient(90deg, #ffffff, var(--secondary), var(--primary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 0.75rem;
+}
+
+.game-subtitle {
+  max-width: 700px;
+  margin: 0 auto 2rem;
+  color: var(--text-muted);
+  font-size: 1.08rem;
+  line-height: 1.55;
+}
+
+.home-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+}
+
+.hero-btn {
+  font-size: 1.15rem;
+  padding: 1rem 2rem;
+}
+
+.infinite-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 14px;
+  padding: 0.7rem 1.4rem;
+  font-family: var(--font-display);
+  font-weight: 800;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-muted);
+  cursor: not-allowed;
+}
+
+.infinite-btn small {
+  font-weight: 500;
+  font-size: 0.78rem;
+  opacity: 0.85;
+}
+
+.infinite-btn.unlocked {
+  cursor: pointer;
+  color: #111;
+  border-color: var(--accent);
+  background: linear-gradient(135deg, var(--accent), var(--secondary));
+}
+
+.campaign-strip {
+  background: var(--bg-card);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 22px;
+  padding: 1.4rem;
+}
+
+.campaign-strip h3 {
+  font-family: var(--font-display);
+  margin-bottom: 1rem;
+}
+
+.level-chips {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 0.7rem;
+}
+
+.level-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.2rem;
+  padding: 0.7rem 0.85rem;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-main);
+  font-family: var(--font-body);
+  cursor: pointer;
+  text-align: left;
+  transition: transform 0.15s ease, border-color 0.2s ease;
+}
+
+.level-chip.open:hover,
+.level-chip.done:hover {
+  transform: translateY(-2px);
+  border-color: var(--secondary);
+}
+
+.level-chip.done {
+  border-color: rgba(8, 217, 214, 0.55);
+  background: rgba(8, 217, 214, 0.12);
+}
+
+.level-chip.locked {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.level-chip em {
+  font-style: normal;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  background: var(--primary);
+  color: #fff;
+}
+
+/* Phase 1 Layout */
+.phase1-layout {
+  display: grid;
+  grid-template-columns: 310px 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (max-width: 880px) {
+  .phase1-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .artist-stage-card {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    gap: 0.9rem;
+    align-items: center;
+  }
+
+  .decor-chip {
+    grid-column: 1 / -1;
+    margin-bottom: 0;
+  }
+
+  .artist-photo-frame {
+    max-width: 120px;
+    margin-bottom: 0;
+  }
+}
+
+.artist-stage-card {
+  background: var(--bg-card);
+  border: 2px solid var(--border-glow);
+  border-radius: 22px;
+  padding: 1.15rem;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+}
+
+.decor-chip {
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: var(--secondary);
+  margin-bottom: 0.75rem;
+}
+
+.artist-photo-frame {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  margin-bottom: 0.9rem;
+}
+
+.artist-photo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.artist-meta h2 {
+  font-family: var(--font-display);
+  font-size: 1.65rem;
+  margin-bottom: 0.2rem;
+}
+
+.artist-origin {
+  color: var(--secondary);
+  font-size: 0.88rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.artist-tagline {
+  color: var(--text-muted);
+  font-size: 0.92rem;
+  line-height: 1.45;
+  margin-bottom: 0.8rem;
+}
+
+.symbol-row {
+  display: flex;
+  gap: 0.5rem;
+  font-size: 1.35rem;
+}
+
+.question-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.maipu-spotlight {
+  background: linear-gradient(90deg, rgba(255, 46, 99, 0.28), rgba(8, 217, 214, 0.25));
+  border: 1px solid var(--secondary);
+  border-radius: 14px;
+  padding: 0.7rem 1rem;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.question-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.q-counter {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.05rem;
+  color: var(--secondary);
+}
+
+.q-no-timer {
+  font-size: 0.86rem;
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.08);
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+}
+
+.context-box,
+.question-box,
+.wildcards-bar {
+  background: var(--bg-card);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 20px;
+  padding: 1.2rem 1.35rem;
+}
+
+.context-box {
+  border-left: 5px solid var(--secondary);
+}
+
+.box-label {
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--secondary);
+  margin-bottom: 0.4rem;
+}
+
+.context-box p {
+  line-height: 1.55;
+  font-size: 1rem;
+}
+
+.extra-hint {
+  margin-top: 0.75rem;
+  padding: 0.6rem 0.85rem;
+  border-radius: 10px;
+  background: rgba(255, 230, 109, 0.14);
+  border: 1px solid var(--accent);
+  font-size: 0.9rem;
+}
+
+.question-box h3 {
+  font-family: var(--font-display);
+  font-size: 1.22rem;
+  line-height: 1.38;
+  margin-bottom: 0.85rem;
+}
+
+.active-buffs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.65rem;
+}
+
+.buff-pill {
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  background: rgba(255, 230, 109, 0.2);
+  border: 1px solid var(--accent);
+  color: var(--accent);
+}
+
+.options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.option-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  text-align: left;
+  padding: 0.85rem 1rem;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-main);
+  font-family: var(--font-body);
+  font-size: 0.98rem;
+  cursor: pointer;
+  transition: transform 0.12s ease, background 0.2s ease, border-color 0.2s ease;
+}
+
+.option-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.13);
+  border-color: var(--secondary);
+  transform: translateX(3px);
+}
+
+.opt-letter {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-display);
+  font-weight: 800;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.option-btn.correct {
+  background: rgba(46, 196, 182, 0.28);
+  border-color: #2ec4b6;
+}
+
+.option-btn.wrong {
+  background: rgba(230, 57, 70, 0.28);
+  border-color: #e63946;
+  color: #ffb3ba;
+  cursor: not-allowed;
+}
+
+.option-btn.eliminated {
+  opacity: 0.3;
+  text-decoration: line-through;
+  cursor: not-allowed;
+}
+
+.q-feedback {
+  margin-top: 0.9rem;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.q-feedback.success {
+  background: rgba(46, 196, 182, 0.22);
+  border: 1px solid #2ec4b6;
+}
+
+.q-feedback.retry {
+  background: rgba(255, 159, 28, 0.22);
+  border: 1px solid #ff9f1c;
+}
+
+.q-feedback.info {
+  background: rgba(86, 207, 225, 0.2);
+  border: 1px solid #56cfe1;
+}
+
+/* Wildcards */
+.wildcards-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-bottom: 0.65rem;
+}
+
+.wildcards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.7rem;
+}
+
+@media (max-width: 640px) {
+  .wildcards-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.wildcard-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.7rem 0.85rem;
+  border-radius: 14px;
+  border: 1px solid var(--secondary);
+  background: rgba(8, 217, 214, 0.14);
+  color: var(--text-main);
+  text-align: left;
+  cursor: pointer;
+  font-family: var(--font-body);
+  transition: transform 0.15s ease;
+}
+
+.wildcard-btn.ready:hover:not(:disabled) {
+  transform: translateY(-2px);
+  background: rgba(8, 217, 214, 0.24);
+}
+
+.wildcard-btn.charging,
+.wildcard-btn.used {
+  opacity: 0.52;
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.05);
+  cursor: not-allowed;
+}
+
+.wc-icon {
+  font-size: 1.4rem;
+}
+
+.wc-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.wc-text strong {
+  font-size: 0.92rem;
+}
+
+.wc-text small {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+}
+
+/* DVD Floating Layer */
+.dvd-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 35;
+}
+
+.dvd-face-btn {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  border: 3px solid var(--dvd-aura, #08d9d6);
+  background: rgba(15, 10, 26, 0.85);
+  padding: 4px;
+  cursor: pointer;
+  pointer-events: auto;
+  box-shadow: 0 0 22px var(--dvd-aura, #08d9d6);
+  animation: dvdPulse 2.2s ease-in-out infinite;
+}
+
+@keyframes dvdPulse {
+  0%, 100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.25);
+  }
+}
+
+.dvd-face-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+}
+
+.dvd-badge {
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--dvd-aura, #08d9d6);
+  color: #111;
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  font-weight: 900;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+/* Phase 2 Rhythm */
+.phase2-layout {
+  display: grid;
+  grid-template-columns: 310px 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (max-width: 820px) {
+  .phase2-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.rhythm-sidebar {
+  background: var(--bg-card);
+  border: 2px solid var(--border-glow);
+  border-radius: 22px;
+  padding: 1.2rem;
+}
+
+.rhythm-art-box {
+  width: 140px;
+  height: 140px;
+  margin: 0 auto 0.8rem;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 2px solid var(--secondary);
+}
+
+.rhythm-art-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.rhythm-sidebar h3 {
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+}
+
+.rhythm-song-tag {
+  text-align: center;
+  color: var(--secondary);
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.rhythm-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.stat-box {
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 0.55rem;
+  text-align: center;
+}
+
+.stat-box span {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.stat-box strong {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+}
+
+.approval-box {
+  margin-bottom: 0.9rem;
+}
+
+.approval-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.82rem;
+  font-weight: 700;
+  margin-bottom: 0.3rem;
+}
+
+.approval-bar {
+  position: relative;
+  height: 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  overflow: hidden;
+}
+
+.approval-fill {
+  height: 100%;
+  transition: width 0.2s ease, background 0.2s ease;
+}
+
+.approval-fill.passing {
+  background: #2ec4b6;
+}
+
+.approval-fill.failing {
+  background: #e63946;
+}
+
+.approval-target-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: #ffffff;
+}
+
+.song-time-wrap {
+  font-size: 0.9rem;
+  margin-bottom: 0.8rem;
+  text-align: center;
+}
+
+.r-feedback-banner {
+  text-align: center;
+  padding: 0.65rem;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.92rem;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.r-feedback-banner.good {
+  background: rgba(46, 196, 182, 0.24);
+  color: #80ffdb;
+}
+
+.r-feedback-banner.bad {
+  background: rgba(230, 57, 70, 0.28);
+  color: #ffb3ba;
+}
+
+.rhythm-board-wrap {
+  position: relative;
+  background: var(--bg-card);
+  border: 2px solid var(--border-glow);
+  border-radius: 22px;
+  padding: 1rem;
+}
+
+.rhythm-countdown {
+  position: absolute;
+  inset: 0;
+  z-index: 15;
+  display: grid;
+  place-items: center;
+  background: rgba(10, 8, 18, 0.72);
+  border-radius: 20px;
+  font-family: var(--font-display);
+  font-size: 4rem;
+  font-weight: 900;
+  color: var(--accent);
+}
+
+.rhythm-track {
+  position: relative;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.42);
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.hit-zone-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 44px;
+  background: rgba(255, 255, 255, 0.08);
+  border-top: 2px solid rgba(255, 255, 255, 0.35);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.35);
+  pointer-events: none;
+}
+
+.lanes-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  height: 100%;
+}
+
+.lane {
+  position: relative;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  transition: background 0.12s ease;
+}
+
+.lane:last-child {
+  border-right: none;
+}
+
+.lane.error-flash {
+  background: rgba(230, 57, 70, 0.35);
+}
+
+.lane-notes {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.rhythm-note {
+  position: absolute;
+  left: 14%;
+  width: 72%;
+  height: 36px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 1rem;
+  color: #111;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+}
+
+.lane-color-0 { background: #ff4d6d; color: #fff; }
+.lane-color-1 { background: #08d9d6; }
+.lane-color-2 { background: #ffe66d; }
+.lane-color-3 { background: #b565ff; color: #fff; }
+
+.lane-receptor {
+  position: absolute;
+  bottom: 12px;
+  left: 10%;
+  width: 80%;
+  padding: 0.45rem 0;
+  border-radius: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.32);
+  background: rgba(20, 20, 35, 0.85);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.lane-receptor .key-cap {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 1.1rem;
+}
+
+.lane-receptor small {
+  font-size: 0.68rem;
+  opacity: 0.75;
+}
+
+.lane-receptor.hit-flash {
+  border-color: #2ec4b6;
+  background: rgba(46, 196, 182, 0.45);
+}
+
+.lane-receptor.error-flash {
+  border-color: #e63946;
+  background: rgba(230, 57, 70, 0.55);
+}
+
+/* Modals */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: rgba(6, 4, 14, 0.82);
+  backdrop-filter: blur(8px);
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+}
+
+.modal-card {
+  width: 100%;
+  max-width: 560px;
+  background: #171226;
+  border: 2px solid var(--secondary);
+  border-radius: 24px;
+  padding: 1.7rem;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+  text-align: center;
+}
+
+.modal-badge,
+.wildcard-badge {
+  display: inline-block;
+  padding: 0.3rem 0.9rem;
+  border-radius: 999px;
+  background: rgba(8, 217, 214, 0.16);
+  color: var(--secondary);
+  font-weight: 800;
+  font-size: 0.82rem;
+  margin-bottom: 0.8rem;
+}
+
+.modal-card h2 {
+  font-family: var(--font-display);
+  font-size: 1.65rem;
+  margin-bottom: 0.9rem;
+}
+
+.modal-body {
+  text-align: left;
+  color: var(--text-muted);
+  line-height: 1.55;
+  margin-bottom: 1.4rem;
+}
+
+.explain-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.explain-list li {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.65rem 0.9rem;
+  border-radius: 12px;
+  color: var(--text-main);
+}
+
+.fact-text {
+  font-size: 1.12rem;
+  color: var(--text-main);
+  text-align: center;
+  background: rgba(255, 255, 255, 0.06);
+  padding: 1rem;
+  border-radius: 14px;
+}
+
+.modal-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  margin-top: 1.2rem;
+}
+
+/* Wildcard Minigames */
+.mg-timer-bar {
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  overflow: hidden;
+  margin: 0.85rem 0 1rem;
+}
+
+.mg-timer-fill {
+  height: 100%;
+  width: 100%;
+  background: var(--accent);
+}
+
+.mg-arena {
+  min-height: 170px;
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 16px;
+  padding: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.mg-drop-zone {
+  position: relative;
+  width: 100%;
+  height: 140px;
+}
+
+.mg-falling-icon {
+  position: absolute;
+  font-size: 2rem;
+  background: rgba(255, 255, 255, 0.14);
+  border: 2px solid var(--secondary);
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  cursor: pointer;
+}
+
+.mg-bar-track {
+  position: relative;
+  width: 100%;
+  height: 28px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  margin-bottom: 1rem;
+}
+
+.mg-bar-green {
+  position: absolute;
+  left: 34%;
+  width: 32%;
+  top: 0;
+  bottom: 0;
+  background: rgba(46, 196, 182, 0.55);
+  border: 2px solid #2ec4b6;
+  border-radius: 999px;
+}
+
+.mg-bar-cursor {
+  position: absolute;
+  top: -4px;
+  width: 10px;
+  height: 36px;
+  border-radius: 5px;
+  background: var(--accent);
+  transform: translateX(-50%);
+}
+
+.mg-break-btn {
+  padding: 0.9rem 1.4rem;
+  border-radius: 14px;
+  border: none;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  color: #111;
+  font-family: var(--font-display);
+  font-weight: 900;
+  cursor: pointer;
+  transition: transform 0.12s ease;
+}
+
+.mg-status {
+  margin-top: 0.85rem;
+  font-weight: 800;
+  min-height: 1.4rem;
+}
+
+.mg-status.win { color: #2ec4b6; }
+.mg-status.lose { color: #ff6b6b; }
+
+/* Gallery */
+.gallery-header {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 1rem;
+}
+
+.gallery-card {
+  background: var(--bg-card);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 18px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.gallery-card.unlocked {
+  border-color: var(--card-accent, var(--secondary));
+}
+
+.gal-img-wrap {
+  height: 180px;
+  background: rgba(0, 0, 0, 0.35);
+  display: grid;
+  place-items: center;
+}
+
+.gal-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.gal-locked-icon {
+  font-size: 2.5rem;
+  opacity: 0.4;
+}
+
+.gal-info {
+  padding: 0.95rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.gal-badges {
+  display: flex;
+  gap: 0.4rem;
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+
+.gal-level {
+  background: rgba(255, 255, 255, 0.12);
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+}
+
+.gal-maipu {
+  background: var(--primary);
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+}
+
+.gal-info p {
+  font-size: 0.84rem;
+  color: var(--text-muted);
+}
+
+.small-play-btn {
+  margin-top: 0.35rem;
+  padding: 0.45rem 0.8rem;
+  border-radius: 10px;
+  border: none;
+  background: var(--secondary);
+  color: #111;
+  font-family: var(--font-display);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+/* Estética única por artista: cada nivel transforma fondo, paleta, luces y textura */
+
+body.theme-default {
+  --bg-main: radial-gradient(circle at 20% 20%, #241038 0%, #0d0816 70%);
+  --primary: #ff2e63;
+  --secondary: #08d9d6;
+  --accent: #ffe66d;
+  --border-glow: rgba(8, 217, 214, 0.45);
+}
+
+/* 1. AKRILLA — Urbano / Callejero Maipú */
+body.theme-akrilla {
+  --bg-main: linear-gradient(135deg, #16071b 0%, #2a0a24 45%, #071b24 100%);
+  --primary: #ff2e63;
+  --secondary: #08d9d6;
+  --accent: #eaeaea;
+  --border-glow: rgba(255, 46, 99, 0.6);
+  background-image: radial-gradient(rgba(8, 217, 214, 0.12) 1px, transparent 1px), var(--bg-main);
+  background-size: 24px 24px, 100% 100%;
+}
+
+/* 2. Princesa Alba — Pop Urbano brillante */
+body.theme-princesaalba {
+  --bg-main: linear-gradient(135deg, #33092b 0%, #59114d 50%, #1c092b 100%);
+  --primary: #ff66b3;
+  --secondary: #ffe66d;
+  --accent: #ffffff;
+  --border-glow: rgba(255, 102, 179, 0.6);
+}
+
+/* 3. Soulfia — R&B Nocturno neón */
+body.theme-soulfia {
+  --bg-main: radial-gradient(circle at top right, #3a125c 0%, #140c24 65%);
+  --primary: #b565ff;
+  --secondary: #ffd166;
+  --accent: #f8edeb;
+  --border-glow: rgba(181, 101, 255, 0.55);
+}
+
+/* 4. Ana Tijoux — Hip-Hop cálido / vinilo */
+body.theme-anatijoux {
+  --bg-main: linear-gradient(145deg, #21130b 0%, #3d1d0c 55%, #140d09 100%);
+  --primary: #f77f00;
+  --secondary: #fcbf49;
+  --accent: #eae2b7;
+  --border-glow: rgba(247, 127, 0, 0.55);
+}
+
+/* 5. Javiera Mena — Electropop Synth-Pop */
+body.theme-javieramena {
+  --bg-main: linear-gradient(160deg, #071329 0%, #180c36 55%, #07222b 100%);
+  --primary: #f15bb5;
+  --secondary: #00f5d4;
+  --accent: #fee440;
+  --border-glow: rgba(0, 245, 212, 0.55);
+}
+
+/* 6. Francisca Valenzuela — Pop-Rock Ruidosa */
+body.theme-franciscavalenzuela {
+  --bg-main: linear-gradient(135deg, #240d1a 0%, #102038 100%);
+  --primary: #ff4d6d;
+  --secondary: #4cc9f0;
+  --accent: #fff0f3;
+  --border-glow: rgba(255, 77, 109, 0.55);
+}
+
+/* 7. Mon Laferte — Retro-Teatral */
+body.theme-monlaferte {
+  --bg-main: radial-gradient(circle at center, #3b0b12 0%, #170508 75%);
+  --primary: #e63946;
+  --secondary: #f4a261;
+  --accent: #f1faee;
+  --border-glow: rgba(230, 57, 70, 0.6);
+}
+
+/* 8. Rubio — Art-Pop Experimental */
+body.theme-rubio {
+  --bg-main: linear-gradient(145deg, #08121f 0%, #1d1033 60%, #071c21 100%);
+  --primary: #9d4edd;
+  --secondary: #72efdd;
+  --accent: #e0aaff;
+  --border-glow: rgba(114, 239, 221, 0.5);
+}
+
+/* 9. chini.png — Art-Rock Pictórico */
+body.theme-chinipng {
+  --bg-main: linear-gradient(135deg, #161c18 0%, #262115 55%, #112422 100%);
+  --primary: #ff9f1c;
+  --secondary: #2ec4b6;
+  --accent: #cbf3f0;
+  --border-glow: rgba(255, 159, 28, 0.55);
+}
+
+/* 10. Snail Mail — Indie Rock */
+body.theme-snailmail {
+  --bg-main: linear-gradient(150deg, #0f1928 0%, #261425 100%);
+  --primary: #ff758f;
+  --secondary: #56cfe1;
+  --accent: #f8f9fa;
+  --border-glow: rgba(86, 207, 225, 0.55);
+}
+
+/* 11. Paramore — Pop-Punk Energía */
+body.theme-paramore {
+  --bg-main: linear-gradient(135deg, #260a10 0%, #3d1406 55%, #14080e 100%);
+  --primary: #ff5400;
+  --secondary: #ffbd00;
+  --accent: #ffffff;
+  --border-glow: rgba(255, 84, 0, 0.6);
+}
+
+/* 12. tricot — Math-Rock Geométrico Japonés */
+body.theme-tricot {
+  --bg-main: linear-gradient(135deg, #0c0d14 0%, #1a0b1c 50%, #071a21 100%);
+  --primary: #ff0055;
+  --secondary: #00e5ff;
+  --accent: #ffee00;
+  --border-glow: rgba(0, 229, 255, 0.6);
+  background-image: linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px), var(--bg-main);
+  background-size: 36px 36px, 36px 36px, 100% 100%;
+}
+
+  </style>
+</head>
+<body class="theme-default">
+  <div id="app">
+    <header id="top-bar" class="top-bar hidden">
+      <div class="top-bar-left">
+        <button id="btn-home" class="icon-btn" title="Volver al menú">🏠 Menú</button>
+        <div class="level-badge">
+          <span id="hud-level">Nivel 1/12</span>
+          <span id="hud-artist" class="hud-artist-name">AKRILLA</span>
+        </div>
+      </div>
+      <div class="top-bar-center">
+        <div class="visibility-meter-wrap">
+          <div class="visibility-labels">
+            <span>📡 Visibilidad</span>
+            <span id="hud-visibility-text">0 / 350</span>
+          </div>
+          <div class="visibility-bar">
+            <div id="hud-visibility-fill" class="visibility-fill" style="width: 0%"></div>
+          </div>
+        </div>
+      </div>
+      <div class="top-bar-right">
+        <button id="btn-mute" class="icon-btn" title="Silenciar / Activar sonido">🔊</button>
+        <button id="btn-pause" class="pause-btn" title="Pausar / Reanudar (Esc o P)">
+          <span id="pause-icon">⏸️</span> <span id="pause-label">Pausa</span>
+        </button>
+      </div>
+    </header>
+    <main id="screen-container" class="screen-container"></main>
+    <div id="dvd-layer" class="dvd-layer hidden"></div>
+    <div id="modal-overlay" class="modal-overlay hidden"></div>
+  </div>
+  <script>
+// --- artists.js ---
+const ARTISTS = [
+  {
+    id: 'akrilla',
+    level: 1,
+    name: 'AKRILLA',
+    origin: 'Maipú, Santiago (Chile)',
+    isMaipuLocal: true,
+    genre: 'Urbano / Trap / Reggaetón Experimental',
+    tagline: 'Desde las calles de Maipú para el mundo: rompiendo el molde del género urbano.',
+    albumTitle: 'Epistolares',
+    themeClass: 'theme-akrilla',
+    colors: {
+      primary: '#ff2e63',
+      secondary: '#08d9d6',
+      accent: '#eaeaea',
+      bg: '#120816',
+    },
+    symbols: ['🚇', '🎤', '⚡', '🎧', '🌆'],
+    decorLabel: 'ESTACIÓN MAIPÚ • ZONA URBANA',
+    files: {
+      audio: './public/music/akrilla.mp3',
+      photo: './public/images/akrilla_foto.jpg',
+      face: './public/images/akrilla_cara.png',
+    },
+    synth: {
+      bpm: 108,
+      scale: [220, 261.63, 293.66, 329.63, 392.0],
+      bassPattern: [110, 0, 110, 130.81, 98, 0, 110, 146.83],
+      wave: 'sawtooth',
+      style: 'urban',
+    },
+    rhythm: {
+      durationSec: 32,
+      speedPxPerSec: 250,
+      spawnIntervalMs: 740,
+      minApprovalPct: 60,
+    },
+  },
+  {
+    id: 'princesaalba',
+    level: 2,
+    name: 'Princesa Alba',
+    origin: 'Santiago, Chile',
+    genre: 'Pop Urbano',
+    tagline: 'Brillo, cancha y pop chileno hecho con autogestión y actitud.',
+    albumTitle: 'Besitos, cuídate',
+    themeClass: 'theme-princesaalba',
+    colors: {
+      primary: '#ff66b3',
+      secondary: '#ffe66d',
+      accent: '#ffffff',
+      bg: '#2b0924',
+    },
+    symbols: ['👑', '💖', '✨', '⚽', '💅'],
+    decorLabel: 'POP URBANO • BRILLO & CANCHA',
+    files: {
+      audio: './public/music/princesaalba.mp3',
+      photo: './public/images/princesaalba_foto.jpg',
+      face: './public/images/princesaalba_cara.png',
+    },
+    synth: {
+      bpm: 114,
+      scale: [261.63, 293.66, 329.63, 392.0, 440.0],
+      bassPattern: [130.81, 0, 164.81, 130.81, 146.83, 0, 196.0, 146.83],
+      wave: 'triangle',
+      style: 'pop',
+    },
+    rhythm: {
+      durationSec: 33,
+      speedPxPerSec: 265,
+      spawnIntervalMs: 700,
+      minApprovalPct: 60,
+    },
+  },
+  {
+    id: 'soulfia',
+    level: 3,
+    name: 'Soulfia',
+    origin: 'Santiago, Chile',
+    genre: 'R&B / Pop Urbano',
+    tagline: 'Voz poderosa del R&B chileno que conquistó escenarios desde la independencia.',
+    albumTitle: 'Brujerías de Cantina',
+    themeClass: 'theme-soulfia',
+    colors: {
+      primary: '#b565ff',
+      secondary: '#ffd166',
+      accent: '#f8edeb',
+      bg: '#140c24',
+    },
+    symbols: ['🔮', '🌙', '✨', '🎙️', '💜'],
+    decorLabel: 'NEÓN R&B • VIBRA NOCTURNA',
+    files: {
+      audio: './public/music/soulfia.mp3',
+      photo: './public/images/soulfia_foto.jpg',
+      face: './public/images/soulfia_cara.png',
+    },
+    synth: {
+      bpm: 102,
+      scale: [246.94, 293.66, 329.63, 369.99, 440.0],
+      bassPattern: [123.47, 0, 146.83, 0, 110, 0, 164.81, 123.47],
+      wave: 'sine',
+      style: 'rnb',
+    },
+    rhythm: {
+      durationSec: 34,
+      speedPxPerSec: 275,
+      spawnIntervalMs: 670,
+      minApprovalPct: 62,
+    },
+  },
+  {
+    id: 'anatijoux',
+    level: 4,
+    name: 'Ana Tijoux',
+    origin: 'Chile / Francia',
+    genre: 'Hip-Hop / Rap Consciente',
+    tagline: 'Rimas con historia, memoria y fuerza frente a una industria dominada por hombres.',
+    albumTitle: '1977',
+    themeClass: 'theme-anatijoux',
+    colors: {
+      primary: '#f77f00',
+      secondary: '#fcbf49',
+      accent: '#eae2b7',
+      bg: '#1b120c',
+    },
+    symbols: ['📻', '✊', '🎤', '🔥', '🥁'],
+    decorLabel: 'HIP-HOP CONSCIENTE • VINILO & RIMA',
+    files: {
+      audio: './public/music/anatijoux.mp3',
+      photo: './public/images/anatijoux_foto.jpg',
+      face: './public/images/anatijoux_cara.png',
+    },
+    synth: {
+      bpm: 96,
+      scale: [196.0, 233.08, 261.63, 293.66, 349.23],
+      bassPattern: [98, 98, 0, 116.54, 130.81, 0, 98, 87.31],
+      wave: 'square',
+      style: 'hiphop',
+    },
+    rhythm: {
+      durationSec: 35,
+      speedPxPerSec: 290,
+      spawnIntervalMs: 640,
+      minApprovalPct: 62,
+    },
+  },
+  {
+    id: 'javieramena',
+    level: 5,
+    name: 'Javiera Mena',
+    origin: 'Santiago, Chile',
+    genre: 'Electropop / Synth-Pop',
+    tagline: 'Pionera del electropop latinoamericano hecha a punta de sintetizadores y autogestión.',
+    albumTitle: 'Mena',
+    themeClass: 'theme-javieramena',
+    colors: {
+      primary: '#00f5d4',
+      secondary: '#f15bb5',
+      accent: '#fee440',
+      bg: '#081226',
+    },
+    symbols: ['🎹', '🌌', '⚡', '💿', '🕹️'],
+    decorLabel: 'SYNTH-POP • LUCES DE NEÓN',
+    files: {
+      audio: './public/music/javieramena.mp3',
+      photo: './public/images/javieramena_foto.jpg',
+      face: './public/images/javieramena_cara.png',
+    },
+    synth: {
+      bpm: 124,
+      scale: [261.63, 311.13, 349.23, 392.0, 466.16],
+      bassPattern: [130.81, 130.81, 155.56, 155.56, 174.61, 174.61, 196.0, 155.56],
+      wave: 'sawtooth',
+      style: 'synth',
+    },
+    rhythm: {
+      durationSec: 35,
+      speedPxPerSec: 300,
+      spawnIntervalMs: 610,
+      minApprovalPct: 63,
+    },
+  },
+  {
+    id: 'franciscavalenzuela',
+    level: 6,
+    name: 'Francisca Valenzuela',
+    origin: 'Chile / EE.UU.',
+    genre: 'Pop-Rock / Alternativo',
+    tagline: 'Piano, rock y la creación de Ruidosa para abrir espacios a mujeres en festivales.',
+    albumTitle: 'Tajo Abierto',
+    themeClass: 'theme-franciscavalenzuela',
+    colors: {
+      primary: '#ff4d6d',
+      secondary: '#4cc9f0',
+      accent: '#fff0f3',
+      bg: '#1c0f18',
+    },
+    symbols: ['🎹', '📢', '🎸', '🌟', '✊'],
+    decorLabel: 'FESTIVAL RUIDOSA • POP-ROCK',
+    files: {
+      audio: './public/music/franciscavalenzuela.mp3',
+      photo: './public/images/franciscavalenzuela_foto.jpg',
+      face: './public/images/franciscavalenzuela_cara.png',
+    },
+    synth: {
+      bpm: 120,
+      scale: [293.66, 329.63, 369.99, 440.0, 493.88],
+      bassPattern: [146.83, 0, 146.83, 185.0, 220.0, 0, 196.0, 146.83],
+      wave: 'triangle',
+      style: 'rock',
+    },
+    rhythm: {
+      durationSec: 36,
+      speedPxPerSec: 310,
+      spawnIntervalMs: 590,
+      minApprovalPct: 63,
+    },
+  },
+  {
+    id: 'monlaferte',
+    level: 7,
+    name: 'Mon Laferte',
+    origin: 'Viña del Mar, Chile / México',
+    genre: 'Rock Alternativo / Retro-Teatral',
+    tagline: 'Intensidad escénica, estética retro y una carrera construida contra todo pronóstico.',
+    albumTitle: 'Norma',
+    themeClass: 'theme-monlaferte',
+    colors: {
+      primary: '#e63946',
+      secondary: '#f4a261',
+      accent: '#f1faee',
+      bg: '#1e080c',
+    },
+    symbols: ['🌹', '🎭', '💋', '🎸', '🕯️'],
+    decorLabel: 'ESCENARIO RETRO-TEATRAL • PASIÓN',
+    files: {
+      audio: './public/music/monlaferte.mp3',
+      photo: './public/images/monlaferte_foto.jpg',
+      face: './public/images/monlaferte_cara.png',
+    },
+    synth: {
+      bpm: 112,
+      scale: [220.0, 246.94, 261.63, 329.63, 349.23],
+      bassPattern: [110, 0, 164.81, 110, 130.81, 0, 174.61, 164.81],
+      wave: 'sawtooth',
+      style: 'retro',
+    },
+    rhythm: {
+      durationSec: 36,
+      speedPxPerSec: 320,
+      spawnIntervalMs: 570,
+      minApprovalPct: 64,
+    },
+  },
+  {
+    id: 'rubio',
+    level: 8,
+    name: 'Rubio',
+    origin: 'Santiago, Chile',
+    genre: 'Art-Pop / Electrónica Experimental',
+    tagline: 'Capas sonoras, visuales hipnóticos y experimentación sin pedir permiso.',
+    albumTitle: 'Pez',
+    themeClass: 'theme-rubio',
+    colors: {
+      primary: '#72efdd',
+      secondary: '#9d4edd',
+      accent: '#e0aaff',
+      bg: '#0b101b',
+    },
+    symbols: ['🐟', '🌊', '🔮', '🎛️', '🦋'],
+    decorLabel: 'ART-POP EXPERIMENTAL • ONDAS',
+    files: {
+      audio: './public/music/rubio.mp3',
+      photo: './public/images/rubio_foto.jpg',
+      face: './public/images/rubio_cara.png',
+    },
+    synth: {
+      bpm: 118,
+      scale: [261.63, 293.66, 349.23, 392.0, 493.88],
+      bassPattern: [130.81, 0, 196.0, 0, 174.61, 130.81, 220.0, 0],
+      wave: 'sine',
+      style: 'artpop',
+    },
+    rhythm: {
+      durationSec: 37,
+      speedPxPerSec: 330,
+      spawnIntervalMs: 550,
+      minApprovalPct: 64,
+    },
+  },
+  {
+    id: 'chinipng',
+    level: 9,
+    name: 'chini.png',
+    origin: 'Santiago, Chile',
+    genre: 'Art-Rock / Indie Pictórico',
+    tagline: 'Pintura, guitarras indie y poesía visual que no encaja en listas comerciales.',
+    albumTitle: 'El Día Libre de Polux',
+    themeClass: 'theme-chinipng',
+    colors: {
+      primary: '#ff9f1c',
+      secondary: '#2ec4b6',
+      accent: '#cbf3f0',
+      bg: '#161b18',
+    },
+    symbols: ['🎨', '🖼️', '🎸', '🖍️', '🌿'],
+    decorLabel: 'ART-ROCK PICTÓRICO • LIENZO INDIE',
+    files: {
+      audio: './public/music/chinipng.mp3',
+      photo: './public/images/chinipng_foto.jpg',
+      face: './public/images/chinipng_cara.png',
+    },
+    synth: {
+      bpm: 122,
+      scale: [246.94, 293.66, 349.23, 392.0, 440.0],
+      bassPattern: [123.47, 146.83, 0, 196.0, 174.61, 0, 146.83, 123.47],
+      wave: 'triangle',
+      style: 'indie',
+    },
+    rhythm: {
+      durationSec: 38,
+      speedPxPerSec: 340,
+      spawnIntervalMs: 530,
+      minApprovalPct: 65,
+    },
+  },
+  {
+    id: 'snailmail',
+    level: 10,
+    name: 'Snail Mail',
+    origin: 'Maryland, EE.UU.',
+    genre: 'Indie Rock / Rock Alternativo',
+    tagline: 'Guitarras crudas y honestidad adolescente que desafió las etiquetas de la prensa.',
+    albumTitle: 'Lush',
+    themeClass: 'theme-snailmail',
+    colors: {
+      primary: '#56cfe1',
+      secondary: '#ff758f',
+      accent: '#f8f9fa',
+      bg: '#101926',
+    },
+    symbols: ['🐌', '✉️', '🎸', '📼', '🌙'],
+    decorLabel: 'INDIE ROCK • CASSETTE & GUITARRA',
+    files: {
+      audio: './public/music/snailmail.mp3',
+      photo: './public/images/snailmail_foto.jpg',
+      face: './public/images/snailmail_cara.png',
+    },
+    synth: {
+      bpm: 126,
+      scale: [261.63, 293.66, 329.63, 392.0, 440.0],
+      bassPattern: [130.81, 130.81, 164.81, 196.0, 146.83, 146.83, 196.0, 164.81],
+      wave: 'sawtooth',
+      style: 'indie',
+    },
+    rhythm: {
+      durationSec: 38,
+      speedPxPerSec: 350,
+      spawnIntervalMs: 510,
+      minApprovalPct: 65,
+    },
+  },
+  {
+    id: 'paramore',
+    level: 11,
+    name: 'Paramore',
+    origin: 'Tennessee, EE.UU.',
+    genre: 'Pop-Punk / Rock Alternativo',
+    tagline: 'Hayley Williams liderando una banda en una escena rockera que dudaba de las mujeres.',
+    albumTitle: 'After Laughter',
+    themeClass: 'theme-paramore',
+    colors: {
+      primary: '#ff5400',
+      secondary: '#ffbd00',
+      accent: '#ffffff',
+      bg: '#1a0b12',
+    },
+    symbols: ['🔥', '⚡', '🎸', '🧡', '🤘'],
+    decorLabel: 'POP-PUNK • ENERGÍA DE ESTADIO',
+    files: {
+      audio: './public/music/paramore.mp3',
+      photo: './public/images/paramore_foto.jpg',
+      face: './public/images/paramore_cara.png',
+    },
+    synth: {
+      bpm: 136,
+      scale: [293.66, 349.23, 392.0, 440.0, 523.25],
+      bassPattern: [146.83, 146.83, 174.61, 196.0, 220.0, 220.0, 196.0, 174.61],
+      wave: 'square',
+      style: 'rock',
+    },
+    rhythm: {
+      durationSec: 40,
+      speedPxPerSec: 365,
+      spawnIntervalMs: 490,
+      minApprovalPct: 65,
+    },
+  },
+  {
+    id: 'tricot',
+    level: 12,
+    name: 'tricot',
+    origin: 'Kioto, Japón',
+    genre: 'Math-Rock / Rock Alternativo',
+    tagline: 'Precisión geométrica, guitarras frenéticas y sello propio desde Japón.',
+    albumTitle: 'T H E',
+    themeClass: 'theme-tricot',
+    colors: {
+      primary: '#ff0055',
+      secondary: '#00e5ff',
+      accent: '#ffee00',
+      bg: '#0f1016',
+    },
+    symbols: ['🔺', '◼️', '⚡', '🎸', '🇯🇵'],
+    decorLabel: 'MATH-ROCK JAPONÉS • GEOMETRÍA PURA',
+    files: {
+      audio: './public/music/tricot.mp3',
+      photo: './public/images/tricot_foto.jpg',
+      face: './public/images/tricot_cara.png',
+    },
+    synth: {
+      bpm: 142,
+      scale: [261.63, 311.13, 392.0, 466.16, 523.25],
+      bassPattern: [130.81, 155.56, 196.0, 130.81, 233.08, 196.0, 155.56, 174.61],
+      wave: 'sawtooth',
+      style: 'math',
+    },
+    rhythm: {
+      durationSec: 42,
+      speedPxPerSec: 380,
+      spawnIntervalMs: 465,
+      minApprovalPct: 65,
+    },
+  },
+];
+
+
+// --- questions.js ---
+// 5 preguntas únicas por artista (60 preguntas en total).
+// Enfoque 100% en identidad, brechas de género, sesgos algorítmicos y citas reales.
+// Cero teoría musical.
+
+const QUESTIONS = {
+  akrilla: [
+    {
+      id: 'akrilla-1',
+      context: 'AKRILLA (Fernanda Sepúlveda) creció en Maipú y desde su pieza empezó a mezclar trap, reggaetón y sonidos experimentales, demostrando que no hace falta venir de grandes estudios para sonar fuerte.',
+      question: '¿Por qué es tan importante para la escena chilena que una referente como AKRILLA haya surgido desde Maipú?',
+      options: [
+        'Porque demuestra que el talento urbano de comunas periféricas puede llegar a grandes escenarios sin perder su identidad.',
+        'Porque en Maipú está prohibido escuchar música pop internacional.',
+        'Porque solo los artistas de Maipú pueden subir canciones a plataformas digitales.',
+        'Porque Maipú tiene las únicas radios de trap del continente.',
+      ],
+      correctIndex: 0,
+      feedback: '¡Exacto! AKRILLA representa el orgullo de Maipú y abre camino para jóvenes de cualquier comuna.',
+    },
+    {
+      id: 'akrilla-2',
+      context: 'En entrevistas sobre el movimiento urbano chileno, AKRILLA ha comentado que al principio muchos dudaban de que una mujer pudiera producir o liderar un proyecto de trap oscuro y experimental sin depender de un hombre.',
+      question: 'Según lo que ha vivido AKRILLA, ¿qué prejuicio de género enfrentan las mujeres en el género urbano?',
+      options: [
+        'Se asume que solo pueden cantar coros suaves y no liderar ni producir sus propios proyectos.',
+        'Se les exige tocar guitarra acústica antes de grabar reggaetón.',
+        'Las plataformas borran automáticamente las voces femeninas de trap.',
+        'No pueden usar apodos artísticos en inglés.',
+      ],
+      correctIndex: 0,
+      feedback: '¡Muy bien! Muchas veces se subestima a las mujeres en roles de liderazgo y producción urbana.',
+    },
+    {
+      id: 'akrilla-3',
+      context: 'Los algoritmos de streaming suelen recomendar en automático las mismas 10 canciones comerciales de siempre, dejando ocultas propuestas frescas como las de AKRILLA.',
+      question: '¿Cómo afecta el algoritmo de las plataformas a artistas emergentes como AKRILLA?',
+      options: [
+        'Prioriza canciones virales de grandes sellos y reduce la visibilidad de propuestas nuevas o distintas.',
+        'Regala entradas a conciertos a quienes escuchan menos música.',
+        'Traduce todas las letras al inglés para que nadie las entienda.',
+        'Solo funciona los fines de semana para artistas chilenas.',
+      ],
+      correctIndex: 0,
+      feedback: '¡Correcto! El algoritmo premia lo que ya es masivo, dificultando descubrir voces nuevas.',
+    },
+    {
+      id: 'akrilla-4',
+      context: 'En su disco "Epistolares", AKRILLA eligió letras muy personales y una estética propia, en vez de copiar la fórmula repetitiva de los hits virales de turno.',
+      question: '¿Qué mensaje deja la apuesta artística de AKRILLA frente a la presión comercial?',
+      options: [
+        'Que ser auténtica y contar historias reales conecta más que seguir una receta viral.',
+        'Que todas las canciones deben durar exactamente 1 minuto.',
+        'Que es mejor no publicar discos completos en internet.',
+        'Que solo importa tener millones de seguidores antes de grabar.',
+      ],
+      correctIndex: 0,
+      feedback: '¡Así es! La autenticidad de AKRILLA la llevó incluso a festivales internacionales.',
+    },
+    {
+      id: 'akrilla-5',
+      context: 'Cuando una persona busca "urbano chileno" en una app de música, las primeras listas oficiales suelen estar llenas casi exclusivamente de hombres.',
+      question: '¿Qué puedes hacer tú como oyente para ayudar a romper esa brecha en las plataformas?',
+      options: [
+        'Buscar, guardar en playlists y compartir activamente a artistas mujeres como AKRILLA.',
+        'Dejar el celular en silencio todo el día.',
+        'Escuchar únicamente la lista "Top 10 Global" todos los días.',
+        'Bloquear todas las canciones que tengan menos de un millón de visitas.',
+      ],
+      correctIndex: 0,
+      feedback: '¡Bien! Tus reproducciones, guardados y recomendaciones entrenan al algoritmo a mostrar más diversidad.',
+    },
+  ],
+
+  princesaalba: [
+    {
+      id: 'princesaalba-1',
+      context: 'Princesa Alba se hizo conocida en 2017 con un video grabado en el estadio de Colo-Colo. En vez de tener un gran sello detrás, ella misma impulsó su proyecto desde internet.',
+      question: '¿Qué demostró el inicio de la carrera de Princesa Alba en la música chilena?',
+      options: [
+        'Que una artista mujer puede usar el humor, el fútbol y la autogestión para abrirse paso sin pedir permiso.',
+        'Que es obligatorio ser futbolista profesional para cantar pop.',
+        'Que solo las grandes disqueras pueden grabar videoclips en Chile.',
+        'Que las redes sociales no sirven para difundir música nacional.',
+      ],
+      correctIndex: 0,
+      feedback: '¡Exacto! Princesa Alba transformó comentarios en impulso para crear su propio camino.',
+    },
+    {
+      id: 'princesaalba-2',
+      context: 'Princesa Alba ha contado en entrevistas que al inicio recibió muchos comentarios burlándose de su voz y su aspecto, críticas que casi nunca se les hacen con tanta dureza a los cantantes hombres que recién parten.',
+      question: '¿Qué desigualdad refleja esa experiencia que denunció Princesa Alba?',
+      options: [
+        'Que a las mujeres en la música se les juzga mucho más por su apariencia y se les exige perfección desde el día uno.',
+        'Que a los hombres no les permiten grabar videoclips en estadios.',
+        'Que el pop urbano está prohibido en las radios chilenas.',
+        'Que las mujeres no pueden escribir sus propias canciones.',
+      ],
+      correctIndex: 0,
+      feedback: '¡Correcto! La doble vara de exigencia hacia las mujeres es una brecha muy real en la industria.',
+    },
+    {
+      id: 'princesaalba-3',
+      context: 'Muchas playlists de "Pop Latino" en streaming agrupan a artistas hombres arriba y dejan a pocas mujeres en los puestos finales.',
+      question: '¿Por qué es un problema que las listas editoriales muestren menos mujeres?',
+      options: [
+        'Porque menos gente las descubre, reciben menos reproducciones y ganan menos ingresos por su trabajo.',
+        'Porque las canciones de mujeres pesan más megabytes en internet.',
+        'Porque el público joven no sabe usar buscadores.',
+        'Porque las plataformas cierran las cuentas con pocas canciones.',
+      ],
+      correctIndex: 0,
+      feedback: '¡Exacto! Estar visible en playlists define cuántas personas conocen a una artista.',
+    },
+    {
+      id: 'princesaalba-4',
+      context: 'Con canciones como "Convéncete" y su disco "Besitos, cuídate", Princesa Alba pasó de ser subestimada en redes a llenar teatros y girar por otros países.',
+      question: '¿Cuál fue la clave de su crecimiento frente a quienes la criticaban al comienzo?',
+      options: [
+        'Seguir trabajando, profesionalizar su propuesta y conectar con una comunidad fiel.',
+        'Cambiar su nombre a uno en japonés para engañar al algoritmo.',
+        'Dejar de cantar en español para sonar en radios de otro idioma.',
+        'Borrar todas sus canciones antiguas de internet.',
+      ],
+      correctIndex: 0,
+      feedback: '¡Bien! La constancia y el apoyo de su comunidad hicieron crecer su proyecto.',
+    },
+    {
+      id: 'princesaalba-5',
+      context: 'En festivales masivos en Chile, durante años el porcentaje de artistas mujeres en el cartel fue muy bajo comparado con el de hombres.',
+      question: '¿Cómo ayuda el éxito de artistas como Princesa Alba a cambiar esos carteles?',
+      options: [
+        'Demuestra que las mujeres convocan público masivo y merecen horarios principales.',
+        'Obliga a los festivales a eliminar los escenarios al aire libre.',
+        'Hace que los conciertos duren solamente 15 minutos.',
+        'Impide que participen bandas de rock en los eventos.',
+      ],
+      correctIndex: 0,
+      feedback: '¡Muy bien! Cada artista mujer en horario estelar abre la puerta para muchas más.',
+    },
+  ],
+
+  soulfia: [
+    {
+      id: 'soulfia-1',
+      context: 'Soulfia ganó el Premio Pulsar a Mejor Nueva Artista con su propuesta de R&B y pop urbano, un estilo donde pocas mujeres chilenas habían recibido tanta atención.',
+      question: '¿Por qué fue tan significativo que Soulfia ganara ese reconocimiento?',
+      options: [
+        'Porque visibilizó el R&B hecho por mujeres en Chile frente a géneros más dominados por hombres.',
+        'Porque fue el primer premio entregado por un robot de streaming.',
+        'Porque prohibió que otros estilos participaran en los premios.',
+        'Porque solo se entrega a canciones grabadas en vivo en un metro.',
+      ],
+      correctIndex: 0,
+      feedback: '¡Exacto! El R&B femenino chileno ganó un espacio enorme gracias a su trabajo.',
+    },
+    {
+      id: 'soulfia-2',
+      context: 'Soulfia ha señalado en conversaciones sobre la industria que las mujeres muchas veces deben demostrar el doble de esfuerzo para ser tomadas en serio como compositoras y no solo como "intérpretes bonitas".',
+      question: '¿Qué busca visibilizar Soulfia con esa declaración?',
+      options: [
+        'Que las artistas mujeres también crean, componen y dirigen su música, no son solo una imagen.',
+        'Que las cantantes no deberían usar vestuario llamativo en el escenario.',
+        'Que componer canciones es imposible sin un sello multinacional.',
+        'Que el R&B no tiene letras ni mensajes propios.',
+      ],
+      correctIndex: 0,
+      feedback: '¡Correcto! Reconocer la autoría y creatividad femenina es clave para la equidad.',
+    },
+    {
+      id: 'soulfia-3',
+      context: 'Cuando escuchas una canción en streaming y termina, la función "Reproducción automática" suele poner canciones muy parecidas a lo más comercial.',
+      question: '¿Qué pasa si dejamos siempre la "Reproducción automática" sin explorar por nuestra cuenta?',
+      options: [
+        'El algoritmo nos encierra en una burbuja con los mismos artistas populares de siempre.',
+        'Nuestro teléfono se queda sin batería en cinco minutos.',
+        'Las canciones independientes se borran de nuestra biblioteca.',
+        'El volumen baja automáticamente cuando canta una mujer.',
+      ],
+      correctIndex: 0,
+      feedback: '¡Bien! Salir de la burbuja del algoritmo nos permite conocer proyectos increíbles como Soulfia.',
+    },
+    {
+      id: 'soulfia-4',
+      context: 'En "Brujerías de Cantina", Soulfia mezcló sonidos urbanos con sensibilidad R&B y letras directas sobre emociones reales.',
+      question: '¿Por qué es valioso que existan referentes como Soulfia para estudiantes de 12 y 13 años?',
+      options: [
+        'Porque muestra que las mujeres pueden explorar distintos estilos y expresar sus ideas con fuerza propia.',
+        'Porque enseña a programar aplicaciones de música en cinco minutos.',
+        'Porque dice que solo el R&B es música verdadera.',
+        'Porque recomienda no escuchar música de otros países.',
+      ],
+      correctIndex: 0,
+      feedback: '¡Así es! Tener referentes cercanos inspira a crear sin miedo.',
+    },
+    {
+      id: 'soulfia-5',
+      context: 'Muchos estudios sobre la industria musical muestran que menos del 20% de las personas acreditadas como productoras son mujeres.',
+      question: '¿Qué significa esta cifra para la música que escuchamos todos los días?',
+      options: [
+        'Que faltan más oportunidades y visibilidad para mujeres detrás de las consolas y la producción.',
+        'Que a las mujeres no les gusta usar computadores ni micrófonos.',
+        'Que el 80% de las canciones no tienen ningún productor.',
+        'Que las plataformas cobran más caro por canciones producidas por mujeres.',
+      ],
+      correctIndex: 0,
+      feedback: '¡Exacto! Abrir espacios en producción y composición hace la música más rica y justa.',
+    },
+  ],
+
+  anatijoux: [
+    {
+      id: 'anatijoux-1',
+      context: 'Ana Tijoux comenzó en el rap chileno en los años 90 con Makiza y luego construyó una carrera solista reconocida en todo el mundo.',
+      question: '¿Qué barrera histórica tuvo que enfrentar Ana Tijoux en el hip-hop de los años 90?',
+      options: [
+        'Un ambiente muy masculinizado donde pocas mujeres tenían espacio para tomar el micrófono.',
+        'La falta total de micrófonos en Santiago de Chile.',
+        'Que el rap solo podía cantarse en francés por ley.',
+        'Que las radios no tenían permiso para transmitir baterías.',
+      ],
+      correctIndex: 0,
+      feedback: '¡Correcto! Ana Tijoux abrió camino en una escena donde casi todos eran hombres.',
+    },
+    {
+      id: 'anatijoux-2',
+      context: 'Ana Tijoux ha dicho en múltiples entrevistas que las mujeres en la música "siempre tenemos que validar el doble lo que hacemos" y ha criticado que los medios hablen más de la ropa o la edad de una artista que de su música.',
+      question: '¿Qué denuncia Ana Tijoux con estas palabras?',
+      options: [
+        'El machismo de la industria y la prensa, que evalúa a las mujeres con exigencias distintas a las de los hombres.',
+        'Que los conciertos deberían hacerse sin público para evitar críticas.',
+        'Que los periodistas no saben escribir sobre historia.',
+        'Que el rap no debería sonar en televisión.',
+      ],
+      correctIndex: 0,
+      feedback: '¡Muy bien! Juzgar el físico en vez de la obra artística es una forma clara de sesgo de género.',
+    },
+    {
+      id: 'anatijoux-3',
+      context: 'Su canción "1977" se volvió un clásico mundial e incluso apareció en series famosas, a pesar de tener una letra íntima y nada comercial.',
+      question: '¿Qué nos enseña el éxito de "1977" frente a la lógica de los algoritmos actuales?',
+      options: [
+        'Que una canción honesta y con identidad propia puede trascender aunque no siga la moda viral.',
+        'Que todas las canciones deben llevar un año en el título para triunfar.',
+        'Que solo las series de televisión pueden descubrir artistas.',
+        'Que el hip-hop solo funciona si dura más de 10 minutos.',
+      ],
+      correctIndex: 0,
+      feedback: '¡Exacto! La calidad y la verdad artística logran cruzar fronteras.',
+    },
+    {
+      id: 'anatijoux-4',
+      context: 'En sus letras, Ana Tijoux suele hablar de desigualdad, memoria y derechos sociales, temas que a veces los algoritmos promocionan menos que las canciones de fiesta.',
+      question: '¿Por qué los sistemas de recomendación suelen mostrar menos canciones con contenido social?',
+      options: [
+        'Porque priorizan contenido ligero y rápido de consumir para mantener anuncios y reproducciones constantes.',
+        'Porque las canciones con mensaje social están prohibidas en internet.',
+        'Porque los algoritmos solo entienden canciones instrumentales sin voz.',
+        'Porque las letras largas ocupan demasiado espacio en la nube.',
+      ],
+      correctIndex: 0,
+      feedback: '¡Bien! Los algoritmos optimizan clics rápidos, no necesariamente profundidad o diversidad.',
+    },
+    {
+      id: 'anatijoux-5',
+      context: 'Hoy en día, muchas raperas jóvenes de Chile y Latinoamérica citan a Ana Tijoux como su mayor inspiración.',
+      question: '¿Por qué es fundamental conocer a pioneras como Ana Tijoux?',
+      options: [
+        'Para entender que el lugar que hoy ocupan las mujeres en el urbano costó esfuerzo y valentía.',
+        'Para copiar exactamente sus mismas rimas sin cambiar ninguna palabra.',
+        'Para dejar de escuchar a artistas nuevas de menos de 25 años.',
+        'Para demostrar que el rap nació en el año 2020.',
+      ],
+      correctIndex: 0,
+      feedback: '¡Exacto! Conocer la historia nos ayuda a valorar a quienes abrieron las puertas.',
+    },
+  ],
+
+  javieramena: [
+    {
+      id: 'javieramena-1',
+      context: 'Javiera Mena grabó sus primeras canciones en su casa usando su computador cuando casi nadie en Chile hacía electropop independiente.',
+      question: '¿Qué demostró Javiera Mena al producir su propia música desde su pieza?',
+      options: [
+        'Que las mujeres pueden liderar la producción electrónica sin depender de grandes estudios.',
+        'Que los sintetizadores solo funcionan si se graban en la playa.',
+        'Que el electropop no necesita melodías ni voces.',
+        'Que es imposible hacer música en Chile sin viajar a Europa.',
+      ],
+      correctIndex: 0,
+      feedback: '¡Correcto! Su autogestión inspiró a toda una generación de músicas independientes.',
+    },
+    {
+      id: 'javieramena-2',
+      context: 'Javiera Mena ha comentado que durante años en los festivales y giras casi todo el equipo técnico —sonidistas, iluminadores, productores— eran hombres, y que costaba mucho que valoraran a una mujer dando indicaciones técnicas.',
+      question: '¿Qué problema muestra esta experiencia de Javiera Mena?',
+      options: [
+        'La brecha de género en los roles técnicos y de liderazgo dentro de la música en vivo.',
+        'Que las luces de neón consumen demasiada electricidad en los conciertos.',
+        'Que los micrófonos inalámbricos solo funcionan en espacios cerrados.',
+        'Que las bandas de rock no usan equipo técnico en sus shows.',
+      ],
+      correctIndex: 0,
+      feedback: '¡Muy bien! La brecha no está solo sobre el escenario, también detrás de él.',
+    },
+    {
+      id: 'javieramena-3',
+      context: 'En las plataformas digitales, cuando buscas "música electrónica", la mayoría de recomendaciones iniciales son DJs hombres europeos o estadounidenses.',
+      question: '¿Qué doble sesgo ocurre en ese ejemplo?',
+      options: [
+        'Se invisibiliza tanto a las mujeres como a las artistas latinoamericanas del género.',
+        'Se borran las canciones que tienen título en español.',
+        'Solo se reproducen canciones grabadas antes de 1980.',
+        'Las plataformas cobran doble suscripción por escuchar música chilena.',
+      ],
+      correctIndex: 0,
+      feedback: '¡Exacto! Género y territorio muchas veces quedan relegados por el algoritmo global.',
+    },
+    {
+      id: 'javieramena-4',
+      context: 'Su álbum "Mena" fue elegido por medios internacionales como uno de los mejores discos en español de su década, sin tener detrás una campaña millonaria.',
+      question: '¿Qué factor fue decisivo para que "Mena" llegara tan lejos?',
+      options: [
+        'El boca a boca entre oyentes y la originalidad de su sonido.',
+        'Pagar anuncios en todos los partidos de fútbol del mundo.',
+        'Regalar un teclado con cada descarga digital.',
+        'Cambiar el estilo a balada acústica a última hora.',
+      ],
+      correctIndex: 0,
+      feedback: '¡Bien! La recomendación real entre personas sigue siendo más poderosa que un algoritmo.',
+    },
+    {
+      id: 'javieramena-5',
+      context: 'Javiera Mena también ha visibilizado abiertamente temáticas LGBTQ+ en el pop chileno, algo poco común cuando empezó.',
+      question: '¿Por qué suma valor la diversidad de voces en la música pop?',
+      options: [
+        'Porque permite que más jóvenes se sientan representados y escuchados tal como son.',
+        'Porque hace que todas las canciones suenen exactamente iguales.',
+        'Porque obliga a cerrar las radios tradicionales.',
+        'Porque reduce la duración de los festivales de verano.',
+      ],
+      correctIndex: 0,
+      feedback: '¡Exacto! La representación abre espacios más libres y respetuosos para todas y todos.',
+    },
+  ],
+
+  franciscavalenzuela: [
+    {
+      id: 'franciscavalenzuela-1',
+      context: 'Además de su carrera musical, Francisca Valenzuela fundó el festival y plataforma "Ruidosa", dedicado a impulsar a mujeres y disidencias en la música.',
+      question: '¿Por qué decidió Francisca Valenzuela crear Ruidosa?',
+      options: [
+        'Para visibilizar y corregir la enorme falta de mujeres en los carteles de festivales y en la industria.',
+        'Para prohibir que los hombres toquen guitarra eléctrica en Chile.',
+        'Para vender entradas más caras que los conciertos internacionales.',
+        'Para reemplazar la música en vivo por transmisiones de radio.',
+      ],
+      correctIndex: 0,
+      feedback: '¡Exacto! Ruidosa nació de investigar cifras reales y actuar para cambiarlas.',
+    },
+    {
+      id: 'franciscavalenzuela-2',
+      context: 'Francisca Valenzuela ha declarado públicamente: "Cuando mirábamos los carteles de festivales latinoamericanos, menos del 15% eran proyectos liderados por mujeres, y nos decían que no había suficientes artistas mujeres".',
+      question: '¿Qué demostró el trabajo de Francisca Valenzuela frente a esa excusa?',
+      options: [
+        'Que sí había muchísimas artistas talentosas, pero los programadores y medios no las buscaban ni invitaban.',
+        'Que en Latinoamérica solo existían diez cantantes mujeres.',
+        'Que los festivales no tenían escenarios suficientes para más bandas.',
+        'Que el público prefería conciertos sin cantantes.',
+      ],
+      correctIndex: 0,
+      feedback: '¡Muy bien! El problema nunca fue falta de talento, sino falta de oportunidades y visibilidad.',
+    },
+    {
+      id: 'franciscavalenzuela-3',
+      context: 'Los estudios de Ruidosa también analizaron listas de reproducción y rankings radiales, encontrando una fuerte mayoría masculina.',
+      question: '¿Cómo influye esto en lo que escuchan los estudiantes en su día a día?',
+      options: [
+        'Si las listas muestran casi puros hombres, creemos erróneamente que casi no hay mujeres haciendo música.',
+        'Hace que los audífonos se dañen más rápido.',
+        'Obliga a escuchar únicamente música clásica en el colegio.',
+        'Impide crear playlists personalizadas en el teléfono.',
+      ],
+      correctIndex: 0,
+      feedback: '¡Correcto! Lo que no se muestra parece no existir, por eso es clave ampliar lo que escuchamos.',
+    },
+    {
+      id: 'franciscavalenzuela-4',
+      context: 'Desde su primer éxito "Peces" hasta discos como "Tajo Abierto", Francisca Valenzuela pasó de la autogestión a escenarios gigantes como Lollapalooza y Viña.',
+      question: '¿Qué rol cumple compartir escenario con otras colegas en sus conciertos?',
+      options: [
+        'Crear redes de apoyo y colaboración entre mujeres en lugar de competir entre sí.',
+        'Ahorrar tiempo para terminar el concierto antes de medianoche.',
+        'Evitar que el público cante las canciones conocidas.',
+        'Competir para ver quién tiene el micrófono más caro.',
+      ],
+      correctIndex: 0,
+      feedback: '¡Exacto! La colaboración entre artistas fortalece a toda la escena.',
+    },
+    {
+      id: 'franciscavalenzuela-5',
+      context: 'Hoy varios países discuten o aplican cuotas mínimas de participación femenina en festivales financiados o masivos.',
+      question: '¿Cuál es el objetivo principal de esas medidas?',
+      options: [
+        'Garantizar igualdad de oportunidades para que el público también conozca proyectos liderados por mujeres.',
+        'Eliminar el rock y el pop de los eventos culturales.',
+        'Hacer que los festivales duren una semana completa.',
+        'Prohibir las bandas mixtas.',
+      ],
+      correctIndex: 0,
+      feedback: '¡Bien! Emparejar la cancha permite que más talento llegue al público.',
+    },
+  ],
+
+  monlaferte: [
+    {
+      id: 'monlaferte-1',
+      context: 'Antes de llenar estadios y ganar varios Latin Grammy, Mon Laferte cantó en micros, bares y trabajó duro de forma independiente en Chile y México.',
+      question: '¿Qué nos muestra el recorrido de Mon Laferte antes de hacerse famosa?',
+      options: [
+        'Que muchas artistas mujeres construyen su carrera a pulso durante años antes de recibir apoyo de la industria.',
+        'Que basta con subir un solo video de 5 segundos para llenar un estadio.',
+        'Que los programas de televisión garantizan el éxito artístico automático.',
+        'Que en México no se escucha música rock.',
+      ],
+      correctIndex: 0,
+      feedback: '¡Correcto! Su éxito fue fruto de años de perseverancia y trabajo propio.',
+    },
+    {
+      id: 'monlaferte-2',
+      context: 'Mon Laferte ha contado en entrevistas que al llegar a la industria musical le pedían cambiar su forma de vestir y suavizar su carácter para "vender más", y que cuando una mujer opina fuerte la tildan de "difícil".',
+      question: '¿Qué crítica hace Mon Laferte sobre el trato hacia las mujeres en la música?',
+      options: [
+        'Que se intenta moldear a las artistas como un producto y se castiga que tengan carácter y opinión propia.',
+        'Que no deberían existir vestuarios teatrales en los conciertos.',
+        'Que las cantantes nunca deben dar entrevistas en radio.',
+        'Que los discos no necesitan portadas diseñadas.',
+      ],
+      correctIndex: 0,
+      feedback: '¡Exacto! Defender la identidad propia frente a presiones comerciales requiere mucha valentía.',
+    },
+    {
+      id: 'monlaferte-3',
+      context: 'En discos como "Norma" o "La Trenza", Mon Laferte mezcla rock alternativo con bolero, cumbia y estética retro-teatral, sin encajar en una sola etiqueta.',
+      question: '¿Por qué a veces los algoritmos tienen problemas con artistas tan versátiles como Mon Laferte?',
+      options: [
+        'Porque los sistemas prefieren clasificar a cada artista en una sola caja simple para venderla fácil.',
+        'Porque los servidores no pueden reproducir canciones con trompetas y guitarras juntas.',
+        'Porque está prohibido mezclar géneros en un mismo álbum.',
+        'Porque las canciones retro solo funcionan en televisores antiguos.',
+      ],
+      correctIndex: 0,
+      feedback: '¡Muy bien! La creatividad muchas veces rompe las etiquetas rígidas de las plataformas.',
+    },
+    {
+      id: 'monlaferte-4',
+      context: 'Mon Laferte también es pintora y muralista, y lleva su arte visual a las portadas y escenografías de sus giras.',
+      question: '¿Qué aporta que una artista controle tanto su música como su estética visual?',
+      options: [
+        'Le da coherencia total a su obra y evita que otros decidan su imagen por ella.',
+        'Hace que los conciertos no necesiten iluminación.',
+        'Obliga a que el público pinte cuadros durante el show.',
+        'Reemplaza completamente las letras de las canciones.',
+      ],
+      correctIndex: 0,
+      feedback: '¡Exacto! Tomar el control creativo es una forma poderosa de autonomía.',
+    },
+    {
+      id: 'monlaferte-5',
+      context: 'En Viña del Mar, Mon Laferte donó sus ganancias de un concierto solidario y siempre ha mantenido un vínculo fuerte con sus orígenes.',
+      question: '¿Por qué conecta tanto con públicos de distintas edades en Chile?',
+      options: [
+        'Por su entrega emocional genuina y por no olvidar de dónde viene.',
+        'Porque solo canta canciones de menos de un minuto.',
+        'Porque nunca realiza giras fuera de su ciudad.',
+        'Porque prohíbe grabar sus conciertos con celulares.',
+      ],
+      correctIndex: 0,
+      feedback: '¡Bien! La autenticidad traspasa pantallas y generaciones.',
+    },
+  ],
+
+  rubio: [
+    {
+      id: 'rubio-1',
+      context: 'Rubio es el proyecto personal de Fran Straube, quien antes tocó batería y cantó en bandas como Miss Garrison antes de lanzar su propia propuesta experimental.',
+      question: '¿Qué demuestra la trayectoria de Fran Straube con Rubio?',
+      options: [
+        'Que una mujer puede pasar de ser baterista de banda a dirigir un proyecto electrónico y visual propio.',
+        'Que los bateristas tienen prohibido cantar al mismo tiempo.',
+        'Que la música experimental solo se puede hacer en Japón.',
+        'Que para ser solista hay que dejar todos los instrumentos.',
+      ],
+      correctIndex: 0,
+      feedback: '¡Exacto! Fran Straube domina instrumentos, composición y dirección artística.',
+    },
+    {
+      id: 'rubio-2',
+      context: 'Fran Straube ha comentado que en la escena alternativa muchas veces la gente se sorprende al ver a una mujer manejando máquinas, sintetizadores y dirigiendo todo el sonido en vivo.',
+      question: '¿Qué estereotipo de género refleja esa sorpresa del público?',
+      options: [
+        'La falsa idea de que la tecnología musical y las máquinas electrónicas son "cosa de hombres".',
+        'Que los sintetizadores son demasiado pesados para llevarlos de gira.',
+        'Que en los conciertos electrónicos no hay público joven.',
+        'Que las mujeres solo pueden tocar instrumentos de viento.',
+      ],
+      correctIndex: 0,
+      feedback: '¡Correcto! La tecnología musical no tiene género, aunque los estereotipos digan lo contrario.',
+    },
+    {
+      id: 'rubio-3',
+      context: 'La música de Rubio tiene atmósferas hipnóticas y cambios inesperados, muy distintos a la fórmula de 15 segundos pensada para volverse trend en redes.',
+      question: '¿Qué ocurre cuando las plataformas premian solo canciones pensadas para videos cortos de 15 segundos?',
+      options: [
+        'Proyectos artísticos profundos como Rubio reciben menos empuje del algoritmo.',
+        'Todas las canciones pasan a durar 10 minutos automáticamente.',
+        'Las redes sociales borran los videos que tengan música chilena.',
+        'Los audífonos dejan de reproducir sonidos graves.',
+      ],
+      correctIndex: 0,
+      feedback: '¡Muy bien! Vale la pena darse el tiempo de escuchar propuestas distintas a los trends rápidos.',
+    },
+    {
+      id: 'rubio-4',
+      context: 'Rubio ha tocado en festivales internacionales importantes en Europa, México y Estados Unidos, representando a la música chilena de vanguardia.',
+      question: '¿Cómo logra un proyecto experimental chileno llegar a escenarios del mundo sin ser pop masivo?',
+      options: [
+        'Con una identidad visual y sonora única que destaca en circuitos alternativos y festivales.',
+        'Pagando para aparecer en todos los videojuegos de fútbol.',
+        'Copiando exactamente las canciones del Top 1 Global.',
+        'Cantando únicamente sin micrófono.',
+      ],
+      correctIndex: 0,
+      feedback: '¡Así es! La originalidad abre puertas en todo el mundo.',
+    },
+    {
+      id: 'rubio-5',
+      context: 'En sus shows, Rubio cuida cada luz, vestuario y visual como si fuera una película en vivo.',
+      question: '¿Qué aprendemos al descubrir proyectos como Rubio?',
+      options: [
+        'Que la música también es un espacio para experimentar, imaginar mundos nuevos y ser libre.',
+        'Que solo existe un estilo válido para hacer canciones.',
+        'Que no se pueden usar luces de colores en conciertos chilenos.',
+        'Que el arte visual y la música nunca deben mezclarse.',
+      ],
+      correctIndex: 0,
+      feedback: '¡Exacto! La música es un laboratorio creativo sin límites.',
+    },
+  ],
+
+  chinipng: [
+    {
+      id: 'chinipng-1',
+      context: 'chini.png (Chini Ayarza) es música y artista visual chilena. Su proyecto mezcla rock alternativo, indie y una estética llena de pintura, dibujo y color.',
+      question: '¿Qué hace especial la propuesta de chini.png dentro del rock alternativo chileno?',
+      options: [
+        'Une la pintura y el arte visual con guitarras indie y letras poéticas muy personales.',
+        'Solo publica canciones en formato de imagen sin sonido.',
+        'Toca exclusivamente en museos sin público.',
+        'Prohíbe el uso de guitarras eléctricas en sus discos.',
+      ],
+      correctIndex: 0,
+      feedback: '¡Exacto! Su mundo visual y sonoro van siempre de la mano.',
+    },
+    {
+      id: 'chinipng-2',
+      context: 'Chini Ayarza ha reflexionado sobre cómo en el circuito rockero e indie chileno muchas veces los espacios y medios se enfocan primero en las bandas de hombres, dejando a los proyectos liderados por mujeres como "una categoría aparte".',
+      question: '¿Por qué es injusto etiquetar la música hecha por mujeres como una "categoría aparte"?',
+      options: [
+        'Porque sugiere que lo "normal" es el rock hecho por hombres y que las mujeres son solo un anexo.',
+        'Porque las mujeres usan guitarras de distinto tamaño.',
+        'Porque el rock alternativo nació solo para hombres.',
+        'Porque las plataformas no tienen la palabra "rock" en español.',
+      ],
+      correctIndex: 0,
+      feedback: '¡Muy bien! Las mujeres son parte central del rock y el indie, no un subgénero.',
+    },
+    {
+      id: 'chinipng-3',
+      context: 'Su disco "El Día Libre de Polux" ganó reconocimiento de la crítica, aunque en los algoritmos masivos casi no aparece junto a los grandes hits comerciales.',
+      question: '¿Por qué es importante que existan espacios como este juego o recomendaciones entre amigos para conocer a chini.png?',
+      options: [
+        'Porque el algoritmo rara vez te mostrará rock alternativo independiente si no lo buscas activamente.',
+        'Porque chini.png no tiene permitido subir canciones a internet.',
+        'Porque los discos independientes se autodestruyen después de un mes.',
+        'Porque el rock chileno solo se escucha en cintas VHS.',
+      ],
+      correctIndex: 0,
+      feedback: '¡Correcto! Descubrir fuera del algoritmo requiere curiosidad y comunidad.',
+    },
+    {
+      id: 'chinipng-4',
+      context: 'El nombre "chini.png" hace un guiño directo a los archivos de imagen digital, conectando su faceta de diseñadora/pintora con la era de internet.',
+      question: '¿Qué demuestra esa elección de nombre artístico?',
+      options: [
+        'Creatividad para construir una identidad propia que mezcla artes visuales y música.',
+        'Que su música solo se puede escuchar abriendo Paint.',
+        'Que no le gusta cantar en vivo frente a personas.',
+        'Que todas las artistas deben usar extensiones de archivo en su nombre.',
+      ],
+      correctIndex: 0,
+      feedback: '¡Bien! Hasta el nombre refleja su universo pictórico y digital.',
+    },
+    {
+      id: 'chinipng-5',
+      context: 'Chini Ayarza también colabora con otras bandas y artistas de la escena independiente de Santiago.',
+      question: '¿Cómo ayuda la colaboración entre bandas independientes a enfrentar la falta de difusión masiva?',
+      options: [
+        'Permite compartir público, organizar tocatas autogestionadas y apoyarse mutuamente.',
+        'Hace que todas las bandas deban usar el mismo nombre.',
+        'Obliga a dejar de tocar instrumentos en vivo.',
+        'Elimina la necesidad de ensayar antes de un concierto.',
+      ],
+      correctIndex: 0,
+      feedback: '¡Exacto! La red de apoyo hace crecer la escena independiente.',
+    },
+  ],
+
+  snailmail: [
+    {
+      id: 'snailmail-1',
+      context: 'Lindsey Jordan formó Snail Mail cuando tenía apenas 15 años, escribiendo y tocando sus propias guitarras de indie rock.',
+      question: '¿Qué inspira el caso de Snail Mail a estudiantes de 12 o 13 años?',
+      options: [
+        'Que no hay que esperar a ser adulto para empezar a crear canciones y formar un proyecto serio.',
+        'Que los adolescentes tienen prohibido tocar rock alternativo.',
+        'Que solo se puede grabar música después de terminar la universidad.',
+        'Que las guitarras indie solo se venden a mayores de 21 años.',
+      ],
+      correctIndex: 0,
+      feedback: '¡Exacto! A los 15 años ya estaba componiendo canciones que recorrerían el mundo.',
+    },
+    {
+      id: 'snailmail-2',
+      context: 'Lindsey Jordan ha contado en entrevistas que le molestaba que la prensa la presentara siempre como "la adolescente con guitarra" en vez de hablar en serio de su composición y su técnica como guitarrista.',
+      question: '¿Qué sesgo aparece cuando se minimiza a una artista joven y mujer?',
+      options: [
+        'Se la trata como una curiosidad por su edad y género en lugar de valorar su talento musical real.',
+        'Se le regalan demasiadas guitarras en cada concierto.',
+        'Se prohíbe que toque canciones rápidas en vivo.',
+        'Se obliga a que todos sus discos tengan portada azul.',
+      ],
+      correctIndex: 0,
+      feedback: '¡Muy bien! Ser joven y mujer no quita seriedad ni profundidad artística.',
+    },
+    {
+      id: 'snailmail-3',
+      context: 'El indie rock de guitarras como el de Snail Mail suele tener menos espacio en las listas más populares de hoy, dominadas por hits ultra-producidos.',
+      question: '¿Qué pasa con géneros como el indie rock cuando el algoritmo solo empuja tendencias virales?',
+      options: [
+        'Quedan ocultos para quienes nunca salen de la pestaña de "Tendencias" o "Top Global".',
+        'Las guitarras dejan de sonar en los parlantes.',
+        'Las canciones en inglés desaparecen de internet.',
+        'Los conciertos indie pasan a ser gratuitos por ley.',
+      ],
+      correctIndex: 0,
+      feedback: '¡Correcto! Explorar más allá del Top Global abre todo un mundo de guitarras y estilos.',
+    },
+    {
+      id: 'snailmail-4',
+      context: 'El nombre "Snail Mail" (correo lento o carta física) contrasta con la velocidad frenética de internet y las redes sociales.',
+      question: '¿Qué invitación nos hace ese nombre en tiempos de algoritmos rápidos?',
+      options: [
+        'A tomarnos el tiempo de escuchar álbumes con calma, como quien lee una carta honesta.',
+        'A no usar nunca internet para escuchar música.',
+        'A enviar discos por correo postal en lugar de usar audífonos.',
+        'A acelerar todas las canciones al doble de velocidad.',
+      ],
+      correctIndex: 0,
+      feedback: '¡Bien! Escuchar con atención nos conecta mucho más con la música.',
+    },
+    {
+      id: 'snailmail-5',
+      context: 'Su primer álbum "Lush" fue aclamado mundialmente y llevó a Snail Mail a girar por Norteamérica, Europa y Asia.',
+      question: '¿Qué demuestra el éxito internacional de "Lush"?',
+      options: [
+        'Que el rock alternativo liderado por mujeres jóvenes sigue muy vivo y conecta en todo el mundo.',
+        'Que el rock murió hace treinta años.',
+        'Que solo las bandas de cinco integrantes pueden hacer giras.',
+        'Que es imposible hacer indie rock sin sintetizadores.',
+      ],
+      correctIndex: 0,
+      feedback: '¡Exacto! Las nuevas generaciones siguen renovando el rock alternativo.',
+    },
+  ],
+
+  paramore: [
+    {
+      id: 'paramore-1',
+      context: 'En los años 2000, la escena pop-punk y rock estaba formada casi en un 95% por bandas de hombres. En medio de eso apareció Paramore, liderada por Hayley Williams.',
+      question: '¿Qué significó la llegada de Paramore para miles de chicas que querían tocar rock?',
+      options: [
+        'Les mostró que una mujer podía liderar una banda de rock masiva con energía y voz propia.',
+        'Significó que las mujeres solo podían cantar baladas lentas.',
+        'Prohibió que los hombres tocaran batería en bandas pop-punk.',
+        'Hizo que el rock dejara de usar guitarras eléctricas.',
+      ],
+      correctIndex: 0,
+      feedback: '¡Exacto! Hayley Williams se convirtió en un referente enorme para nuevas generaciones.',
+    },
+    {
+      id: 'paramore-2',
+      context: 'Hayley Williams ha denunciado varias veces que durante años sufrió comentarios machistas en festivales de rock y que la prensa intentaba enfrentarla constantemente con otras cantantes mujeres.',
+      question: '¿Por qué es dañina esa costumbre de la industria de enfrentar a las mujeres entre sí?',
+      options: [
+        'Porque hace creer que solo hay espacio para "una mujer a la vez", en vez de abrir espacio para todas.',
+        'Porque hace que las entradas a conciertos cuesten el doble.',
+        'Porque impide que las bandas graben discos en verano.',
+        'Porque obliga a cambiar el color de pelo en cada gira.',
+      ],
+      correctIndex: 0,
+      feedback: '¡Muy bien! En la música hay espacio de sobra para todas las artistas sin rivalidades inventadas.',
+    },
+    {
+      id: 'paramore-3',
+      context: 'A lo largo de su carrera, Paramore cambió de estilo desde el pop-punk de "Riot!" hacia el synth-pop/rock de "After Laughter" y el post-punk de "This Is Why".',
+      question: '¿Qué enseña esa evolución frente a la presión de repetir siempre la misma fórmula?',
+      options: [
+        'Que una banda liderada por una mujer tiene derecho a reinventarse y crecer sin quedarse atrapada en el pasado.',
+        'Que cambiar de estilo borra automáticamente las canciones antiguas.',
+        'Que el público no acepta ningún cambio en una banda.',
+        'Que solo se puede grabar un disco cada veinte años.',
+      ],
+      correctIndex: 0,
+      feedback: '¡Correcto! Evolucionar libremente es parte de ser artista.',
+    },
+    {
+      id: 'paramore-4',
+      context: 'En 2024, Paramore ganó dos premios Grammy en categorías de rock, siendo la primera banda liderada por una mujer en ganar Mejor Álbum de Rock en décadas.',
+      question: '¿Qué revela el hecho de que pasaran tantos años sin una banda liderada por mujer ganando ese premio?',
+      options: [
+        'Que la brecha de género en el rock ha sido enorme incluso en los premios más famosos del mundo.',
+        'Que ninguna mujer había grabado un disco de rock antes de 2024.',
+        'Que los premios Grammy no incluyen la categoría de rock.',
+        'Que Paramore es la única banda de rock que existe en Estados Unidos.',
+      ],
+      correctIndex: 0,
+      feedback: '¡Exacto! Ese hito histórico mostró cuánto camino aún queda por emparejar.',
+    },
+    {
+      id: 'paramore-5',
+      context: 'En sus conciertos actuales, Paramore invita y abre escenario a bandas jóvenes lideradas por mujeres y personas diversas.',
+      question: '¿Qué logra esa acción concreta en la industria?',
+      options: [
+        'Usa su fama para darle visibilidad real a nuevas artistas frente a miles de personas.',
+        'Acorta la duración del concierto principal a la mitad.',
+        'Evita que las canciones suenen en plataformas de streaming.',
+        'Hace que los fans no puedan cantar los coros.',
+      ],
+      correctIndex: 0,
+      feedback: '¡Bien! Abrir el escenario a quienes vienen detrás multiplica las oportunidades.',
+    },
+  ],
+
+  tricot: [
+    {
+      id: 'tricot-1',
+      context: 'tricot es una banda japonesa de math-rock formada en Kioto por Ikkyu Nakajima, Motifour Kida y Hiromi Hirohiro, quienes fundaron su propio sello discográfico.',
+      question: '¿Por qué tricot decidió crear su propio sello independiente ("Bakuretsu Records")?',
+      options: [
+        'Para tener control total sobre su música y sus giras sin depender de presiones comerciales.',
+        'Porque en Japón está prohibido vender discos en tiendas.',
+        'Para no tener que tocar nunca en vivo frente al público.',
+        'Porque solo querían grabar canciones de menos de 10 segundos.',
+      ],
+      correctIndex: 0,
+      feedback: '¡Exacto! La independencia les dio libertad total para crear su sonido único.',
+    },
+    {
+      id: 'tricot-2',
+      context: 'Las integrantes de tricot han contado que muchas veces las presentan en el extranjero primero como "banda de chicas" antes que por su increíble nivel técnico en guitarras y bajo.',
+      question: '¿Qué problema tiene reducir una banda a la etiqueta "banda de chicas"?',
+      options: [
+        'Desvía la atención de su talento, complejidad y trabajo musical como banda de rock.',
+        'Significa que no pueden usar amplificadores en el escenario.',
+        'Hace que sus canciones duren el doble en streaming.',
+        'Impide que viajen en avión a otros países.',
+      ],
+      correctIndex: 0,
+      feedback: '¡Correcto! Nadie dice "banda de chicos" para hablar de rock; la música se valora por su arte.',
+    },
+    {
+      id: 'tricot-3',
+      context: 'tricot canta en japonés y hace rock alternativo muy enérgico, algo que los algoritmos globales rara vez recomiendan en Chile si solo escuchas lo más comercial.',
+      question: '¿Qué barreras rompe una banda como tricot cuando logra fans en Latinoamérica?',
+      options: [
+        'Rompe la barrera del idioma, del género y de la burbuja comercial del algoritmo.',
+        'Obliga a todos los oyentes a aprender japonés en una semana.',
+        'Demuestra que el streaming traduce las canciones automáticamente.',
+        'Hace que todas las radios chilenas transmitan solo rock japonés.',
+      ],
+      correctIndex: 0,
+      feedback: '¡Muy bien! La música conecta emociones más allá del idioma.',
+    },
+    {
+      id: 'tricot-4',
+      context: 'En sus videos musicales y portadas, tricot mezcla humor, estética geométrica, colores intensos y mucha personalidad.',
+      question: '¿Qué aporta ver proyectos tan distintos al pop comercial de siempre?',
+      options: [
+        'Amplía nuestro gusto musical y nos enseña que hay mil formas creativas de hacer rock.',
+        'Nos obliga a dejar de escuchar música urbana.',
+        'Hace que los instrumentos suenen desafinados.',
+        'Reduce la variedad de estilos disponibles en internet.',
+      ],
+      correctIndex: 0,
+      feedback: '¡Así es! Escuchar variedad nos da libertad para elegir lo que realmente nos gusta.',
+    },
+    {
+      id: 'tricot-5',
+      context: 'Desde Maipú hasta Kioto, completaste este viaje descubriendo 12 proyectos liderados por mujeres en el urbano y el rock alternativo.',
+      question: '¿Cuál es el aprendizaje principal de romper el algoritmo en este juego?',
+      options: [
+        'Que buscar activamente voces diversas y proyectos de mujeres enriquece nuestra cultura y combate la invisibilización.',
+        'Que los algoritmos siempre eligen lo mejor y no hay que cuestionarlos.',
+        'Que solo existe música buena en un solo país del mundo.',
+        'Que escuchar música en grupo está prohibido.',
+      ],
+      correctIndex: 0,
+      feedback: '¡Felicidades! Tú decides qué escuchar y a quién darle visibilidad.',
+    },
+  ],
+};
+
+// --- facts.js ---
+// Banco extenso de Datos Curiosos 100% reales y verificables (8 a 10 por artista)
+// Distintos a las preguntas de cada nivel.
+
+const FACTS = {
+  akrilla: [
+    'El nombre real de AKRILLA es Fernanda Sepúlveda y nació y creció en la comuna de Maipú.',
+    'Antes de dedicarse de lleno al urbano, aprendió a tocar guitarra y exploró música en su pieza en Maipú.',
+    'Su primer álbum de estudio se titula "Epistolares" (2024) y fue destacado por la crítica musical chilena.',
+    'En 2024 fue seleccionada para presentarse en el festival Primavera Sound de Barcelona, llevando el urbano de Maipú a Europa.',
+    'Ha colaborado con artistas como Princesa Alba, Gianluca, Young Cister y Taichu.',
+    'Su estética visual mezcla referencias de anime, cultura callejera chilena y moda futurista.',
+    'Antes de lanzar su primer disco ya había participado en escenarios masivos como Lollapalooza Chile.',
+    'El nombre "AKRILLA" juega con la sonoridad del acrílico y la fuerza de una marca propia.',
+    'Muchas de sus primeras maquetas fueron grabadas de forma casera con recursos mínimos en Santiago.',
+  ],
+  princesaalba: [
+    'Su nombre real es Trinidad Riveros y estudió Dirección Audiovisual en la Universidad Católica.',
+    'Su primer viral, "My Only One", fue grabado en el Estadio Monumental de Colo-Colo en 2017.',
+    'Participó como jurado y colaboradora en múltiples proyectos del pop chileno antes de lanzar su disco debut.',
+    'Su álbum "Besitos, cuídate" (2021) incluyó colaboraciones con Ms Nina, Duda Beat y Alizzz.',
+    'Ha sido telonera de artistas internacionales gigantes como Coldplay y Dua Lipa en sus visitas a Chile.',
+    'Es hincha declarada de Colo-Colo y ha usado camisetas y estética futbolera en sus shows.',
+    'Su canción "Convéncete" superó decenas de millones de reproducciones y se volvió un himno pop chileno.',
+    'En 2022 debutó con gran éxito en el Festival de Viña del Mar como invitada especial y luego en grandes teatros.',
+    'Ella misma participa activamente en la dirección creativa y visual de todos sus videoclips.',
+  ],
+  soulfia: [
+    'Su nombre real es Sofía Walker y estudió música y canto desde muy joven en Santiago.',
+    'Ganó el Premio Pulsar 2022 a Mejor Nueva Artista por su mixtape "Génesis".',
+    'Su primer álbum de larga duración se llama "Brujerías de Cantina" (2022).',
+    'Su canción "Pantera" fue elegida entre las mejores canciones chilenas de su año por medios especializados.',
+    'Ha tocado en festivales internacionales como Lollapalooza y Primavera Sound.',
+    'Además de cantar, toca teclado y participa en los arreglos vocales de sus canciones.',
+    'Su apodo "Soulfia" combina la palabra "Soul" (alma / género musical) con su nombre Sofía.',
+    'Ha colaborado con artistas chilenos como Polimá Westcoast, Shirel y Harry Nach.',
+    'En sus shows en vivo suele presentarse acompañada de banda completa y coristas.',
+  ],
+  anatijoux: [
+    'Nació en Lille, Francia, hija de padres chilenos exiliados durante la dictadura, y llegó a Chile en 1993.',
+    'En los años 90 formó parte del histórico grupo de rap chileno Makiza.',
+    'Su disco "1977" (2010) fue nominado al Grammy estadounidense y el tema principal sonó en la serie "Breaking Bad".',
+    'También fue incluida en la banda sonora del videojuego FIFA con la canción "1977".',
+    'Ha ganado premios Latin Grammy y colaborado con artistas como Jorge Drexler, Julieta Venegas y Mala Rodríguez.',
+    'En 2014 ganó el Latin Grammy a Grabación del Año junto a Jorge Drexler por "Universos Paralelos".',
+    'La revista Rolling Stone la ha destacado entre las mejores raperas en español de la historia.',
+    'En 2024 publicó su disco "Vida" tras varios años sin lanzar un álbum solista de estudio.',
+    'Su canción "Antipatriarca" es uno de los himnos feministas más cantados en Latinoamérica.',
+  ],
+  javieramena: [
+    'Estudió composición y arreglos musicales en la academia ProJazz en Santiago.',
+    'Su primer disco, "Esquemas Juveniles" (2006), es considerado un clásico fundador del indie pop chileno.',
+    'En 2016 se presentó en el Festival de Viña del Mar y recibió Gaviota de Plata y de Oro.',
+    'Fue nominada al Latin Grammy en la categoría Mejor Canción Alternativa por "Otra Era".',
+    'Ha tocado en festivales internacionales como Coachella (EE.UU.) y Primavera Sound (España).',
+    'Vivió varios años en Madrid, España, conectando la escena electropop chilena con la europea.',
+    'Sus videoclips destacan por coreografías geométricas, neones y referencias a los años 80.',
+    'Ha producido y colaborado con artistas como Julieta Venegas, Miranda! y Gepe.',
+    'Aprende y utiliza constantemente sintetizadores analógicos clásicos en sus giras.',
+  ],
+  franciscavalenzuela: [
+    'Nació en San Francisco (EE.UU.) de padres chilenos científicos y se mudó a Santiago a los 12 años.',
+    'Publicó un libro de poesía en inglés y español cuando era adolescente, antes de su primer disco.',
+    'Su primer gran hit, "Peces", lo lanzó de forma totalmente independiente en 2006.',
+    'Es la creadora de "Ruidosa Fest", el primer festival feminista e interdisciplinario de música en Latinoamérica.',
+    'Estudió Periodismo en la Universidad Católica mientras ya daba conciertos por Chile.',
+    'Ha sido invitada a cantar junto a artistas como U2 (Bono), Pablo Alborán y Natalia Lafourcade.',
+    'Ganó premios Pulsar y se ha presentado múltiples veces en el Festival de Viña del Mar.',
+    'Su álbum "Vida Tan Bonita" (2022) fue producido junto a Sebastian Krys y Ali Stone.',
+    'Además de cantar, toca el piano desde niña y dirige la puesta en escena de sus giras.',
+  ],
+  monlaferte: [
+    'Su nombre real es Norma Monserrat Bustamante Laferte y nació en Viña del Mar en 1983.',
+    'De niña aprendió a tocar guitarra de forma autodidacta y comenzó a cantar en las calles y micros de su ciudad.',
+    'Se mudó a Ciudad de México en 2007 buscando nuevas oportunidades y hoy tiene doble nacionalidad chilena y mexicana.',
+    'Ha ganado múltiples premios Latin Grammy, incluyendo Mejor Álbum de Música Alternativa y Mejor Canción de Rock.',
+    'En 2021 pintó un mural de gran formato en el Cerro Alegre de Valparaíso.',
+    'Su álbum "Norma" (2018) fue grabado en una sola toma continua en los legendarios estudios Capitol de Los Ángeles.',
+    'En 2023 inauguró exposiciones de sus propias pinturas en museos y galerías de Chile y México.',
+    'Ha colaborado con artistas tan diversos como Juanes, Gwen Stefani, Alejandro Fernández y Los Bunkers.',
+    'En 2024 su canción "Tenochtitlán" y su disco "Autopoiética" exploraron sonidos electrónicos y teatrales.',
+  ],
+  rubio: [
+    'Rubio es el proyecto solista de Francisca "Fran" Straube, artista chilena nacida en Santiago.',
+    'Antes de Rubio, fue baterista y vocalista de la reconocida banda indie chilena Miss Garrison.',
+    'El nombre "Rubio" surgió como un juego de identidad y apodo ligado a su historia personal.',
+    'Sus primeros lanzamientos fueron cinco EPs cortos llamados "R", "U", "B", "I", "O" que luego formaron "Pez" (2018).',
+    'Su música ha aparecido en series internacionales como "Élite" y "Control Z".',
+    'Ha girado por festivales de Europa y Norteamérica, incluyendo Vive Latino y Primavera Sound.',
+    'Trabaja estrechamente con directores de cine y arte para crear visuales inmersivos en sus conciertos.',
+    'Su álbum "Venus & Blue" (2023) fue grabado entre Chile, México y Estados Unidos.',
+    'En vivo suele combinar batería electrónica, sintetizadores, samplers y su voz en tiempo real.',
+  ],
+  chinipng: [
+    'Detrás de chini.png está María José "Chini" Ayarza, música y licenciada en Artes Visuales de la Universidad de Chile.',
+    'Antes de su proyecto solista lideró la banda chilena "Chini and the Technicians".',
+    'Su álbum debut solista "El Día Libre de Polux" (2023) ganó el Premio Pulsar a Mejor Artista Rock.',
+    'Ella misma pinta las portadas, afiches y animaciones que acompañan sus lanzamientos musicales.',
+    'También ha dirigido videoclips para otros artistas chilenos usando técnicas de pintura y stop-motion.',
+    'Sus canciones suelen incluir referencias a mitología, pintura, vida cotidiana en Santiago y humor.',
+    'Ha sido destacada por medios internacionales como KEXP (radio de Seattle) con sesiones en vivo.',
+    'Participa activamente en el sello independiente chileno Uva Robot.',
+    'Combina guitarras distorsionadas con arreglos delicados y letras llenas de imágenes visuales.',
+  ],
+  snailmail: [
+    'Snail Mail es el proyecto liderado por la guitarrista y cantante estadounidense Lindsey Jordan.',
+    'Comenzó a tocar guitarra clásica a los 5 años y formó su primera banda de punk en el colegio.',
+    'Su EP debut "Habit" llamó la atención de la crítica cuando ella todavía estaba en la enseñanza media.',
+    'Lanzó su primer álbum largo, "Lush", en 2018 con apenas 18 años de edad.',
+    'El disco "Lush" apareció en las listas de mejores álbumes del año de Pitchfork, Rolling Stone y NPR.',
+    'Su segundo álbum, "Valentine" (2021), tuvo que retrasarse porque Lindsey se sometió a una cirugía de cuerdas vocales y luego regresó más fuerte.',
+    'Cita a bandas como Paramore, Avril Lavigne y Fiona Apple entre sus influencias juveniles.',
+    'En sus giras lleva banda completa y sigue tocando su característica guitarra Fender.',
+    'También actuó en la película independiente "I Saw the TV Glow" (2024).',
+  ],
+  paramore: [
+    'Paramore se formó en Franklin, Tennessee, en 2004, cuando Hayley Williams tenía solo 15 años.',
+    'Su disco "Riot!" (2007) incluye éxitos mundiales como "Misery Business" y obtuvo certificación multiplatino.',
+    'Han ganado 3 premios Grammy, incluyendo Mejor Canción de Rock ("Ain\'t It Fun") y Mejor Álbum de Rock ("This Is Why").',
+    'Hayley Williams también lanzó discos solistas muy íntimos durante la pandemia, como "Petals for Armor".',
+    'Su canción "Decode" fue parte central de la banda sonora de la película "Crepúsculo" (Twilight).',
+    'En 2024 fueron teloneros de Taylor Swift en la etapa europea del "The Eras Tour" frente a estadios llenos.',
+    'Los actuales integrantes estables son Hayley Williams, Taylor York y Zac Farro, amigos desde la adolescencia.',
+    'Su álbum "After Laughter" (2017) mezcló letras muy honestas sobre salud mental con ritmos ochenteros alegres.',
+    'Hayley Williams fundó además su propia marca de tinturas de pelo veganas llamada Good Dye Young.',
+  ],
+  tricot: [
+    'tricot se formó en Kioto, Japón, en 2010, por iniciativa de Ikkyu Nakajima, Motifour Kida y Hiromi Hirohiro.',
+    'En 2015 fundaron su propio sello independiente llamado Bakuretsu Records.',
+    'Han realizado giras por Europa, Estados Unidos, Reino Unido y Asia tocando en festivales como Reading & Leeds.',
+    'La revista Rolling Stone incluyó su disco debut "T H E" (2013) entre los mejores álbumes de math-rock.',
+    'Su baterista actual, Yuusuke Yoshida, se unió oficialmente en 2017 tras varios años de bateristas invitados.',
+    'La vocalista Ikkyu Nakajima también diseña ropa y participa en otros proyectos musicales paralelos en Japón.',
+    'Sus canciones suelen mezclar cambios de ritmo inesperados con melodías pop súper pegadizas.',
+    'En sus portadas y videos suelen usar humor absurdo y figuras geométricas minimalistas.',
+    'Son admiradas por guitarristas y bateristas de todo el mundo por su precisión al tocar en vivo.',
+  ],
+};
+
+// --- soundEngine.js ---
+// Motor de audio híbrido: carga /public/music/<artista>.mp3 si existe,
+// o genera una pista musical dinámica con Web Audio API como respaldo inmediato.
+
+class SoundEngine {
+  constructor() {
+    this.ctx = null;
+    this.muted = false;
+    this.paused = false;
+    this.currentArtist = null;
+    this.audioEl = null;
+    this.usingMp3 = false;
+    this.synthTimer = null;
+    this.stepIndex = 0;
+    this.volumeScale = 0.45;
+  }
+
+  ensureContext() {
+    if (!this.ctx) {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      this.ctx = new AudioCtx();
+    }
+    if (this.ctx.state === 'suspended' && !this.paused) {
+      this.ctx.resume().catch(() => {});
+    }
+  }
+
+  setMuted(muted) {
+    this.muted = muted;
+    if (this.audioEl) {
+      this.audioEl.muted = muted;
+    }
+  }
+
+  setPhaseVolume(isRhythmPhase) {
+    this.volumeScale = isRhythmPhase ? 0.72 : 0.36;
+    if (this.audioEl) {
+      this.audioEl.volume = this.volumeScale;
+    }
+  }
+
+  playArtistTrack(artist, isRhythmPhase = false) {
+    this.stopTrack();
+    this.currentArtist = artist;
+    this.setPhaseVolume(isRhythmPhase);
+    this.ensureContext();
+
+    const audio = new Audio(artist.files.audio);
+    audio.loop = true;
+    audio.volume = this.volumeScale;
+    audio.muted = this.muted;
+
+    let settled = false;
+    const fallbackToSynth = () => {
+      if (settled) return;
+      settled = true;
+      if (this.currentArtist?.id !== artist.id) return;
+      this.usingMp3 = false;
+      this.audioEl = null;
+      this.startSynthLoop(artist);
+    };
+
+    audio.addEventListener(
+      'canplaythrough',
+      () => {
+        if (settled) return;
+        settled = true;
+        if (this.currentArtist?.id !== artist.id) return;
+        this.usingMp3 = true;
+        this.audioEl = audio;
+        if (!this.paused) {
+          audio.play().catch(() => {
+            this.usingMp3 = false;
+            this.startSynthLoop(artist);
+          });
+        }
+      },
+      { once: true }
+    );
+
+    audio.addEventListener('error', fallbackToSynth, { once: true });
+    audio.load();
+  }
+
+  startSynthLoop(artist) {
+    if (this.synthTimer) clearInterval(this.synthTimer);
+    this.stepIndex = 0;
+    const stepMs = Math.round((60 / artist.synth.bpm / 2) * 1000);
+
+    this.synthTimer = setInterval(() => {
+      if (this.paused || this.muted || !this.ctx) return;
+      this.playSynthStep(artist, this.stepIndex++);
+    }, stepMs);
+  }
+
+  playSynthStep(artist, step) {
+    const now = this.ctx.currentTime;
+    const { scale, bassPattern, wave, style } = artist.synth;
+    const vol = this.volumeScale * 0.22;
+
+    // Kick en tiempos pares o patrón urbano
+    const isKick = style === 'urban' ? step % 4 === 0 || step % 8 === 3 : step % 4 === 0;
+    if (isKick) {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(135, now);
+      osc.frequency.exponentialRampToValueAtTime(42, now + 0.11);
+      gain.gain.setValueAtTime(vol * 1.4, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.13);
+    }
+
+    // Snare / Clap en 2 y 6
+    if (step % 4 === 2) {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(style === 'urban' ? 240 : 190, now);
+      osc.frequency.exponentialRampToValueAtTime(80, now + 0.07);
+      gain.gain.setValueAtTime(vol * 0.85, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.09);
+    }
+
+    // Bajo
+    const bassFreq = bassPattern[step % bassPattern.length];
+    if (bassFreq > 0) {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(bassFreq, now);
+      gain.gain.setValueAtTime(vol * 0.9, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.19);
+    }
+
+    // Melodía arpegiada
+    if (step % 2 === 0 || (style === 'math' && step % 3 === 1)) {
+      const noteFreq = scale[(step * 3 + Math.floor(step / 4)) % scale.length];
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = wave;
+      osc.frequency.setValueAtTime(noteFreq, now);
+      gain.gain.setValueAtTime(vol * 0.48, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.17);
+    }
+  }
+
+  pause() {
+    this.paused = true;
+    if (this.audioEl && !this.audioEl.paused) {
+      this.audioEl.pause();
+    }
+    if (this.ctx && this.ctx.state === 'running') {
+      this.ctx.suspend().catch(() => {});
+    }
+  }
+
+  resume() {
+    this.paused = false;
+    if (this.ctx && this.ctx.state === 'suspended') {
+      this.ctx.resume().catch(() => {});
+    }
+    if (this.audioEl && this.usingMp3) {
+      this.audioEl.play().catch(() => {});
+    }
+  }
+
+  stopTrack() {
+    if (this.synthTimer) {
+      clearInterval(this.synthTimer);
+      this.synthTimer = null;
+    }
+    if (this.audioEl) {
+      this.audioEl.pause();
+      this.audioEl.src = '';
+      this.audioEl = null;
+    }
+    this.usingMp3 = false;
+  }
+
+  playSfx(type) {
+    if (this.muted) return;
+    this.ensureContext();
+    const now = this.ctx.currentTime;
+
+    const tone = (freqStart, freqEnd, duration, wave = 'sine', gainVal = 0.16, delay = 0) => {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = wave;
+      osc.frequency.setValueAtTime(freqStart, now + delay);
+      osc.frequency.exponentialRampToValueAtTime(Math.max(20, freqEnd), now + delay + duration);
+      gain.gain.setValueAtTime(gainVal, now + delay);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + delay + duration);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now + delay);
+      osc.stop(now + delay + duration + 0.01);
+    };
+
+    switch (type) {
+      case 'correct':
+        tone(523.25, 659.25, 0.12, 'triangle', 0.18, 0);
+        tone(659.25, 783.99, 0.16, 'triangle', 0.18, 0.09);
+        break;
+      case 'wrong':
+        tone(220, 140, 0.18, 'sawtooth', 0.14, 0);
+        break;
+      case 'hit':
+        tone(660, 880, 0.08, 'sine', 0.16, 0);
+        break;
+      case 'miss':
+        tone(170, 95, 0.14, 'sawtooth', 0.15, 0);
+        break;
+      case 'dvd':
+        tone(587.33, 880, 0.1, 'sine', 0.16, 0);
+        tone(880, 1174.66, 0.16, 'sine', 0.16, 0.08);
+        break;
+      case 'win':
+        tone(523.25, 523.25, 0.1, 'triangle', 0.18, 0);
+        tone(659.25, 659.25, 0.1, 'triangle', 0.18, 0.1);
+        tone(783.99, 1046.5, 0.25, 'triangle', 0.2, 0.2);
+        break;
+      case 'tick':
+        tone(440, 440, 0.05, 'sine', 0.1, 0);
+        break;
+      default:
+        break;
+    }
+  }
+}
+
+const soundEngine = new SoundEngine();
+
+// --- placeholders.js ---
+// Genera respaldos SVG estilizados para portadas/fotos (*_foto.jpg)
+// y rostros recortados (*_cara.png) mientras no existan los archivos reales.
+
+function encodeSvg(svg) {
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+}
+
+function getPhotoFallbackSvg(artist) {
+  const { primary, secondary, bg } = artist.colors;
+  const symbol = artist.symbols[0] || '🎵';
+  const maipuTag = artist.isMaipuLocal
+    ? `<rect x="24" y="22" width="160" height="28" rx="14" fill="${secondary}" />
+       <text x="104" y="41" font-family="sans-serif" font-size="13" font-weight="800" fill="#111" text-anchor="middle">ORGULLO MAIPÚ</text>`
+    : '';
+
+  const svg = `
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+    <defs>
+      <linearGradient id="g-${artist.id}" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="${bg}" />
+        <stop offset="60%" stop-color="${primary}44" />
+        <stop offset="100%" stop-color="${secondary}55" />
+      </linearGradient>
+    </defs>
+    <rect width="400" height="400" rx="28" fill="url(#g-${artist.id})" />
+    <circle cx="310" cy="95" r="75" fill="${primary}33" />
+    <circle cx="90" cy="310" r="95" fill="${secondary}22" />
+    <rect x="20" y="20" width="360" height="360" rx="22" fill="none" stroke="${primary}" stroke-width="3" stroke-opacity="0.6" />
+    ${maipuTag}
+    <circle cx="200" cy="175" r="74" fill="${bg}" stroke="${secondary}" stroke-width="5" />
+    <text x="200" y="195" font-size="64" text-anchor="middle">${symbol}</text>
+    <text x="200" y="295" font-family="sans-serif" font-size="32" font-weight="900" fill="#ffffff" text-anchor="middle">${artist.name}</text>
+    <text x="200" y="328" font-family="sans-serif" font-size="15" font-weight="700" fill="${secondary}" text-anchor="middle">${artist.albumTitle.toUpperCase()}</text>
+    <text x="200" y="356" font-family="sans-serif" font-size="12" fill="#ffffffaa" text-anchor="middle">${artist.genre}</text>
+  </svg>`;
+  return encodeSvg(svg);
+}
+
+function getFaceFallbackSvg(artist) {
+  const { primary, secondary, bg } = artist.colors;
+  const initials = artist.name
+    .split(/[\s.]+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0].toUpperCase())
+    .join('');
+
+  const svg = `
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180">
+    <defs>
+      <radialGradient id="f-${artist.id}" cx="50%" cy="40%" r="55%">
+        <stop offset="0%" stop-color="${primary}" />
+        <stop offset="100%" stop-color="${bg}" />
+      </radialGradient>
+    </defs>
+    <circle cx="90" cy="90" r="82" fill="url(#f-${artist.id})" stroke="${secondary}" stroke-width="6" />
+    <circle cx="90" cy="76" r="32" fill="#ffe5d9" />
+    <path d="M44 146 C44 114, 136 114, 136 146" fill="${secondary}" />
+    <path d="M56 72 C56 40, 124 40, 124 72" fill="#1b1024" />
+    <circle cx="78" cy="76" r="4" fill="#111" />
+    <circle cx="102" cy="76" r="4" fill="#111" />
+    <path d="M80 90 Q90 98 100 90" stroke="#111" stroke-width="3" fill="none" stroke-linecap="round" />
+    <rect x="46" y="132" width="88" height="24" rx="12" fill="#000000aa" />
+    <text x="90" y="149" font-family="sans-serif" font-size="13" font-weight="800" fill="#fff" text-anchor="middle">${initials} • ${artist.symbols[0]}</text>
+  </svg>`;
+  return encodeSvg(svg);
+}
+
+function createArtistImage(src, fallbackSvg, alt, className = '') {
+  const img = document.createElement('img');
+  img.alt = alt;
+  if (className) img.className = className;
+  img.src = src;
+  img.onerror = () => {
+    if (img.src !== fallbackSvg) {
+      img.src = fallbackSvg;
+    }
+  };
+  return img;
+}
+
+// --- dvdFloater.js ---
+
+const AURA_COLORS = ['#ff2e63', '#08d9d6', '#ffe66d', '#b565ff', '#00f5d4', '#ff9f1c'];
+
+class DvdFloater {
+  constructor({ layerEl, artist, isPausedFn, onShowFactModal }) {
+    this.layerEl = layerEl;
+    this.artist = artist;
+    this.isPausedFn = isPausedFn;
+    this.onShowFactModal = onShowFactModal;
+
+    this.x = 40 + Math.random() * 160;
+    this.y = 90 + Math.random() * 140;
+    this.vx = (Math.random() > 0.5 ? 1 : -1) * 235;
+    this.vy = (Math.random() > 0.5 ? 1 : -1) * 190;
+    this.size = 88;
+    this.colorIdx = 0;
+
+    this.active = false;
+    this.respawnRemainingMs = 0;
+    this.rafId = null;
+    this.lastTime = null;
+    this.usedFactIndices = new Set();
+    this.el = null;
+  }
+
+  start() {
+    this.layerEl.classList.remove('hidden');
+    this.spawn();
+    this.lastTime = performance.now();
+    const loop = (now) => {
+      const dt = Math.min(0.05, (now - this.lastTime) / 1000);
+      this.lastTime = now;
+      this.tick(dt);
+      this.rafId = requestAnimationFrame(loop);
+    };
+    this.rafId = requestAnimationFrame(loop);
+  }
+
+  spawn() {
+    this.layerEl.innerHTML = '';
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'dvd-face-btn';
+    btn.title = `¡Atrapa a ${this.artist.name} para descubrir un Dato Curioso!`;
+
+    const img = createArtistImage(
+      this.artist.files.face,
+      getFaceFallbackSvg(this.artist),
+      `Rostro de ${this.artist.name}`,
+      'dvd-face-img'
+    );
+
+    const badge = document.createElement('span');
+    badge.className = 'dvd-badge';
+    badge.textContent = '✨ ¡Dato!';
+
+    btn.appendChild(img);
+    btn.appendChild(badge);
+    this.applyAuraColor(btn);
+
+    btn.addEventListener('click', () => this.handleCatch());
+
+    this.el = btn;
+    this.layerEl.appendChild(btn);
+    this.active = true;
+    this.updatePosition();
+  }
+
+  applyAuraColor(el) {
+    const color = AURA_COLORS[this.colorIdx % AURA_COLORS.length];
+    el.style.setProperty('--dvd-aura', color);
+  }
+
+  tick(dt) {
+    if (this.isPausedFn()) return;
+
+    if (!this.active) {
+      if (this.respawnRemainingMs > 0) {
+        this.respawnRemainingMs -= dt * 1000;
+        if (this.respawnRemainingMs <= 0) {
+          this.respawnRemainingMs = 0;
+          this.spawn();
+        }
+      }
+      return;
+    }
+
+    if (!this.el) return;
+    const maxW = window.innerWidth - this.size - 12;
+    const minY = 74;
+    const maxH = window.innerHeight - this.size - 12;
+
+    this.x += this.vx * dt;
+    this.y += this.vy * dt;
+
+    let bounced = false;
+    if (this.x <= 12) {
+      this.x = 12;
+      this.vx = Math.abs(this.vx);
+      bounced = true;
+    } else if (this.x >= maxW) {
+      this.x = maxW;
+      this.vx = -Math.abs(this.vx);
+      bounced = true;
+    }
+
+    if (this.y <= minY) {
+      this.y = minY;
+      this.vy = Math.abs(this.vy);
+      bounced = true;
+    } else if (this.y >= maxH) {
+      this.y = maxH;
+      this.vy = -Math.abs(this.vy);
+      bounced = true;
+    }
+
+    if (bounced) {
+      this.colorIdx = (this.colorIdx + 1) % AURA_COLORS.length;
+      this.applyAuraColor(this.el);
+    }
+
+    this.updatePosition();
+  }
+
+  updatePosition() {
+    if (this.el) {
+      this.el.style.transform = `translate3d(${Math.round(this.x)}px, ${Math.round(this.y)}px, 0)`;
+    }
+  }
+
+  getNextFact() {
+    const list = FACTS[this.artist.id] || [];
+    if (list.length === 0) return 'Artista destacada por romper barreras en la industria musical.';
+    if (this.usedFactIndices.size >= list.length) {
+      this.usedFactIndices.clear();
+    }
+    const available = list.map((_, idx) => idx).filter((idx) => !this.usedFactIndices.has(idx));
+    const chosenIdx = available[Math.floor(Math.random() * available.length)];
+    this.usedFactIndices.add(chosenIdx);
+    return list[chosenIdx];
+  }
+
+  handleCatch() {
+    if (!this.active || this.isPausedFn()) return;
+    this.active = false;
+    this.layerEl.innerHTML = '';
+    this.el = null;
+    soundEngine.playSfx('dvd');
+
+    const fact = this.getNextFact();
+    this.onShowFactModal(fact, () => {
+      // Al cerrar el modal, inicia contador interno de 10 segundos para reaparecer
+      this.respawnRemainingMs = 10000;
+    });
+  }
+
+  destroy() {
+    if (this.rafId) cancelAnimationFrame(this.rafId);
+    this.rafId = null;
+    this.active = false;
+    this.layerEl.innerHTML = '';
+    this.layerEl.classList.add('hidden');
+  }
+}
+
+// --- wildcards.js ---
+
+const WILDCARD_DEFS = [
+  {
+    id: 'share',
+    name: 'Compartir',
+    effectLabel: 'Pista extra / Escudo',
+    icon: '📤',
+    minigameTitle: '¡Atrapa 3 íconos musicales!',
+    minigameDesc: 'Haz clic en 3 notas que caen antes de que se acabe el tiempo (5s).',
+  },
+  {
+    id: 'playlist',
+    name: 'Agregar a Playlist',
+    effectLabel: 'Elimina 2 opciones',
+    icon: '➕',
+    minigameTitle: '¡Detén la barra en la zona verde!',
+    minigameDesc: 'Presiona "¡DETENER!" cuando el marcador pase por el centro verde (4s).',
+  },
+  {
+    id: 'stream',
+    name: 'Stremear',
+    effectLabel: 'Puntos x2',
+    icon: '🎧',
+    minigameTitle: '¡Rompe el Algoritmo!',
+    minigameDesc: 'Haz clic 3 veces seguidas en el botón antes de que desaparezca (4.5s).',
+  },
+];
+
+function openWildcardMinigame(wildcardId, modalOverlay, isPausedFn, onResult) {
+  const def = WILDCARD_DEFS.find((w) => w.id === wildcardId);
+  if (!def) return;
+
+  modalOverlay.classList.remove('hidden');
+  modalOverlay.innerHTML = `
+    <div class="modal-card wildcard-modal">
+      <div class="wildcard-badge">${def.icon} ${def.name} — ${def.effectLabel}</div>
+      <h2>${def.minigameTitle}</h2>
+      <p>${def.minigameDesc}</p>
+      <div class="mg-timer-bar"><div id="mg-timer-fill" class="mg-timer-fill"></div></div>
+      <div id="mg-arena" class="mg-arena"></div>
+      <div id="mg-status" class="mg-status"></div>
+    </div>
+  `;
+
+  const arena = modalOverlay.querySelector('#mg-arena');
+  const timerFill = modalOverlay.querySelector('#mg-timer-fill');
+  const statusEl = modalOverlay.querySelector('#mg-status');
+
+  let finished = false;
+  const finish = (won) => {
+    if (finished) return;
+    finished = true;
+    soundEngine.playSfx(won ? 'win' : 'wrong');
+    statusEl.textContent = won
+      ? `✅ ¡Logrado! Activaste: ${def.effectLabel}`
+      : '😅 ¡Casi! No se activó esta vez.';
+    statusEl.className = `mg-status ${won ? 'win' : 'lose'}`;
+    setTimeout(() => {
+      modalOverlay.classList.add('hidden');
+      modalOverlay.innerHTML = '';
+      onResult(won);
+    }, 900);
+  };
+
+  const durationMs = wildcardId === 'share' ? 5000 : wildcardId === 'playlist' ? 4000 : 4500;
+  let elapsed = 0;
+  let last = performance.now();
+
+  const tickTimer = (now) => {
+    if (finished) return;
+    const dt = now - last;
+    last = now;
+    if (!isPausedFn()) {
+      elapsed += dt;
+      const pct = Math.max(0, 100 - (elapsed / durationMs) * 100);
+      timerFill.style.width = `${pct}%`;
+      if (elapsed >= durationMs) {
+        finish(false);
+        return;
+      }
+    }
+    requestAnimationFrame(tickTimer);
+  };
+  requestAnimationFrame(tickTimer);
+
+  if (wildcardId === 'share') {
+    runCatchMinigame(arena, isPausedFn, () => finish(true));
+  } else if (wildcardId === 'playlist') {
+    runTimingBarMinigame(arena, isPausedFn, (won) => finish(won));
+  } else {
+    runBreakAlgorithmMinigame(arena, isPausedFn, () => finish(true));
+  }
+}
+
+function runCatchMinigame(arena, isPausedFn, onWin) {
+  let caught = 0;
+  arena.innerHTML = `
+    <div class="mg-catch-counter">Atrapados: <strong id="mg-caught">0</strong> / 3</div>
+    <div id="mg-drop-zone" class="mg-drop-zone"></div>
+  `;
+  const counterEl = arena.querySelector('#mg-caught');
+  const zone = arena.querySelector('#mg-drop-zone');
+  const icons = ['🎵', '🎧', '🎤', '💿', '✨'];
+
+  const spawnIcon = () => {
+    if (!arena.isConnected) return;
+    const item = document.createElement('button');
+    item.type = 'button';
+    item.className = 'mg-falling-icon';
+    item.textContent = icons[Math.floor(Math.random() * icons.length)];
+    item.style.left = `${10 + Math.random() * 78}%`;
+    item.style.top = '-20px';
+
+    let y = -20;
+    const speed = 75 + Math.random() * 45;
+    let alive = true;
+
+    item.addEventListener('click', () => {
+      if (!alive || isPausedFn()) return;
+      alive = false;
+      item.remove();
+      caught += 1;
+      counterEl.textContent = String(caught);
+      soundEngine.playSfx('hit');
+      if (caught >= 3) {
+        onWin();
+      }
+    });
+
+    zone.appendChild(item);
+
+    let last = performance.now();
+    const fall = (now) => {
+      if (!alive || !item.isConnected) return;
+      const dt = (now - last) / 1000;
+      last = now;
+      if (!isPausedFn()) {
+        y += speed * dt;
+        item.style.top = `${y}px`;
+        if (y > 170) {
+          alive = false;
+          item.remove();
+          return;
+        }
+      }
+      requestAnimationFrame(fall);
+    };
+    requestAnimationFrame(fall);
+  };
+
+  spawnIcon();
+  const spawner = setInterval(() => {
+    if (!arena.isConnected) {
+      clearInterval(spawner);
+      return;
+    }
+    if (!isPausedFn()) spawnIcon();
+  }, 650);
+}
+
+function runTimingBarMinigame(arena, isPausedFn, onDone) {
+  arena.innerHTML = `
+    <div class="mg-bar-track">
+      <div class="mg-bar-green"></div>
+      <div id="mg-bar-cursor" class="mg-bar-cursor"></div>
+    </div>
+    <button id="mg-stop-btn" type="button" class="primary-btn">¡DETENER!</button>
+  `;
+  const cursor = arena.querySelector('#mg-bar-cursor');
+  const stopBtn = arena.querySelector('#mg-stop-btn');
+
+  let pos = 10;
+  let dir = 1;
+  let stopped = false;
+  let last = performance.now();
+
+  const move = (now) => {
+    if (stopped || !arena.isConnected) return;
+    const dt = (now - last) / 1000;
+    last = now;
+    if (!isPausedFn()) {
+      pos += dir * 135 * dt;
+      if (pos >= 95) {
+        pos = 95;
+        dir = -1;
+      } else if (pos <= 5) {
+        pos = 5;
+        dir = 1;
+      }
+      cursor.style.left = `${pos}%`;
+    }
+    requestAnimationFrame(move);
+  };
+  requestAnimationFrame(move);
+
+  stopBtn.addEventListener('click', () => {
+    if (stopped || isPausedFn()) return;
+    stopped = true;
+    const won = pos >= 34 && pos <= 66;
+    onDone(won);
+  });
+}
+
+function runBreakAlgorithmMinigame(arena, isPausedFn, onWin) {
+  let clicks = 0;
+  arena.innerHTML = `
+    <div class="mg-catch-counter">Clics: <strong id="mg-clicks">0</strong> / 3</div>
+    <button id="mg-break-btn" type="button" class="mg-break-btn">⚡ ROMPER ALGORITMO</button>
+  `;
+  const clicksEl = arena.querySelector('#mg-clicks');
+  const btn = arena.querySelector('#mg-break-btn');
+
+  btn.addEventListener('click', () => {
+    if (isPausedFn()) return;
+    clicks += 1;
+    clicksEl.textContent = String(clicks);
+    soundEngine.playSfx('hit');
+    btn.style.transform = `translate(${Math.round((Math.random() - 0.5) * 80)}px, ${Math.round((Math.random() - 0.5) * 35)}px)`;
+    if (clicks >= 3) {
+      onWin();
+    }
+  });
+}
+
+// --- phase1.js ---
+
+class Phase1Controller {
+  constructor({
+    container,
+    dvdLayer,
+    modalOverlay,
+    artist,
+    answeredIds,
+    isPausedFn,
+    onVisibilityChange,
+    onShowModal,
+    onComplete,
+  }) {
+    this.container = container;
+    this.dvdLayer = dvdLayer;
+    this.modalOverlay = modalOverlay;
+    this.artist = artist;
+    this.answeredIds = answeredIds;
+    this.isPausedFn = isPausedFn;
+    this.onVisibilityChange = onVisibilityChange;
+    this.onShowModal = onShowModal;
+    this.onComplete = onComplete;
+
+    this.questions = (QUESTIONS[artist.id] || []).filter((q) => !answeredIds.has(q.id));
+    if (this.questions.length === 0) {
+      this.questions = [...(QUESTIONS[artist.id] || [])];
+    }
+
+    this.qIndex = 0;
+    this.visibility = 0;
+    this.visibilityGoal = 350;
+
+    // Estado por pregunta
+    this.attemptsUsed = 0;
+    this.eliminatedOptions = new Set();
+    this.shieldActive = false;
+    this.doublePointsActive = false;
+    this.questionLocked = false;
+
+    // Comodines: se habilitan después de 30s en el nivel
+    this.wildcardCooldownSec = 30;
+    this.usedWildcards = new Set();
+    this.cooldownTimer = null;
+
+    this.dvdFloater = null;
+  }
+
+  start() {
+    this.onVisibilityChange(this.visibility, this.visibilityGoal);
+    this.render();
+    this.startWildcardCooldown();
+
+    this.dvdFloater = new DvdFloater({
+      layerEl: this.dvdLayer,
+      artist: this.artist,
+      isPausedFn: this.isPausedFn,
+      onShowFactModal: (fact, onClose) => {
+        this.addVisibility(35);
+        this.onShowModal({
+          badge: `✨ Dato Curioso Real • ${this.artist.name}`,
+          title: '¡Atrapaste el rostro luminoso! (+35 Visibilidad)',
+          body: `<p class="fact-text">${fact}</p>`,
+          buttonText: '¡Genial, seguir jugando!',
+          onClose,
+        });
+      },
+    });
+    this.dvdFloater.start();
+  }
+
+  startWildcardCooldown() {
+    if (this.cooldownTimer) clearInterval(this.cooldownTimer);
+    this.cooldownTimer = setInterval(() => {
+      if (this.isPausedFn()) return;
+      if (this.wildcardCooldownSec > 0) {
+        this.wildcardCooldownSec -= 1;
+        this.updateWildcardButtons();
+        if (this.wildcardCooldownSec === 0) {
+          clearInterval(this.cooldownTimer);
+          this.cooldownTimer = null;
+        }
+      }
+    }, 1000);
+  }
+
+  addVisibility(amount) {
+    this.visibility += amount;
+    this.onVisibilityChange(this.visibility, this.visibilityGoal);
+  }
+
+  render() {
+    const q = this.questions[this.qIndex];
+    if (!q) {
+      this.finishPhase();
+      return;
+    }
+
+    const maipuBanner = this.artist.isMaipuLocal
+      ? `<div class="maipu-spotlight">📍 PROTAGONISTA LOCAL: Orgullo de Maipú — la misma comuna de nuestro colegio</div>`
+      : '';
+
+    this.container.innerHTML = `
+      <div class="phase1-layout">
+        <aside class="artist-stage-card">
+          <div class="decor-chip">${this.artist.decorLabel}</div>
+          <div id="artist-photo-slot" class="artist-photo-frame"></div>
+          <div class="artist-meta">
+            <h2>${this.artist.name}</h2>
+            <p class="artist-origin">${this.artist.origin} • ${this.artist.genre}</p>
+            <p class="artist-tagline">${this.artist.tagline}</p>
+            <div class="symbol-row">${this.artist.symbols.map((s) => `<span>${s}</span>`).join('')}</div>
+          </div>
+        </aside>
+
+        <section class="question-panel">
+          ${maipuBanner}
+          <div class="question-header">
+            <span class="q-counter">Desafío ${this.qIndex + 1} de ${this.questions.length}</span>
+            <span class="q-no-timer">🕊️ Sin límite de tiempo — lee con calma</span>
+          </div>
+
+          <div class="context-box">
+            <div class="box-label">💡 Contexto / Pista</div>
+            <p>${q.context}</p>
+            <div id="extra-hint-box" class="extra-hint ${this.shieldActive ? '' : 'hidden'}">
+              🛡️ <strong>Pista / Escudo activo:</strong> Tu próximo intento está protegido y la respuesta correcta habla de romper sesgos o dar visibilidad real.
+            </div>
+          </div>
+
+          <div class="question-box">
+            <div class="box-label">❓ Pregunta directa</div>
+            <h3>${q.question}</h3>
+            <div id="active-buffs" class="active-buffs">
+              ${this.doublePointsActive ? '<span class="buff-pill">🎧 Puntos x2 activo</span>' : ''}
+              ${this.shieldActive ? '<span class="buff-pill">📤 Escudo activo</span>' : ''}
+            </div>
+            <div id="options-list" class="options-list"></div>
+            <div id="q-feedback" class="q-feedback hidden"></div>
+          </div>
+
+          <div class="wildcards-bar">
+            <div class="wildcards-title">⚡ Comodines estratégicos (1 uso por nivel):</div>
+            <div id="wildcards-grid" class="wildcards-grid"></div>
+          </div>
+        </section>
+      </div>
+    `;
+
+    const photoSlot = this.container.querySelector('#artist-photo-slot');
+    photoSlot.appendChild(
+      createArtistImage(
+        this.artist.files.photo,
+        getPhotoFallbackSvg(this.artist),
+        this.artist.name,
+        'artist-photo-img'
+      )
+    );
+
+    this.renderOptions(q);
+    this.updateWildcardButtons();
+  }
+
+  renderOptions(q) {
+    const list = this.container.querySelector('#options-list');
+    list.innerHTML = '';
+
+    q.options.forEach((optText, idx) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'option-btn';
+      btn.dataset.index = String(idx);
+      btn.innerHTML = `<span class="opt-letter">${String.fromCharCode(65 + idx)}</span><span>${optText}</span>`;
+
+      if (this.eliminatedOptions.has(idx)) {
+        btn.disabled = true;
+        btn.classList.add('eliminated');
+      }
+
+      btn.addEventListener('click', () => this.handleOptionClick(idx, btn));
+      list.appendChild(btn);
+    });
+  }
+
+  handleOptionClick(idx, btn) {
+    if (this.questionLocked || this.isPausedFn()) return;
+    const q = this.questions[this.qIndex];
+    const feedbackEl = this.container.querySelector('#q-feedback');
+
+    if (idx === q.correctIndex) {
+      this.questionLocked = true;
+      btn.classList.add('correct');
+      soundEngine.playSfx('correct');
+
+      let pts = this.attemptsUsed === 0 ? 100 : 70;
+      if (this.doublePointsActive) pts *= 2;
+
+      this.answeredIds.add(q.id);
+      this.addVisibility(pts);
+
+      feedbackEl.className = 'q-feedback success';
+      feedbackEl.innerHTML = `✅ ${q.feedback} <strong>(+${pts} Visibilidad)</strong>`;
+      feedbackEl.classList.remove('hidden');
+
+      setTimeout(() => this.advanceQuestion(), 1450);
+    } else {
+      soundEngine.playSfx('wrong');
+      this.eliminatedOptions.add(idx);
+      btn.disabled = true;
+      btn.classList.add('wrong');
+
+      if (this.attemptsUsed === 0) {
+        this.attemptsUsed = 1;
+        feedbackEl.className = 'q-feedback retry';
+        feedbackEl.textContent = this.shieldActive
+          ? '🛡️ ¡Escudo usado! ¡Casi! Inténtalo de nuevo con las opciones restantes.'
+          : '😅 ¡Casi! Inténtalo de nuevo (segunda oportunidad).';
+        feedbackEl.classList.remove('hidden');
+      } else {
+        // Segundo fallo: mostrar respuesta correcta y avanzar
+        this.questionLocked = true;
+        const correctBtn = this.container.querySelector(`.option-btn[data-index="${q.correctIndex}"]`);
+        if (correctBtn) correctBtn.classList.add('correct');
+
+        const effortPts = this.shieldActive ? 70 : 45;
+        this.answeredIds.add(q.id);
+        this.addVisibility(effortPts);
+
+        feedbackEl.className = 'q-feedback info';
+        feedbackEl.innerHTML = `💡 Respuesta correcta marcada arriba. ${q.feedback} <strong>(+${effortPts} Visibilidad por aprender)</strong>`;
+        feedbackEl.classList.remove('hidden');
+
+        setTimeout(() => this.advanceQuestion(), 2100);
+      }
+    }
+  }
+
+  advanceQuestion() {
+    this.qIndex += 1;
+    this.attemptsUsed = 0;
+    this.eliminatedOptions.clear();
+    this.shieldActive = false;
+    this.doublePointsActive = false;
+    this.questionLocked = false;
+    this.render();
+  }
+
+  updateWildcardButtons() {
+    const grid = this.container.querySelector('#wildcards-grid');
+    if (!grid) return;
+    grid.innerHTML = '';
+
+    WILDCARD_DEFS.forEach((wc) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      const used = this.usedWildcards.has(wc.id);
+      const locked = this.wildcardCooldownSec > 0;
+      btn.className = `wildcard-btn ${used ? 'used' : locked ? 'charging' : 'ready'}`;
+      btn.disabled = used || locked || this.questionLocked;
+
+      let statusText = wc.effectLabel;
+      if (used) statusText = 'Usado en este nivel';
+      else if (locked) statusText = `⏳ Disponible en ${this.wildcardCooldownSec}s`;
+
+      btn.innerHTML = `
+        <span class="wc-icon">${wc.icon}</span>
+        <span class="wc-text">
+          <strong>${wc.name}</strong>
+          <small>${statusText}</small>
+        </span>
+      `;
+
+      btn.addEventListener('click', () => this.activateWildcard(wc.id));
+      grid.appendChild(btn);
+    });
+  }
+
+  activateWildcard(wildcardId) {
+    if (this.wildcardCooldownSec > 0 || this.usedWildcards.has(wildcardId) || this.questionLocked) return;
+    this.usedWildcards.add(wildcardId);
+    this.updateWildcardButtons();
+
+    openWildcardMinigame(wildcardId, this.modalOverlay, this.isPausedFn, (won) => {
+      if (!won) return;
+      if (wildcardId === 'share') {
+        this.shieldActive = true;
+      } else if (wildcardId === 'stream') {
+        this.doublePointsActive = true;
+      } else if (wildcardId === 'playlist') {
+        const q = this.questions[this.qIndex];
+        const wrongIndices = [0, 1, 2, 3].filter(
+          (i) => i !== q.correctIndex && !this.eliminatedOptions.has(i)
+        );
+        wrongIndices.slice(0, 2).forEach((i) => this.eliminatedOptions.add(i));
+      }
+      this.render();
+    });
+  }
+
+  finishPhase() {
+    this.destroy();
+    this.onComplete(this.visibility);
+  }
+
+  destroy() {
+    if (this.cooldownTimer) {
+      clearInterval(this.cooldownTimer);
+      this.cooldownTimer = null;
+    }
+    if (this.dvdFloater) {
+      this.dvdFloater.destroy();
+      this.dvdFloater = null;
+    }
+  }
+}
+
+// --- phase2.js ---
+
+const LANES = [
+  { key: 'a', label: 'A', hand: 'Izq' },
+  { key: 's', label: 'S', hand: 'Izq' },
+  { key: 'k', label: 'K', hand: 'Der' },
+  { key: 'l', label: 'L', hand: 'Der' },
+];
+
+class Phase2Controller {
+  constructor({ container, artist, isPausedFn, onSuccess, onRetryNeeded }) {
+    this.container = container;
+    this.artist = artist;
+    this.isPausedFn = isPausedFn;
+    this.onSuccess = onSuccess;
+    this.onRetryNeeded = onRetryNeeded;
+
+    this.trackHeight = 420;
+    this.hitLineY = 355;
+    this.hitWindowPx = 52; // Margen generoso para 12-13 años
+
+    this.notes = [];
+    this.nextNoteId = 1;
+    this.hits = 0;
+    this.misses = 0;
+    this.falsePresses = 0;
+    this.combo = 0;
+    this.maxCombo = 0;
+    this.score = 0;
+
+    this.countdownSec = 3;
+    this.songElapsedMs = 0;
+    this.songDurationMs = artist.rhythm.durationSec * 1000;
+    this.spawnAccumMs = 0;
+    this.rafId = null;
+    this.lastTime = null;
+    this.finished = false;
+    this.countdownTimer = null;
+
+    this.handleKeyDown = this.handleKeyDown.bind(this);
+  }
+
+  start() {
+    this.render();
+    window.addEventListener('keydown', this.handleKeyDown);
+    this.startCountdown();
+  }
+
+  render() {
+    const minPct = this.artist.rhythm.minApprovalPct;
+    this.container.innerHTML = `
+      <div class="phase2-layout">
+        <div class="rhythm-sidebar">
+          <div id="rhythm-art" class="rhythm-art-box"></div>
+          <h3>${this.artist.name}</h3>
+          <p class="rhythm-song-tag">🎵 ${this.artist.albumTitle}</p>
+          <div class="rhythm-stats">
+            <div class="stat-box"><span>Combo</span><strong id="r-combo">0</strong></div>
+            <div class="stat-box"><span>Aciertos</span><strong id="r-hits">0</strong></div>
+            <div class="stat-box"><span>Errores</span><strong id="r-errors">0</strong></div>
+          </div>
+          <div class="approval-box">
+            <div class="approval-labels">
+              <span>Aprobación</span>
+              <span id="r-approval-text">100% (Meta: ${minPct}%)</span>
+            </div>
+            <div class="approval-bar">
+              <div id="r-approval-fill" class="approval-fill" style="width: 100%"></div>
+              <div class="approval-target-line" style="left: ${minPct}%"></div>
+            </div>
+          </div>
+          <div class="song-time-wrap">
+            <span>⏱️ Tiempo restante: <strong id="r-time-left">${this.artist.rhythm.durationSec}s</strong></span>
+          </div>
+          <div id="r-feedback-banner" class="r-feedback-banner">Prepárate...</div>
+        </div>
+
+        <div class="rhythm-board-wrap">
+          <div id="rhythm-countdown" class="rhythm-countdown">3</div>
+          <div id="rhythm-track" class="rhythm-track" style="height: ${this.trackHeight}px">
+            <div class="hit-zone-bar" style="top: ${this.hitLineY - 22}px"></div>
+            <div class="lanes-grid">
+              ${LANES.map(
+                (lane, i) => `
+                <div class="lane" data-lane="${i}">
+                  <div class="lane-notes" id="lane-notes-${i}"></div>
+                  <button type="button" class="lane-receptor" data-lane="${i}">
+                    <span class="key-cap">${lane.label}</span>
+                    <small>${lane.hand}</small>
+                  </button>
+                </div>`
+              ).join('')}
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    const artBox = this.container.querySelector('#rhythm-art');
+    artBox.appendChild(
+      createArtistImage(
+        this.artist.files.photo,
+        getPhotoFallbackSvg(this.artist),
+        this.artist.name,
+        'rhythm-art-img'
+      )
+    );
+
+    this.container.querySelectorAll('.lane-receptor').forEach((btn) => {
+      btn.addEventListener('pointerdown', () => {
+        const laneIdx = Number(btn.dataset.lane);
+        this.triggerLane(laneIdx);
+      });
+    });
+  }
+
+  startCountdown() {
+    const cdEl = this.container.querySelector('#rhythm-countdown');
+    soundEngine.playSfx('tick');
+
+    this.countdownTimer = setInterval(() => {
+      if (this.isPausedFn() || this.finished) return;
+      this.countdownSec -= 1;
+      if (this.countdownSec > 0) {
+        cdEl.textContent = String(this.countdownSec);
+        soundEngine.playSfx('tick');
+      } else if (this.countdownSec === 0) {
+        cdEl.textContent = '¡SUENA!';
+        soundEngine.playSfx('win');
+      } else {
+        clearInterval(this.countdownTimer);
+        this.countdownTimer = null;
+        cdEl.classList.add('hidden');
+        this.setFeedback('¡Toca A - S - K - L al ritmo!', 'neutral');
+        this.startLoop();
+      }
+    }, 850);
+  }
+
+  startLoop() {
+    this.lastTime = performance.now();
+    const loop = (now) => {
+      if (this.finished) return;
+      const dtMs = Math.min(50, now - this.lastTime);
+      this.lastTime = now;
+
+      if (!this.isPausedFn()) {
+        this.update(dtMs);
+      }
+      this.rafId = requestAnimationFrame(loop);
+    };
+    this.rafId = requestAnimationFrame(loop);
+  }
+
+  update(dtMs) {
+    const dtSec = dtMs / 1000;
+    this.songElapsedMs += dtMs;
+
+    // Dejar de spawnear notas en los últimos 2.2 segundos para que terminen de caer
+    if (this.songElapsedMs < this.songDurationMs - 2200) {
+      this.spawnAccumMs += dtMs;
+      if (this.spawnAccumMs >= this.artist.rhythm.spawnIntervalMs) {
+        this.spawnAccumMs -= this.artist.rhythm.spawnIntervalMs;
+        this.spawnNote();
+      }
+    }
+
+    const speed = this.artist.rhythm.speedPxPerSec;
+    for (let i = this.notes.length - 1; i >= 0; i--) {
+      const note = this.notes[i];
+      note.y += speed * dtSec;
+      note.el.style.transform = `translateY(${Math.round(note.y)}px)`;
+
+      if (note.y > this.hitLineY + this.hitWindowPx + 18) {
+        note.el.remove();
+        this.notes.splice(i, 1);
+        this.misses += 1;
+        this.combo = 0;
+        this.setFeedback('Nota perdida', 'bad');
+        this.updateHud();
+      }
+    }
+
+    const timeLeft = Math.max(0, Math.ceil((this.songDurationMs - this.songElapsedMs) / 1000));
+    const timeEl = this.container.querySelector('#r-time-left');
+    if (timeEl) timeEl.textContent = `${timeLeft}s`;
+
+    if (this.songElapsedMs >= this.songDurationMs && this.notes.length === 0) {
+      this.finishSong();
+    }
+  }
+
+  spawnNote() {
+    const laneIdx = Math.floor(Math.random() * LANES.length);
+    const laneContainer = this.container.querySelector(`#lane-notes-${laneIdx}`);
+    if (!laneContainer) return;
+
+    const el = document.createElement('div');
+    el.className = `rhythm-note lane-color-${laneIdx}`;
+    el.textContent = LANES[laneIdx].label;
+    laneContainer.appendChild(el);
+
+    this.notes.push({
+      id: this.nextNoteId++,
+      lane: laneIdx,
+      y: -36,
+      el,
+    });
+  }
+
+  handleKeyDown(e) {
+    if (this.isPausedFn() || this.finished || this.countdownSec >= 0) return;
+    const key = e.key.toLowerCase();
+    const laneIdx = LANES.findIndex((l) => l.key === key);
+    if (laneIdx !== -1) {
+      e.preventDefault();
+      this.triggerLane(laneIdx);
+    }
+  }
+
+  triggerLane(laneIdx) {
+    if (this.isPausedFn() || this.finished || this.countdownSec >= 0) return;
+
+    const laneEl = this.container.querySelector(`.lane[data-lane="${laneIdx}"]`);
+    const receptor = laneEl?.querySelector('.lane-receptor');
+
+    // Buscar nota más cercana dentro de la zona de acierto en este carril
+    let bestIdx = -1;
+    let bestDist = Infinity;
+    for (let i = 0; i < this.notes.length; i++) {
+      const n = this.notes[i];
+      if (n.lane !== laneIdx) continue;
+      const dist = Math.abs(n.y - this.hitLineY);
+      if (dist <= this.hitWindowPx && dist < bestDist) {
+        bestDist = dist;
+        bestIdx = i;
+      }
+    }
+
+    if (bestIdx !== -1) {
+      const hitNote = this.notes[bestIdx];
+      hitNote.el.remove();
+      this.notes.splice(bestIdx, 1);
+
+      this.hits += 1;
+      this.combo += 1;
+      this.maxCombo = Math.max(this.maxCombo, this.combo);
+      this.score += 100 + this.combo * 10;
+
+      soundEngine.playSfx('hit');
+      receptor?.classList.add('hit-flash');
+      setTimeout(() => receptor?.classList.remove('hit-flash'), 140);
+
+      this.setFeedback(bestDist < 22 ? '🔥 ¡PERFECTO!' : '✨ ¡BIEN!', 'good');
+      this.updateHud();
+    } else {
+      // Penalización anti-machaqueo por tocar a destiempo
+      this.falsePresses += 1;
+      this.combo = 0;
+      this.score = Math.max(0, this.score - 30);
+
+      soundEngine.playSfx('miss');
+      laneEl?.classList.add('error-flash');
+      receptor?.classList.add('error-flash');
+      setTimeout(() => {
+        laneEl?.classList.remove('error-flash');
+        receptor?.classList.remove('error-flash');
+      }, 220);
+
+      this.setFeedback('❌ ¡A destiempo! Solo toca cuando haya nota', 'bad');
+      this.updateHud();
+    }
+  }
+
+  getApprovalPct() {
+    const totalAttempts = this.hits + this.misses + this.falsePresses;
+    if (totalAttempts === 0) return 100;
+    return Math.round((this.hits / totalAttempts) * 100);
+  }
+
+  updateHud() {
+    const comboEl = this.container.querySelector('#r-combo');
+    const hitsEl = this.container.querySelector('#r-hits');
+    const errEl = this.container.querySelector('#r-errors');
+    const appText = this.container.querySelector('#r-approval-text');
+    const appFill = this.container.querySelector('#r-approval-fill');
+
+    const pct = this.getApprovalPct();
+    const minPct = this.artist.rhythm.minApprovalPct;
+
+    if (comboEl) comboEl.textContent = String(this.combo);
+    if (hitsEl) hitsEl.textContent = String(this.hits);
+    if (errEl) errEl.textContent = String(this.misses + this.falsePresses);
+    if (appText) appText.textContent = `${pct}% (Meta: ${minPct}%)`;
+    if (appFill) {
+      appFill.style.width = `${pct}%`;
+      appFill.classList.toggle('passing', pct >= minPct);
+      appFill.classList.toggle('failing', pct < minPct);
+    }
+  }
+
+  setFeedback(text, kind) {
+    const el = this.container.querySelector('#r-feedback-banner');
+    if (!el) return;
+    el.textContent = text;
+    el.className = `r-feedback-banner ${kind}`;
+  }
+
+  finishSong() {
+    this.finished = true;
+    this.cleanupListeners();
+
+    const pct = this.getApprovalPct();
+    const minPct = this.artist.rhythm.minApprovalPct;
+    const totalAttempts = this.hits + this.misses + this.falsePresses;
+
+    if (pct >= minPct) {
+      soundEngine.playSfx('win');
+      this.onSuccess({
+        approvalPct: pct,
+        hits: this.hits,
+        maxCombo: this.maxCombo,
+        score: this.score,
+      });
+    } else {
+      soundEngine.playSfx('wrong');
+      const neededHits = Math.max(1, Math.ceil((minPct / 100) * totalAttempts) - this.hits);
+      this.onRetryNeeded({
+        approvalPct: pct,
+        minPct,
+        neededHits,
+        hits: this.hits,
+        errors: this.misses + this.falsePresses,
+      });
+    }
+  }
+
+  cleanupListeners() {
+    window.removeEventListener('keydown', this.handleKeyDown);
+    if (this.countdownTimer) {
+      clearInterval(this.countdownTimer);
+      this.countdownTimer = null;
+    }
+    if (this.rafId) {
+      cancelAnimationFrame(this.rafId);
+      this.rafId = null;
+    }
+  }
+
+  destroy() {
+    this.finished = true;
+    this.cleanupListeners();
+  }
+}
+
+// --- gallery.js ---
+
+function renderGallery(container, discoveredIds, onBack, onPlayArtist) {
+  container.innerHTML = `
+    <div class="gallery-screen">
+      <div class="gallery-header">
+        <button id="gal-back" type="button" class="secondary-btn">⬅ Volver al Menú</button>
+        <div>
+          <h2>🏆 Medallero: Artistas Descubiertas</h2>
+          <p>Has visibilizado <strong>${discoveredIds.size} de ${ARTISTS.length}</strong> referentes frente al algoritmo.</p>
+        </div>
+      </div>
+      <div id="gallery-grid" class="gallery-grid"></div>
+    </div>
+  `;
+
+  container.querySelector('#gal-back').addEventListener('click', onBack);
+  const grid = container.querySelector('#gallery-grid');
+
+  ARTISTS.forEach((artist) => {
+    const unlocked = discoveredIds.has(artist.id);
+    const card = document.createElement('div');
+    card.className = `gallery-card ${unlocked ? 'unlocked' : 'locked'}`;
+    card.style.setProperty('--card-accent', artist.colors.primary);
+
+    const imgWrap = document.createElement('div');
+    imgWrap.className = 'gal-img-wrap';
+    if (unlocked) {
+      imgWrap.appendChild(
+        createArtistImage(
+          artist.files.photo,
+          getPhotoFallbackSvg(artist),
+          artist.name,
+          'gal-img'
+        )
+      );
+    } else {
+      imgWrap.innerHTML = `<div class="gal-locked-icon">🔒</div>`;
+    }
+
+    const info = document.createElement('div');
+    info.className = 'gal-info';
+    info.innerHTML = `
+      <div class="gal-badges">
+        <span class="gal-level">Nivel ${artist.level}</span>
+        ${artist.isMaipuLocal ? '<span class="gal-maipu">📍 Maipú</span>' : ''}
+      </div>
+      <h3>${unlocked ? artist.name : 'Artista por descubrir'}</h3>
+      <p>${unlocked ? `${artist.genre} • ${artist.origin}` : 'Supera este nivel en la campaña para desbloquear su medalla.'}</p>
+    `;
+
+    if (unlocked) {
+      const replayBtn = document.createElement('button');
+      replayBtn.type = 'button';
+      replayBtn.className = 'small-play-btn';
+      replayBtn.textContent = '▶ Rejugar Nivel';
+      replayBtn.addEventListener('click', () => onPlayArtist(artist.level - 1));
+      info.appendChild(replayBtn);
+    }
+
+    card.appendChild(imgWrap);
+    card.appendChild(info);
+    grid.appendChild(card);
+  });
+}
+
+// --- main.js ---
+
+const STORAGE_KEY = 'rompe_algoritmo_maipu_v1';
+
+class GameApp {
+  constructor() {
+    this.topBar = document.getElementById('top-bar');
+    this.screenEl = document.getElementById('screen-container');
+    this.dvdLayer = document.getElementById('dvd-layer');
+    this.modalOverlay = document.getElementById('modal-overlay');
+
+    this.hudLevel = document.getElementById('hud-level');
+    this.hudArtist = document.getElementById('hud-artist');
+    this.hudVisText = document.getElementById('hud-visibility-text');
+    this.hudVisFill = document.getElementById('hud-visibility-fill');
+    this.btnPause = document.getElementById('btn-pause');
+    this.pauseIcon = document.getElementById('pause-icon');
+    this.pauseLabel = document.getElementById('pause-label');
+    this.btnMute = document.getElementById('btn-mute');
+    this.btnHome = document.getElementById('btn-home');
+
+    this.state = this.loadState();
+    this.answeredQuestionIds = new Set();
+    this.isPaused = false;
+    this.inGameplay = false;
+    this.activeController = null;
+    this.currentLevelIdx = 0;
+    this.infiniteMode = false;
+    this.infiniteStreak = 0;
+
+    this.bindGlobalControls();
+    this.showHome();
+  }
+
+  loadState() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        return {
+          maxUnlockedIdx: parsed.maxUnlockedIdx || 0,
+          campaignCompleted: Boolean(parsed.campaignCompleted),
+          discoveredIds: new Set(parsed.discoveredIds || []),
+          bestInfiniteStreak: parsed.bestInfiniteStreak || 0,
+        };
+      }
+    } catch {
+      // ignore
+    }
+    return {
+      maxUnlockedIdx: 0,
+      campaignCompleted: false,
+      discoveredIds: new Set(),
+      bestInfiniteStreak: 0,
+    };
+  }
+
+  saveState() {
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        maxUnlockedIdx: this.state.maxUnlockedIdx,
+        campaignCompleted: this.state.campaignCompleted,
+        discoveredIds: Array.from(this.state.discoveredIds),
+        bestInfiniteStreak: this.state.bestInfiniteStreak,
+      })
+    );
+  }
+
+  bindGlobalControls() {
+    this.btnPause.addEventListener('click', () => this.togglePause());
+    this.btnMute.addEventListener('click', () => {
+      const next = !soundEngine.muted;
+      soundEngine.setMuted(next);
+      this.btnMute.textContent = next ? '🔇' : '🔊';
+    });
+    this.btnHome.addEventListener('click', () => {
+      this.cleanupActivePhase();
+      soundEngine.stopTrack();
+      this.showHome();
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (!this.inGameplay) return;
+      if (e.key === 'Escape' || e.key.toLowerCase() === 'p') {
+        e.preventDefault();
+        this.togglePause();
+      }
+    });
+  }
+
+  togglePause(forceState) {
+    if (!this.inGameplay) return;
+    this.isPaused = typeof forceState === 'boolean' ? forceState : !this.isPaused;
+
+    if (this.isPaused) {
+      soundEngine.pause();
+      this.pauseIcon.textContent = '▶️';
+      this.pauseLabel.textContent = 'Reanudar';
+      this.showPauseOverlay();
+    } else {
+      soundEngine.resume();
+      this.pauseIcon.textContent = '⏸️';
+      this.pauseLabel.textContent = 'Pausa';
+      this.hidePauseOverlay();
+    }
+  }
+
+  showPauseOverlay() {
+    this.modalOverlay.classList.remove('hidden');
+    this.modalOverlay.innerHTML = `
+      <div class="modal-card pause-modal">
+        <div class="modal-badge">⏸️ JUEGO EN PAUSA</div>
+        <h2>Tómate un respiro</h2>
+        <p>La música, los temporizadores, los elementos flotantes y las notas están detenidos.</p>
+        <div class="modal-actions">
+          <button id="resume-btn" type="button" class="primary-btn">▶️ Continuar jugando (Esc / P)</button>
+          <button id="pause-home-btn" type="button" class="secondary-btn">🏠 Salir al Menú</button>
+        </div>
+      </div>
+    `;
+    this.modalOverlay.querySelector('#resume-btn').addEventListener('click', () => this.togglePause(false));
+    this.modalOverlay.querySelector('#pause-home-btn').addEventListener('click', () => {
+      this.isPaused = false;
+      this.cleanupActivePhase();
+      soundEngine.stopTrack();
+      this.hideModal();
+      this.showHome();
+    });
+  }
+
+  hidePauseOverlay() {
+    if (this.modalOverlay.querySelector('.pause-modal')) {
+      this.hideModal();
+    }
+  }
+
+  showModal({ badge, title, body, buttonText = '¡Entendido, a jugar!', onClose }) {
+    this.modalOverlay.classList.remove('hidden');
+    this.modalOverlay.innerHTML = `
+      <div class="modal-card">
+        ${badge ? `<div class="modal-badge">${badge}</div>` : ''}
+        <h2>${title}</h2>
+        <div class="modal-body">${body}</div>
+        <button id="modal-confirm-btn" type="button" class="primary-btn">${buttonText}</button>
+      </div>
+    `;
+    this.modalOverlay.querySelector('#modal-confirm-btn').addEventListener('click', () => {
+      this.hideModal();
+      if (onClose) onClose();
+    });
+  }
+
+  hideModal() {
+    this.modalOverlay.classList.add('hidden');
+    this.modalOverlay.innerHTML = '';
+  }
+
+  setTheme(themeClass) {
+    document.body.className = themeClass || 'theme-default';
+  }
+
+  cleanupActivePhase() {
+    this.inGameplay = false;
+    this.isPaused = false;
+    this.pauseIcon.textContent = '⏸️';
+    this.pauseLabel.textContent = 'Pausa';
+    if (this.activeController) {
+      this.activeController.destroy();
+      this.activeController = null;
+    }
+    this.dvdLayer.classList.add('hidden');
+    this.dvdLayer.innerHTML = '';
+  }
+
+  showHome() {
+    this.cleanupActivePhase();
+    this.topBar.classList.add('hidden');
+    this.setTheme('theme-default');
+
+    const nextIdx = Math.min(this.state.maxUnlockedIdx, ARTISTS.length - 1);
+    const nextArtist = ARTISTS[nextIdx];
+    const unlockedInf = this.state.campaignCompleted;
+
+    this.screenEl.innerHTML = `
+      <div class="home-screen">
+        <div class="school-pill">🏫 Colegio Particular San Nicolás de Maipú • 7° Básico</div>
+        <h1 class="game-title">ROMPE EL ALGORITMO</h1>
+        <p class="game-subtitle">
+          Descubre 12 proyectos musicales liderados por mujeres en el género urbano y el rock alternativo,
+          desde <strong>AKRILLA en Maipú</strong> hasta escenarios del mundo.
+        </p>
+
+        <div class="home-actions">
+          <button id="btn-start-campaign" type="button" class="primary-btn hero-btn">
+            ▶ ${this.state.maxUnlockedIdx === 0 ? 'Iniciar Campaña (Nivel 1: AKRILLA)' : `Continuar Campaña (Nivel ${nextArtist.level}: ${nextArtist.name})`}
+          </button>
+
+          <button id="btn-gallery" type="button" class="secondary-btn">
+            🏆 Artistas Descubiertas (${this.state.discoveredIds.size}/${ARTISTS.length})
+          </button>
+
+          <button id="btn-infinite" type="button" class="infinite-btn ${unlockedInf ? 'unlocked' : 'locked'}" ${unlockedInf ? '' : 'disabled'}>
+            ${unlockedInf ? '♾️ Modo Infinito / Post-Clase (¡Desbloqueado!)' : '🔒 Modo Infinito / Post-Clase'}
+            <small>${unlockedInf ? `Récord actual: ${this.state.bestInfiniteStreak} canciones` : 'Completa la campaña principal para desbloquear'}</small>
+          </button>
+        </div>
+
+        <div class="campaign-strip">
+          <h3>🗺️ Ruta de la Campaña</h3>
+          <div class="level-chips">
+            ${ARTISTS.map((a, idx) => {
+              const isUnlocked = idx <= this.state.maxUnlockedIdx;
+              const isDone = this.state.discoveredIds.has(a.id);
+              return `
+                <button type="button" class="level-chip ${isDone ? 'done' : isUnlocked ? 'open' : 'locked'}" data-idx="${idx}" ${isUnlocked ? '' : 'disabled'}>
+                  <span>${isDone ? '✅' : isUnlocked ? '🎵' : '🔒'} Nv.${a.level}</span>
+                  <strong>${a.name}</strong>
+                  ${a.isMaipuLocal ? '<em>Maipú</em>' : ''}
+                </button>`;
+            }).join('')}
+          </div>
+        </div>
+      </div>
+    `;
+
+    this.screenEl.querySelector('#btn-start-campaign').addEventListener('click', () => {
+      this.infiniteMode = false;
+      this.startLevel(nextIdx);
+    });
+
+    this.screenEl.querySelector('#btn-gallery').addEventListener('click', () => {
+      renderGallery(
+        this.screenEl,
+        this.state.discoveredIds,
+        () => this.showHome(),
+        (idx) => {
+          this.infiniteMode = false;
+          this.startLevel(idx);
+        }
+      );
+    });
+
+    if (unlockedInf) {
+      this.screenEl.querySelector('#btn-infinite').addEventListener('click', () => {
+        this.startInfiniteMode();
+      });
+    }
+
+    this.screenEl.querySelectorAll('.level-chip.open, .level-chip.done').forEach((chip) => {
+      chip.addEventListener('click', () => {
+        this.infiniteMode = false;
+        this.startLevel(Number(chip.dataset.idx));
+      });
+    });
+  }
+
+  startLevel(levelIdx) {
+    this.cleanupActivePhase();
+    this.currentLevelIdx = levelIdx;
+    const artist = ARTISTS[levelIdx];
+    this.setTheme(artist.themeClass);
+
+    this.topBar.classList.remove('hidden');
+    this.hudLevel.textContent = this.infiniteMode
+      ? `♾️ Infinito #${this.infiniteStreak + 1}`
+      : `Nivel ${artist.level}/${ARTISTS.length}`;
+    this.hudArtist.textContent = artist.isMaipuLocal ? `${artist.name} (Maipú)` : artist.name;
+    this.updateVisibilityHud(0, 350);
+
+    soundEngine.playArtistTrack(artist, false);
+
+    // Pantalla de Explicación ANTES de la Fase 1
+    this.showModal({
+      badge: `📡 FASE 1 • ${artist.name}`,
+      title: '¿Cómo se juega la Fase 1?',
+      body: `
+        <ul class="explain-list">
+          <li>💡 En la parte superior de cada tarjeta leerás una <strong>Pista / Contexto</strong>.</li>
+          <li>❓ Debajo encontrarás la <strong>Pregunta</strong> con 4 opciones para deducir la respuesta <strong>sin límite de tiempo</strong>.</li>
+          <li>🛡️ Tienes <strong>2 oportunidades</strong> por pregunta y <strong>3 comodines</strong> que se activan tras 30 segundos.</li>
+          <li>✨ ¡Atrapa el <strong>rostro luminoso de ${artist.name}</strong> que rebota por la pantalla para descubrir <strong>datos curiosos reales</strong> y sumar Visibilidad!</li>
+        </ul>
+      `,
+      buttonText: '¡Entendido, a jugar!',
+      onClose: () => this.launchPhase1(artist),
+    });
+  }
+
+  updateVisibilityHud(current, goal) {
+    const pct = Math.min(100, Math.round((current / goal) * 100));
+    this.hudVisText.textContent = `${current} / ${goal}`;
+    this.hudVisFill.style.width = `${pct}%`;
+  }
+
+  launchPhase1(artist) {
+    this.inGameplay = true;
+    this.activeController = new Phase1Controller({
+      container: this.screenEl,
+      dvdLayer: this.dvdLayer,
+      modalOverlay: this.modalOverlay,
+      artist,
+      answeredIds: this.answeredQuestionIds,
+      isPausedFn: () => this.isPaused,
+      onVisibilityChange: (cur, goal) => this.updateVisibilityHud(cur, goal),
+      onShowModal: (cfg) => this.showModal(cfg),
+      onComplete: (finalVisibility) => {
+        this.inGameplay = false;
+        this.showPhase2Intro(artist, finalVisibility);
+      },
+    });
+    this.activeController.start();
+  }
+
+  showPhase2Intro(artist, visibilityEarned) {
+    soundEngine.setPhaseVolume(true);
+    this.showModal({
+      badge: `🎸 FASE 2 MUSICAL • ${artist.name}`,
+      title: '¡Desbloqueaste la Fase Musical!',
+      body: `
+        <p class="intro-vis-note">Lograste <strong>${visibilityEarned} puntos de Visibilidad</strong>. ¡Ahora haz que suene ${artist.name}!</p>
+        <ul class="explain-list">
+          <li>🎹 Toca las notas al ritmo usando las teclas <strong>A - S</strong> (mano izquierda) y <strong>K - L</strong> (mano derecha).</li>
+          <li>⚠️ <strong>Evita presionar teclas cuando no haya notas</strong> en la zona de acierto, ¡porque marca error!</li>
+          <li>🎯 Alcanza al menos <strong>${artist.rhythm.minApprovalPct}% de aciertos</strong> para superar el nivel.</li>
+        </ul>
+      `,
+      buttonText: '¡Entendido, a jugar!',
+      onClose: () => this.launchPhase2(artist),
+    });
+  }
+
+  launchPhase2(artist) {
+    this.inGameplay = true;
+    this.activeController = new Phase2Controller({
+      container: this.screenEl,
+      artist,
+      isPausedFn: () => this.isPaused,
+      onSuccess: (stats) => this.handleLevelComplete(artist, stats),
+      onRetryNeeded: (failStats) => this.handlePhase2Retry(artist, failStats),
+    });
+    this.activeController.start();
+  }
+
+  handlePhase2Retry(artist, failStats) {
+    this.inGameplay = false;
+    this.showModal({
+      badge: '🎵 ¡Casi lo logras!',
+      title: `Alcanzaste ${failStats.approvalPct}% (Meta: ${failStats.minPct}%)`,
+      body: `
+        <p>Te faltaron aproximadamente <strong>${failStats.neededHits} aciertos</strong> para superar la canción.</p>
+        <p>No pierdes tu avance de la Fase 1. ¡Inténtalo de nuevo con calma!</p>
+      `,
+      buttonText: '🔄 Reintentar Canción',
+      onClose: () => this.launchPhase2(artist),
+    });
+  }
+
+  handleLevelComplete(artist, stats) {
+    this.inGameplay = false;
+    this.state.discoveredIds.add(artist.id);
+
+    if (this.infiniteMode) {
+      this.infiniteStreak += 1;
+      this.state.bestInfiniteStreak = Math.max(this.state.bestInfiniteStreak, this.infiniteStreak);
+      this.saveState();
+
+      this.showModal({
+        badge: '♾️ MODO INFINITO',
+        title: `¡Superaste a ${artist.name}!`,
+        body: `
+          <p>Aprobación: <strong>${stats.approvalPct}%</strong> • Combo máximo: <strong>${stats.maxCombo}</strong></p>
+          <p>Racha actual: <strong>${this.infiniteStreak} canciones</strong></p>
+        `,
+        buttonText: '▶ Siguiente Artista Aleatoria',
+        onClose: () => {
+          const nextRandom = Math.floor(Math.random() * ARTISTS.length);
+          this.startInfiniteSong(nextRandom);
+        },
+      });
+      return;
+    }
+
+    if (this.currentLevelIdx + 1 > this.state.maxUnlockedIdx && this.currentLevelIdx + 1 < ARTISTS.length) {
+      this.state.maxUnlockedIdx = this.currentLevelIdx + 1;
+    }
+
+    const isFinalLevel = this.currentLevelIdx === ARTISTS.length - 1;
+    if (isFinalLevel) {
+      this.state.campaignCompleted = true;
+    }
+    this.saveState();
+
+    if (isFinalLevel) {
+      this.showModal({
+        badge: '🏆 ¡CAMPAÑA COMPLETADA!',
+        title: '¡Rompiste el algoritmo por completo!',
+        body: `
+          <p>Descubriste a las <strong>12 referentes mujeres</strong> desde Maipú hasta Kioto.</p>
+          <p>🔓 ¡Acabas de desbloquear el <strong>Modo Infinito / Post-Clase</strong> en el menú inicial!</p>
+        `,
+        buttonText: '🏠 Ir al Menú Principal',
+        onClose: () => {
+          soundEngine.stopTrack();
+          this.showHome();
+        },
+      });
+    } else {
+      const nextArtist = ARTISTS[this.currentLevelIdx + 1];
+      this.showModal({
+        badge: `✅ NIVEL ${artist.level} SUPERADO`,
+        title: `¡${artist.name} ahora es visible!`,
+        body: `
+          <p>Aprobación musical: <strong>${stats.approvalPct}%</strong> • Combo máximo: <strong>${stats.maxCombo}</strong></p>
+          <p>Siguiente destino: <strong>Nivel ${nextArtist.level} — ${nextArtist.name}</strong> (${nextArtist.genre})</p>
+        `,
+        buttonText: `▶ Ir al Nivel ${nextArtist.level}`,
+        onClose: () => this.startLevel(this.currentLevelIdx + 1),
+      });
+    }
+  }
+
+  startInfiniteMode() {
+    this.infiniteMode = true;
+    this.infiniteStreak = 0;
+    const randomIdx = Math.floor(Math.random() * ARTISTS.length);
+    this.startInfiniteSong(randomIdx);
+  }
+
+  startInfiniteSong(idx) {
+    this.cleanupActivePhase();
+    const artist = ARTISTS[idx];
+    this.setTheme(artist.themeClass);
+    this.topBar.classList.remove('hidden');
+    this.hudLevel.textContent = `♾️ Infinito #${this.infiniteStreak + 1}`;
+    this.hudArtist.textContent = artist.name;
+    this.updateVisibilityHud(350, 350);
+
+    soundEngine.playArtistTrack(artist, true);
+    this.launchPhase2(artist);
+  }
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  new GameApp();
+});
+
+  </script>
+</body>
+</html>
