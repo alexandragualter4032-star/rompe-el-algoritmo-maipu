@@ -75,9 +75,28 @@ Los archivos de imagen están en `public/images/`; las rutas y enlaces de reprod
 
 Cada nivel muestra el mapa en la ficha de la artista. Para localidades en Chile aparece el mapa del país; si hay un lugar de origen o trayectoria fuera de Chile, aparece un mapamundi. Las marcas son aproximadas y no representan domicilios.
 
-## Decisiones pedagógicas
+## Decisiones pedagógicas, TPACK, escalabilidad y respaldo legal
 
 La revisión basada en el capítulo de Richard E. Mayer y en práctica de recuperación está en [docs/aprendizaje-multimedia.md](docs/aprendizaje-multimedia.md). Los principios considerados incluyen segmentación, señalización, contigüidad y limitar elementos que distraigan. La efectividad pedagógica todavía requiere prueba con estudiantes y revisión de datos biográficos.
+
+### Matriz de justificación de arquitectura (TPACK + Aprendizaje Multimedia + Ley 21.719 / Ley 21.855)
+
+| Decisión de diseño y base de datos | Justificación TPACK (Tecnología, Pedagogía y Contenido) | Aprendizaje Multimedia (Mayer, 2002) y Práctica de Recuperación (Karpicke & Roediger, 2008) | Marco Legal Chileno (Ley 21.719 y Ley 21.855 sobre protección de NNA) |
+| --- | --- | --- | --- |
+| **Códigos aleatorios sin `0/O/1/I` (`ABCDE-12345`) y prohibición de nombres reales** | **TK + PK (Gestión de aula):** En 7° Básico, las cuentas con correo y contraseña consumen tiempo de clase por olvidos. Un código de 10 caracteres sin ambigüedad visual permite entrar en segundos y cambiar de equipo en el laboratorio. | **Reducción de carga cognitiva extrínseca:** Evita fricción de registro y ansiedad de evaluación nominal antes de iniciar la tarea cognitiva musical. | **Minimización de datos y deber reforzado de protección de NNA:** La base solo guarda el hash SHA-256 del código y etiquetas neutras forzadas (`Estudiante 1`, `Equipo 2`), bloqueando la inserción accidental de nombres reales. |
+| **Separación por cursos y elección explícita: *Práctica sin guardado* vs *Guardar para retomar*** | **PK + CK (Flexibilidad didáctica):** Permite usar la aplicación tanto en talleres de una sesión (sin huella digital) como en unidades de varias semanas donde cada curso avanza a distinto ritmo. | **Principio de Segmentación y Ritmo Propio:** El progreso por `checkpoint` (nivel, fase y número de pregunta) permite distribuir la práctica entre sesiones sin perder coherencia. | **Principio de finalidad y consentimiento informado del establecimiento:** En modo sin guardado no se crean códigos ni filas en la base. Activar el guardado exige confirmar fecha de vencimiento y fecha de borrado. |
+| **Fechas separadas de vencimiento (`expires_at`) y borrado definitivo (`delete_at`)** | **PK (Evaluación formativa):** Cuando vence el plazo de juego, los códigos dejan de admitir cambios, pero el docente conserva una ventana acotada para exportar el CSV de avance antes de la eliminación definitiva. | **Práctica de Recuperación Espaciada:** Facilita planificar sesiones de recuperación dentro de un periodo acotado y observar en qué niveles o preguntas hubo mayor dificultad. | **Limitación del plazo de conservación y derecho de supresión:** Al cumplirse `delete_at` (o cuando el docente elimina el curso o desactiva el guardado), `ON DELETE CASCADE` borra curso, códigos, sesiones y progreso. |
+| **Secuencia monótona por curso (`next_student_seq`) y prevención de colisiones** | **TPK (Trazabilidad docente fuera del sistema):** Aunque se eliminen códigos individuales o se generen lotes en distintas clases, el contador del curso nunca reutiliza `Estudiante N` dentro del mismo curso. | **Señalización clara:** Evita ambigüedades al contrastar la tabla privada del docente con el panel de avance. | **Integridad y seudonimización robusta:** Los códigos tienen $32^{10} \approx 1,12 \times 10^{15}$ combinaciones posibles con verificación `UNIQUE (code_hash)` y `UNIQUE (course_id, label)`. |
+
+### Estimación de escalabilidad en Supabase (Plan Gratuito de 500 MB)
+
+- **Tamaño por estudiante:** `student_codes` (~300 B) + `progress` JSONB acotado (~600 B) + `sessions` (~250 B) + índices ≈ **1,2 KB a 1,5 KB por estudiante**.
+- **Tamaño por curso promedio (40 estudiantes):** **~50 KB a 60 KB** por curso completo.
+- **Capacidad total en 500 MB (dejando ~50 MB de margen para catálogos e índices del motor PostgreSQL):**
+  - Hasta **~7.500 cursos simultáneos** (aproximadamente **300.000 estudiantes**).
+  - Con la purga automática por `delete_at` al finalizar cada semestre o unidad, el espacio se libera y reutiliza de forma continua.
+- **Concurrencia en sala de enlaces (Vercel Functions + Supabase Transaction Pooler):**
+  - El cliente PostgreSQL (`src/server/db.ts`) está configurado con `prepare: false` y `max: 3` conexiones para operar con el **Transaction Pooler (Supavisor, puerto 6543)** de Supabase. Como el navegador solo envía una petición `PUT /api/progress` al avanzar de pregunta o completar una fase, múltiples cursos de 40 estudiantes jugando en paralelo requieren menos de 5 conexiones activas simultáneas en la base de datos.
 
 ## Despliegue y pendientes
 

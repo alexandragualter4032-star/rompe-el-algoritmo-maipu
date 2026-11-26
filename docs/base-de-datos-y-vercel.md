@@ -77,6 +77,18 @@ Vercel ofrece funciones con runtime Bun, pero la aplicación actual usa un servi
 - Ningún código, clave, CSV de clase o base de datos se sube a GitHub.
 - La política y el texto informativo fueron revisados por el establecimiento antes de usar información de estudiantes.
 
+## Escalabilidad, retención máxima de 30 días y exportación docente (TPACK + Ley 21.719)
+
+- **Vigencia máxima de códigos (30 días) y borrado automático (hasta 45 días):**
+  - Los códigos de estudiante tienen un tope de **30 días** (`expires_at`), suficiente para cubrir una unidad didáctica mensual sin dejar accesos abiertos indefinidamente.
+  - La fecha de eliminación del curso (`delete_at`, máximo **45 días**) otorga al docente una ventana de hasta 15 días tras el cierre de la actividad para descargar el informe formativo antes de que el servidor elimine por completo el curso, sus códigos, sesiones y progreso (`ON DELETE CASCADE`).
+- **Informe descargable en CSV y Excel (`.xls`):**
+  - El panel docente permite exportar tanto la nómina única de códigos recién creados como el **informe de avance del curso** en formato **CSV** y **planilla Excel (`.xls` SpreadsheetML)** con niveles completados, estado de campaña, punto de retorno, visibilidad acumulada y porcentaje promedio de aprobación de ritmo, sin incluir nombres reales.
+- **Capacidad en Supabase (Plan Gratuito de 500 MB):**
+  - Cada estudiante ocupa entre **1,2 KB y 1,5 KB** (`student_codes` + `progress` JSONB acotado + `sessions` + índices), por lo que un curso promedio de **40 estudiantes ocupa ~50 KB a 60 KB**.
+  - Con ~450 MB útiles (reservando 50 MB para el motor PostgreSQL), la base soporta hasta **~7.500 cursos simultáneos (~300.000 estudiantes)**, y la purga automática tras `delete_at` recicla el espacio continuamente.
+  - Para soportar salas de clases completas conectadas al mismo tiempo desde funciones serverless de Vercel, `src/server/db.ts` utiliza el **Transaction Pooler (Supavisor, puerto 6543)** con `prepare: false` y `max: 3` conexiones.
+
 ## Respaldo legislativo chileno
 
 La Ley 21.719 modifica el marco chileno de protección de datos personales e incluye reglas especiales para niños, niñas y adolescentes, entre ellas el interés superior, la autonomía progresiva y un deber especial de protección para establecimientos educacionales. La Ley 21.855, publicada el 23 de noviembre de 2026, fijó su entrada en vigencia para el **15 de octubre de 2027**. Revisar la fecha y el texto vigente antes de un despliegue real; esta sección sirve para orientar el diseño, no reemplaza la revisión del establecimiento ni asesoría legal.

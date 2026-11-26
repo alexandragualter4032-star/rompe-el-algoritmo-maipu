@@ -2,3 +2,7 @@ node_modules/
 dist/
 /data/
 .env*
+.vercel/
+supabase/.temp/
+
+.vercel

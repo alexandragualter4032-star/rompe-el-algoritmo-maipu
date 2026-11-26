@@ -72,3 +72,70 @@ test('códigos individuales, guardado y expiración de sesiones', async () => {
   const rejected = await post('/api/student/login', { code: created[0].code });
   expect(rejected.status).toBe(401);
 });
+
+test('separación de cursos, modo sin guardado, colisión de alias y borrado completo', async () => {
+  const adminLogin = await post('/api/admin/login', { key: 'test-admin-secret' });
+  expect(adminLogin.status).toBe(200);
+  const adminCookie = adminLogin.headers.get('set-cookie').split(';')[0];
+
+  // Crear curso en modo sin guardado
+  const createNoSave = await post('/api/admin/courses', {
+    alias: '7B-SIN-GUARDAR-2026',
+    saveMode: 'no_save',
+    expireDays: 30,
+    deleteDays: 45,
+  }, adminCookie);
+  expect(createNoSave.status).toBe(201);
+  const { course: noSaveCourse } = await createNoSave.json();
+  expect(noSaveCourse.saveMode).toBe('no_save');
+
+  // Colisión de alias duplicado debe devolver 409
+  const duplicateCourse = await post('/api/admin/courses', {
+    alias: '7B-SIN-GUARDAR-2026',
+    saveMode: 'no_save',
+  }, adminCookie);
+  expect(duplicateCourse.status).toBe(409);
+
+  // Intentar generar códigos en un curso sin guardado debe fallar con 400
+  const blockedCodes = await post('/api/admin/codes', {
+    courseId: noSaveCourse.id,
+    count: 2,
+  }, adminCookie);
+  expect(blockedCodes.status).toBe(400);
+
+  // Activar guardado en el curso y generar códigos con etiqueta neutra forzada
+  const enableSave = await post(`/api/admin/courses/${noSaveCourse.id}/mode`, {
+    saveMode: 'save_to_resume',
+  }, adminCookie);
+  expect(enableSave.status).toBe(200);
+
+  // Aunque envíen un nombre propio en prefix, el servidor lo sanitiza a 'Estudiante'
+  const gen1 = await post('/api/admin/codes', {
+    courseId: noSaveCourse.id,
+    count: 2,
+    prefix: 'Juan Perez',
+  }, adminCookie);
+  expect(gen1.status).toBe(201);
+  const { created: batch1 } = await gen1.json();
+  expect(batch1[0].label).toBe('Estudiante 1');
+  expect(batch1[1].label).toBe('Estudiante 2');
+
+  // Si se borra Estudiante 1 y se genera otro código, la secuencia sigue en Estudiante 3 sin repetir etiqueta
+  await post(`/api/admin/students/${batch1[0].id}/delete`, {}, adminCookie);
+  const gen2 = await post('/api/admin/codes', {
+    courseId: noSaveCourse.id,
+    count: 1,
+  }, adminCookie);
+  const { created: batch2 } = await gen2.json();
+  expect(batch2[0].label).toBe('Estudiante 3');
+
+  // Borrar el curso completo elimina también sus códigos y sesiones
+  const delCourse = await fetch(`${base}/api/admin/courses/${noSaveCourse.id}`, {
+    method: 'DELETE',
+    headers: { cookie: adminCookie },
+  });
+  expect(delCourse.status).toBe(200);
+
+  const loginAfterDelete = await post('/api/student/login', { code: batch2[0].code });
+  expect(loginAfterDelete.status).toBe(401);
+});
