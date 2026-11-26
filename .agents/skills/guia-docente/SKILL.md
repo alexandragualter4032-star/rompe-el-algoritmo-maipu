@@ -9,15 +9,15 @@ Este documento explica cómo utilizar la versión publicada en **Vercel + Supaba
 
 > [!IMPORTANT]
 > **Acceso al sitio publicado:**
-> - **URL pública para estudiantes:** `https://rompe-el-algoritmo-maipu-ten.vercel.app/`
-> - **URL directa al panel docente:** `https://rompe-el-algoritmo-maipu-ten.vercel.app/?admin=1`
+> - **URL pública para estudiantes:** `https://rompe-el-algoritmo-maipu.vercel.app/`
+> - **URL directa al panel docente:** `https://rompe-el-algoritmo-maipu.vercel.app/?admin=1`
 > - **Clave docente (`ADMIN_KEY`):** Se entrega por canal privado (guardada localmente en `data/admin.key` en el equipo de despliegue y como variable secreta en Vercel; **nunca se sube a GitHub**).
 
 ---
 
 ## 1. Cómo entrar al Panel Docente
 
-1. Abre `https://rompe-el-algoritmo-maipu-ten.vercel.app/?admin=1` (o entra a la página principal y selecciona la pestaña **«Docente / administración»**).
+1. Abre `https://rompe-el-algoritmo-maipu.vercel.app/?admin=1` (o entra a la página principal y selecciona la pestaña **«Docente / administración»**).
 2. Ingresa el **Código de administración** privado que te compartió tu compañero de equipo.
 3. Verás el **Panel docente** con:
    - Resumen de códigos creados, códigos vigentes y niveles completados.
