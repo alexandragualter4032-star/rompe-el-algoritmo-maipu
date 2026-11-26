@@ -207,7 +207,8 @@ async function getPg() {
 let sqliteDb: any = null;
 async function getSqlite() {
   if (sqliteDb) return sqliteDb;
-  const { Database } = await import('bun:sqlite');
+  const sqliteModName = 'bun:sqlite';
+  const { Database } = await import(/* @vite-ignore */ sqliteModName);
   const dataDir = getEnv('DATA_DIR') ? resolve(getEnv('DATA_DIR')!) : resolve(root, 'data');
   mkdirSync(dataDir, { recursive: true });
   try { chmodSync(dataDir, 0o700); } catch { /* Windows */ }

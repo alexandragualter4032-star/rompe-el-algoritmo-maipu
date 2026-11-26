@@ -18,7 +18,7 @@ import {
   setCourseSaveMode,
   updateStudentProgress,
   verifyAdminKey,
-} from './db.ts';
+} from './db';
 
 function json(data: unknown, status = 200, cookieHeader?: string) {
   const headers = new Headers({

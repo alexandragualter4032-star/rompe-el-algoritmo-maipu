@@ -4,7 +4,6 @@ import { soundEngine } from '../audio/soundEngine.js';
 import { Phase1Controller } from '../components/phase1.js';
 import { Phase2Controller } from '../components/phase2.js';
 import { ArtistImage } from './ArtistImage.jsx';
-import { OriginMap } from './OriginMap.jsx';
 import { api } from './api.js';
 
 const freshProgress = () => ({
@@ -277,6 +276,20 @@ export function Game({ role, initialProgress, student, debugLevel, onExit }) {
   }
 
   useEffect(() => {
+    // Pre-cargar el retrato y portada de la artista actual y de la siguiente para que no tarden al abrir el nivel
+    for (const idx of [currentIdx, Math.min(ARTISTS.length - 1, currentIdx + 1)]) {
+      const a = ARTISTS[idx];
+      if (!a?.files) continue;
+      for (const imgPath of [a.files.photo, a.files.singleCover, a.files.albumCover]) {
+        if (imgPath) {
+          const img = new Image();
+          img.src = imgPath;
+        }
+      }
+    }
+  }, [currentIdx]);
+
+  useEffect(() => {
     document.body.className = screen === 'home' || screen === 'gallery' ? 'theme-default' : artist.themeClass;
   }, [screen, artist.themeClass]);
 
@@ -389,7 +402,6 @@ export function Game({ role, initialProgress, student, debugLevel, onExit }) {
         pausedRef={pausedRef} onVisibilityChange={onVisibilityChange} onShowModal={setModal}
         onProgress={onQuestionProgress} onComplete={onQuestionsComplete}
         onSuccess={onRhythmSuccess} onRetry={onRhythmRetry} />}
-      {screen === 'questions' && <OriginMap artist={artist} />}
     </main>
 
     <div ref={dvdLayer} className="dvd-layer hidden" />
