@@ -587,6 +587,17 @@ body {
 .auth-card .game-title { font-size: clamp(2rem, 8vw, 3.5rem); }
 .auth-card .game-subtitle { margin-bottom: 1.2rem; }
 .auth-card > .secondary-btn { margin-top: 1rem; }
+.auth-card h2 { margin: 0.8rem 0; }
+.credential-reveal {
+  margin: 1rem auto;
+  padding: 1rem;
+  border: 2px solid var(--secondary);
+  border-radius: 14px;
+  background: rgba(8, 217, 214, 0.1);
+  text-align: left;
+}
+.credential-reveal code { display: inline-block; padding: 0.3rem 0.55rem; border-radius: 6px; background: #090711; font-size: 1.15rem; letter-spacing: 0.08em; }
+.credential-reveal .secondary-btn { margin-top: 0.35rem; }
 
 .auth-tabs {
   display: flex;

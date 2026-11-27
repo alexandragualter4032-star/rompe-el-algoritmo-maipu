@@ -64,24 +64,19 @@ function downloadExcelXml(filename, sheetName, rows) {
   URL.revokeObjectURL(url);
 }
 
-const NEUTRAL_PREFIXES = ['Estudiante', 'Equipo', 'Puesto', 'Grupo'];
-
 export function AdminPanel({ onDebug, onLogout }) {
   const [courses, setCourses] = useState([]);
   const [selectedCourseId, setSelectedCourseId] = useState('');
   const [students, setStudents] = useState([]);
-  const [created, setCreated] = useState([]);
+  const [joinCode, setJoinCode] = useState('');
+  const [renewedCredential, setRenewedCredential] = useState(null);
 
-  // Formulario nuevo curso (máximo 30 días de vigencia de códigos, 45 días para borrado definitivo)
+  // Formulario nuevo curso (máximo 30 días de acceso, 45 días para borrado definitivo)
   const [newAlias, setNewAlias] = useState('');
   const [newSaveMode, setNewSaveMode] = useState('no_save');
   const [newExpireDays, setNewExpireDays] = useState(30);
   const [newDeleteDays, setNewDeleteDays] = useState(45);
 
-  // Formulario generación de códigos (máximo 30 días)
-  const [count, setCount] = useState(25);
-  const [days, setDays] = useState(30);
-  const [prefix, setPrefix] = useState('Estudiante');
   const [debugLevel, setDebugLevel] = useState(0);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
@@ -118,7 +113,7 @@ export function AdminPanel({ onDebug, onLogout }) {
   function buildProgressReportRows() {
     const header = [
       'Curso',
-      'Etiqueta (Pseudónimo)',
+      'Usuario (alias inventado)',
       'Niveles Completados (de 12)',
       'Campaña Completada',
       'Próximo Nivel / Retomar',
@@ -126,7 +121,7 @@ export function AdminPanel({ onDebug, onLogout }) {
       'Aprobación Ritmo Promedio (%)',
       'Mejor Racha Modo Infinito',
       'Sesiones Activas',
-      'Vencimiento Código',
+      'Vencimiento Acceso',
       'Borrado Automático',
     ];
     const dataRows = visibleStudents.map((item) => {
@@ -143,7 +138,7 @@ export function AdminPanel({ onDebug, onLogout }) {
           : `Nivel ${item.progress.maxUnlockedIdx + 1}`;
       return [
         item.courseAlias || currentCourse?.alias || '',
-        item.label,
+        item.username || item.label,
         item.progress.discoveredIds.length,
         item.progress.campaignCompleted ? 'Sí' : 'No',
         resumeLabel,
@@ -185,8 +180,27 @@ export function AdminPanel({ onDebug, onLogout }) {
       });
       setNewAlias('');
       setSelectedCourseId(result.course.id);
-      setNotice(`Curso ${result.course.alias} creado en modo "${result.course.saveMode === 'no_save' ? 'Práctica sin guardado' : 'Guardar para retomar'}".`);
+      setJoinCode(result.course.joinCode || '');
+      setNotice(result.course.joinCode
+        ? `Curso ${result.course.alias} creado. Entrega el único código de curso solo a sus estudiantes.`
+        : `Curso ${result.course.alias} creado sin guardado. No se necesita código.`);
       await refresh('');
+    } catch (cause) {
+      setError(cause.message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function handleIssueCourseCode(course) {
+    if (!course) return;
+    if (!window.confirm('Generar una nueva invitación invalidará la anterior, si existe. ¿Continuar?')) return;
+    setBusy(true);
+    setError('');
+    try {
+      const result = await api(`/api/admin/courses/${course.id}/invite-code`, 'POST', {});
+      setJoinCode(result.joinCode);
+      setNotice(`Código de curso para ${course.alias}. Compártelo solo con esa clase.`);
     } catch (cause) {
       setError(cause.message);
     } finally {
@@ -199,14 +213,14 @@ export function AdminPanel({ onDebug, onLogout }) {
     if (course.saveMode === 'save_to_resume') {
       const ok = window.confirm(
         `¿Cambiar el curso "${course.alias}" a modo "Práctica sin guardado"?\n\n` +
-        `ATENCIÓN: Se borrarán inmediatamente todos los códigos (${course.totalCodes}), sesiones activas y el progreso guardado de este curso.`
+        `ATENCIÓN: Se borrarán inmediatamente todas las cuentas (${course.totalCodes}), sesiones activas y los avances de este curso.`
       );
       if (!ok) return;
       setBusy(true);
       try {
         await api(`/api/admin/courses/${course.id}/mode`, 'POST', { saveMode: 'no_save' });
-        setCreated([]);
-        setNotice(`El curso ${course.alias} pasó a modo sin guardado y sus registros fueron eliminados.`);
+        setJoinCode('');
+        setNotice(`El curso ${course.alias} pasó a modo sin guardado y sus cuentas y avances fueron eliminados.`);
         await refresh('');
       } catch (cause) {
         setError(cause.message);
@@ -218,15 +232,16 @@ export function AdminPanel({ onDebug, onLogout }) {
       const delDate = date(course.deleteAt);
       const ok = window.confirm(
         `¿Activar guardado ("Retomar otro día") para el curso "${course.alias}"?\n\n` +
-        `• Los códigos vencerán el: ${expDate}\n` +
+        `• El acceso vencerá el: ${expDate}\n` +
         `• Los datos se borrarán automáticamente el: ${delDate}\n` +
-        `• Solo se guardan códigos en hash y etiquetas neutras.`
+        `• Se guardan alias inventados, contraseñas en hash y avance.`
       );
       if (!ok) return;
       setBusy(true);
       try {
         await api(`/api/admin/courses/${course.id}/mode`, 'POST', { saveMode: 'save_to_resume' });
-        setNotice(`Guardado activado para ${course.alias}. Ya puedes generar códigos pseudónimos.`);
+        setJoinCode('');
+        setNotice(`Guardado activado para ${course.alias}. Ya puedes compartir el código de curso.`);
         await refresh('');
       } catch (cause) {
         setError(cause.message);
@@ -244,7 +259,6 @@ export function AdminPanel({ onDebug, onLogout }) {
     setBusy(true);
     try {
       await api(`/api/admin/courses/${course.id}`, 'DELETE');
-      setCreated([]);
       setNotice(`Curso ${course.alias} y todos sus datos asociados fueron eliminados.`);
       setSelectedCourseId('');
       await refresh('');
@@ -255,47 +269,37 @@ export function AdminPanel({ onDebug, onLogout }) {
     }
   }
 
-  async function generate(event) {
-    event.preventDefault();
-    if (currentCourse && currentCourse.saveMode !== 'save_to_resume') {
-      setError('Activa el modo "Guardar para retomar" en el curso antes de crear códigos.');
-      return;
-    }
-    setBusy(true);
-    setError('');
-    try {
-      const result = await api('/api/admin/codes', 'POST', {
-        courseId: currentCourse?.id,
-        count: Number(count),
-        days: Math.min(30, Math.max(1, Number(days) || 30)),
-        prefix,
-      });
-      setCreated(result.created);
-      setNotice(`${result.created.length} códigos creados. Descárgalos ahora: el servidor solo conserva su hash y no volverá a mostrarlos.`);
-      await refresh('');
-    } catch (cause) {
-      setError(cause.message);
-    } finally {
-      setBusy(false);
-    }
-  }
-
   async function action(id, kind) {
-    if (kind === 'reset' && !window.confirm('¿Reiniciar todo el avance de este código?')) return;
-    if (kind === 'revoke' && !window.confirm('¿Desactivar este código y cerrar sus sesiones?')) return;
-    if (kind === 'delete' && !window.confirm('¿Borrar definitivamente este código y todo su progreso de la base de datos?')) return;
+    if (kind === 'reset' && !window.confirm('¿Reiniciar todo el avance de esta cuenta?')) return;
+    if (kind === 'revoke' && !window.confirm('¿Desactivar esta cuenta y cerrar sus sesiones?')) return;
+    if (kind === 'delete' && !window.confirm('¿Borrar definitivamente esta cuenta y todo su progreso de la base de datos?')) return;
     setError('');
     try {
       await api(`/api/admin/students/${id}/${kind}`, 'POST', {});
       setNotice(
-        kind === 'expire-sessions' ? 'Sesiones cerradas. El código sigue válido.' :
-        kind === 'revoke' ? 'Código desactivado.' :
+        kind === 'expire-sessions' ? 'Sesiones cerradas. La cuenta sigue activa.' :
+        kind === 'revoke' ? 'Cuenta desactivada.' :
         kind === 'delete' ? 'Registro y progreso eliminados.' :
         'Progreso reiniciado.'
       );
       await refresh('');
     } catch (cause) {
       setError(cause.message);
+    }
+  }
+
+  async function resetPassword(item) {
+    if (!window.confirm(`¿Generar una nueva contraseña para ${item.username}? La anterior dejará de funcionar.`)) return;
+    setBusy(true);
+    setError('');
+    try {
+      const result = await api(`/api/admin/students/${item.id}/new-password`, 'POST', {});
+      setRenewedCredential({ id: item.id, username: item.username, password: result.password });
+      setNotice('Nueva contraseña lista. Muéstrala al estudiante en privado.');
+    } catch (cause) {
+      setError(cause.message);
+    } finally {
+      setBusy(false);
     }
   }
 
@@ -310,21 +314,21 @@ export function AdminPanel({ onDebug, onLogout }) {
 
     <main className="admin-main">
       <section className="admin-stats" aria-label="Resumen">
-        <div><strong>{visibleStudents.length}</strong><span>Códigos creados</span></div>
-        <div><strong>{visibleStudents.filter((item) => !item.revokedAt && item.expiresAt > Date.now()).length}</strong><span>Códigos vigentes</span></div>
+        <div><strong>{visibleStudents.length}</strong><span>Cuentas creadas</span></div>
+        <div><strong>{visibleStudents.filter((item) => !item.revokedAt && item.expiresAt > Date.now()).length}</strong><span>Cuentas vigentes</span></div>
         <div><strong>{totalCompleted}</strong><span>Niveles completados en total</span></div>
       </section>
 
       <section className="admin-card" aria-labelledby="privacy-note-title">
         <h2 id="privacy-note-title">Privacidad, TPACK y modo de trabajo por curso</h2>
         <p>
-          <strong>1. Práctica sin guardado (recomendado para 1 sesión):</strong> No se crean códigos ni se registran datos en el servidor. Al cerrar o recargar la página, la partida se pierde.
+          <strong>1. Práctica sin guardar (recomendado para 1 sesión):</strong> No se crea una cuenta ni se registra avance en el servidor. Al cerrar o recargar, la partida se pierde.
         </p>
         <p>
-          <strong>2. Retomar otro día (máximo 30 días de vigencia):</strong> Genera códigos aleatorios individuales con fecha de vencimiento de acceso (hasta 30 días) y fecha de borrado automático (hasta 45 días, dando una ventana al docente para descargar el informe en CSV o Excel antes de la eliminación total).
+          <strong>2. Guardar para retomar (máximo 30 días):</strong> Comparte un solo código de curso. Cada estudiante elige un alias inventado; al superar el nivel 1 recibe una contraseña personal. El acceso vence en la fecha indicada y los datos se borran al llegar la fecha de eliminación.
         </p>
         <p className="admin-hint">
-          Prohibido ingresar nombres, apellidos, RUT, correo o número de lista en la plataforma (Ley 21.719 / protección de NNA). Si necesitas asociar un código a un estudiante, conserva la tabla <em>nombre ↔ código</em> en un registro privado fuera del sistema y de GitHub.
+          No usar nombres reales, apellidos, iniciales, RUT, correo ni número de lista como usuario. El alias debe ser inventado. Si necesitas vincular avance e identidad, conserva esa relación en privado, fuera de la aplicación y de GitHub.
         </p>
       </section>
 
@@ -337,7 +341,7 @@ export function AdminPanel({ onDebug, onLogout }) {
           {courses.length > 0 && (
             <div className="admin-form">
               <label>Seleccionar curso
-                <select value={currentCourse?.id || ''} onChange={(e) => { setSelectedCourseId(e.target.value); setCreated([]); }}>
+                <select value={currentCourse?.id || ''} onChange={(e) => { setSelectedCourseId(e.target.value); setJoinCode(''); setRenewedCredential(null); }}>
                   {courses.map((c) => (
                     <option key={c.id} value={c.id}>
                       {c.alias} ({c.saveMode === 'save_to_resume' ? 'Con guardado' : 'Sin guardado'})
@@ -350,14 +354,15 @@ export function AdminPanel({ onDebug, onLogout }) {
                   <p>
                     <strong>Modo actual:</strong>{' '}
                     {currentCourse.saveMode === 'save_to_resume'
-                      ? 'Guardar para retomar con código'
+                      ? 'Guardar para retomar con cuenta'
                       : 'Práctica sin guardado (no almacena datos)'}
                   </p>
                   <p>
-                    <strong>Vencimiento de códigos:</strong> {date(currentCourse.expiresAt)} ·{' '}
+                    <strong>Vencimiento de acceso:</strong> {date(currentCourse.expiresAt)} ·{' '}
                     <strong>Borrado definitivo del curso:</strong> {date(currentCourse.deleteAt)}
                   </p>
                   <div className="admin-row-actions">
+                    {currentCourse.saveMode === 'save_to_resume' && <button type="button" className="secondary-btn" disabled={busy} onClick={() => handleIssueCourseCode(currentCourse)}>Generar o renovar invitación</button>}
                     <button type="button" className="secondary-btn" disabled={busy} onClick={() => handleToggleCourseMode(currentCourse)}>
                       {currentCourse.saveMode === 'save_to_resume'
                         ? 'Desactivar guardado y borrar progreso'
@@ -369,6 +374,7 @@ export function AdminPanel({ onDebug, onLogout }) {
                       </button>
                     )}
                   </div>
+                  {joinCode && <p className="admin-hint">Código de curso (se muestra ahora): <code>{joinCode}</code>. Compártelo solo con esta clase. Al crear otro, este dejará de servir.</p>}
                 </div>
               )}
             </div>
@@ -386,7 +392,7 @@ export function AdminPanel({ onDebug, onLogout }) {
                 <option value="save_to_resume">2. Retomar otro día (con fecha de borrado)</option>
               </select>
             </label>
-            <label>Vencimiento de códigos (máx. 30 días)
+            <label>Vencimiento de acceso (máx. 30 días)
               <input type="number" min="1" max="30" value={newExpireDays} onChange={(e) => setNewExpireDays(e.target.value)} />
             </label>
             <label>Borrado definitivo de datos (máx. 45 días)
@@ -397,42 +403,6 @@ export function AdminPanel({ onDebug, onLogout }) {
         </section>
 
         <section className="admin-card">
-          <h2>Generar códigos</h2>
-          <p>Entrega uno distinto a cada estudiante. Solo se permiten etiquetas genéricas neutras y hasta 30 días de vigencia.</p>
-          {currentCourse?.saveMode === 'no_save' && (
-            <p className="admin-hint">
-              El curso <strong>{currentCourse.alias}</strong> está en modo <em>Práctica sin guardado</em>. Para usar códigos, activa primero el guardado en la tarjeta del curso.
-            </p>
-          )}
-          <form onSubmit={generate} className="admin-form">
-            <label>Cantidad <input type="number" min="1" max="45" value={count} onChange={(event) => setCount(event.target.value)} /></label>
-            <label>Vencen en días <input type="number" min="1" max="30" value={days} onChange={(event) => setDays(event.target.value)} /></label>
-            <label>Etiqueta neutra
-              <select aria-label="Etiqueta" value={prefix} onChange={(event) => setPrefix(event.target.value)}>
-                {NEUTRAL_PREFIXES.map((item) => <option key={item} value={item}>{item}</option>)}
-              </select>
-            </label>
-            <button className="primary-btn" disabled={busy || currentCourse?.saveMode === 'no_save'}>
-              {busy ? 'Generando…' : 'Generar códigos'}
-            </button>
-          </form>
-          {created.length > 0 && <div className="created-codes">
-            <div className="created-heading"><strong>Códigos recién creados (descarga única)</strong>
-              <div className="admin-table-actions">
-                <button type="button" className="secondary-btn" onClick={() => downloadCsv(`codigos-${currentCourse?.alias || 'curso'}.csv`, [
-                  ['Curso', 'Etiqueta', 'Código', 'Vence', 'Borrado definitivo'],
-                  ...created.map((item) => [item.courseAlias || currentCourse?.alias || '', item.label, item.code, date(item.expiresAt), date(item.deleteAt || currentCourse?.deleteAt || item.expiresAt)]),
-                ])}>Descargar CSV</button>
-                <button type="button" className="secondary-btn" onClick={() => downloadExcelXml(`codigos-${currentCourse?.alias || 'curso'}.xls`, 'Codigos', [
-                  ['Curso', 'Etiqueta', 'Código', 'Vence', 'Borrado definitivo'],
-                  ...created.map((item) => [item.courseAlias || currentCourse?.alias || '', item.label, item.code, date(item.expiresAt), date(item.deleteAt || currentCourse?.deleteAt || item.expiresAt)]),
-                ])}>Descargar Excel (.xls)</button>
-              </div>
-            </div>
-            <ul>{created.map((item) => <li key={item.id}><span>{item.label}</span><code>{item.code}</code></li>)}</ul>
-          </div>}
-
-          <hr style={{ margin: '1rem 0', opacity: 0.2 }} />
           <h2>Probar niveles</h2>
           <p>Abre cualquier nivel en modo de prueba. No modifica el progreso de estudiantes.</p>
           <label className="admin-select">Nivel
@@ -466,19 +436,21 @@ export function AdminPanel({ onDebug, onLogout }) {
             const checkpoint = item.progress.checkpoint;
             const status = item.revokedAt ? 'Desactivado' : item.expiresAt <= Date.now() ? 'Vencido' : `Vence ${date(item.expiresAt)}`;
             return <tr key={item.id}>
-              <td><strong>{item.label}</strong><small>#{item.id} · {item.activeSessions} sesión(es)</small></td>
+              <td><strong>{item.label}</strong><small>{item.username ? `Usuario: ${item.username} · ` : ''}#{item.id} · {item.activeSessions} sesión(es)</small></td>
               <td>{item.progress.discoveredIds.length}/12 niveles</td>
               <td>{checkpoint ? `${ARTISTS[checkpoint.levelIdx]?.name}: ${checkpoint.stage === 'questions' ? `pregunta ${Math.min(5, checkpoint.questionIndex + 1)}` : 'ritmo'}` : 'Sin partida pendiente'}</td>
               <td>{status}{item.deleteAt ? ` · Borrado ${date(item.deleteAt)}` : ''}</td>
               <td><div className="admin-row-actions">
                 <button type="button" onClick={() => action(item.id, 'expire-sessions')}>Cerrar sesiones</button>
                 <button type="button" onClick={() => action(item.id, 'reset')}>Reiniciar avance</button>
-                {!item.revokedAt && <button type="button" onClick={() => action(item.id, 'revoke')}>Desactivar código</button>}
-                <button type="button" onClick={() => action(item.id, 'delete')}>Borrar registro</button>
+                {item.username && <button type="button" disabled={busy} onClick={() => resetPassword(item)}>Nueva contraseña</button>}
+                {!item.revokedAt && <button type="button" onClick={() => action(item.id, 'revoke')}>Desactivar cuenta</button>}
+                <button type="button" onClick={() => action(item.id, 'delete')}>Borrar cuenta</button>
               </div></td>
             </tr>;
           })}</tbody></table>
-          {visibleStudents.length === 0 && <p className="admin-empty">Aún no hay códigos en este curso. Genera los primeros para empezar o usa el modo de práctica sin guardado.</p>}
+          {renewedCredential && <p className="admin-hint">Usuario {renewedCredential.username} · nueva contraseña: <code>{renewedCredential.password}</code>. Anótala y entrégala en privado; solo se muestra ahora.</p>}
+          {visibleStudents.length === 0 && <p className="admin-empty">Aún no hay cuentas en este curso. Comparte el código del curso o usa el modo sin guardar.</p>}
         </div>
       </section>
     </main>

@@ -12,7 +12,7 @@ Juego educativo de música y pensamiento crítico. Sus 12 niveles presentan proy
 - Reproductores incrustados de YouTube para canciones, discos o playlists. El navegador puede impedir autoplay.
 - Minijuego de ritmo con controles de teclado y pantalla táctil. Sus notas aún no están sincronizadas con BPM ni con las grabaciones.
 - Modo de prueba, sin guardar avance.
-- Panel docente: códigos de acceso individuales, seguimiento, exportación CSV, cierre de sesión, reinicio y depuración de niveles.
+- Panel docente: creación de cursos, códigos de invitación, seguimiento, exportación CSV, renovación de contraseñas y depuración de niveles.
 - Persistencia actual mediante Bun y SQLite local.
 - Diseño adaptable y soporte para `prefers-reduced-motion`.
 
@@ -52,9 +52,13 @@ Vite usa `http://localhost:5175/` y envía las llamadas `/api` al servidor confi
 
 ## Acceso docente y progreso
 
-En el primer inicio, el servidor genera `data/admin.key`. Inicia sesión en **Docente / administración** usando esa clave. Guárdala fuera del repositorio. La base `data/game.sqlite` contiene códigos y avances; ambos archivos están ignorados por Git.
+En el primer inicio, el servidor genera `data/admin.key`. Inicia sesión en **Docente / administración** usando esa clave. Guárdala fuera del repositorio. La base `data/game.sqlite` contiene cuentas y avances; ambos archivos están ignorados por Git.
 
-El panel crea códigos de estudiante y los muestra una sola vez para descargar. La base guarda hashes de los códigos. En esta versión, entrar con un código guarda el avance; el vencimiento impide volver a entrar, pero no borra automáticamente el registro ni el progreso. La retención y el borrado automáticos están pendientes. Cada estudiante puede retomar desde la pregunta pendiente o reiniciar la fase de ritmo. Las sesiones docentes duran ocho horas y las estudiantiles hasta siete días.
+El menú ofrece **Jugar sin guardar** o **Guardar para retomar**. Para guardar, el docente entrega un código de curso; el estudiante usa un alias inventado y completa el nivel 1. Al terminar, la aplicación crea su cuenta, guarda ese avance y muestra una contraseña aleatoria una sola vez. Debe anotarla. El docente puede generar otra contraseña si se pierde; la anterior deja de funcionar. Las cuentas pueden retomar desde su último avance. Las sesiones docentes duran ocho horas y las estudiantiles hasta siete días.
+
+No ingresar nombres reales, apellidos, iniciales, RUT, correo ni números de lista como alias. La cuenta queda asociada a un pseudónimo y al curso, por lo que el progreso es seudónimo. El código de curso permite inscribirse y debe compartirse solo con esa clase.
+
+La purga automática al vencer la fecha de borrado y la migración a PostgreSQL para Vercel aún están pendientes. En local, los datos se guardan en SQLite dentro de `data/game.sqlite`.
 
 No hace falta pedir nombres reales. El progreso es para retroalimentación: el servidor valida formato y sesión, pero el navegador envía el puntaje, así que no sirve como nota formal ni como ranking resistente a manipulación.
 
@@ -67,7 +71,7 @@ Variables disponibles:
 | `DATA_DIR` | Carpeta persistente para SQLite y clave docente | `./data` |
 | `ADMIN_KEY` | Clave docente opcional, para entornos administrados | Generada en `data/admin.key` |
 
-No guardes secretos, base de datos, códigos descargados ni datos de estudiantes en Git.
+No guardes secretos, base de datos, códigos de invitación ni datos de estudiantes en Git.
 
 ## Medios
 
@@ -83,10 +87,10 @@ La revisión basada en el capítulo de Richard E. Mayer y en práctica de recupe
 
 | Decisión de diseño y base de datos | Justificación TPACK (Tecnología, Pedagogía y Contenido) | Aprendizaje Multimedia (Mayer, 2002) y Práctica de Recuperación (Karpicke & Roediger, 2008) | Marco Legal Chileno (Ley 21.719 y Ley 21.855 sobre protección de NNA) |
 | --- | --- | --- | --- |
-| **Códigos aleatorios sin `0/O/1/I` (`ABCDE-12345`) y prohibición de nombres reales** | **TK + PK (Gestión de aula):** En 7° Básico, las cuentas con correo y contraseña consumen tiempo de clase por olvidos. Un código de 10 caracteres sin ambigüedad visual permite entrar en segundos y cambiar de equipo en el laboratorio. | **Reducción de carga cognitiva extrínseca:** Evita fricción de registro y ansiedad de evaluación nominal antes de iniciar la tarea cognitiva musical. | **Minimización de datos y deber reforzado de protección de NNA:** La base solo guarda el hash SHA-256 del código y etiquetas neutras forzadas (`Estudiante 1`, `Equipo 2`), bloqueando la inserción accidental de nombres reales. |
-| **Separación por cursos y elección explícita: *Práctica sin guardado* vs *Guardar para retomar*** | **PK + CK (Flexibilidad didáctica):** Permite usar la aplicación tanto en talleres de una sesión (sin huella digital) como en unidades de varias semanas donde cada curso avanza a distinto ritmo. | **Principio de Segmentación y Ritmo Propio:** El progreso por `checkpoint` (nivel, fase y número de pregunta) permite distribuir la práctica entre sesiones sin perder coherencia. | **Principio de finalidad y consentimiento informado del establecimiento:** En modo sin guardado no se crean códigos ni filas en la base. Activar el guardado exige confirmar fecha de vencimiento y fecha de borrado. |
-| **Fechas separadas de vencimiento (`expires_at`) y borrado definitivo (`delete_at`)** | **PK (Evaluación formativa):** Cuando vence el plazo de juego, los códigos dejan de admitir cambios, pero el docente conserva una ventana acotada para exportar el CSV de avance antes de la eliminación definitiva. | **Práctica de Recuperación Espaciada:** Facilita planificar sesiones de recuperación dentro de un periodo acotado y observar en qué niveles o preguntas hubo mayor dificultad. | **Limitación del plazo de conservación y derecho de supresión:** Al cumplirse `delete_at` (o cuando el docente elimina el curso o desactiva el guardado), `ON DELETE CASCADE` borra curso, códigos, sesiones y progreso. |
-| **Secuencia monótona por curso (`next_student_seq`) y prevención de colisiones** | **TPK (Trazabilidad docente fuera del sistema):** Aunque se eliminen códigos individuales o se generen lotes en distintas clases, el contador del curso nunca reutiliza `Estudiante N` dentro del mismo curso. | **Señalización clara:** Evita ambigüedades al contrastar la tabla privada del docente con el panel de avance. | **Integridad y seudonimización robusta:** Los códigos tienen $32^{10} \approx 1,12 \times 10^{15}$ combinaciones posibles con verificación `UNIQUE (code_hash)` y `UNIQUE (course_id, label)`. |
+| **Una invitación por curso; alias y contraseña individual después del nivel 1** | **TK + PK (Gestión de aula):** El docente comparte un único código con toda la clase. El estudiante crea su alias y recibe contraseña solo después del primer nivel, reduciendo el reparto de credenciales individuales. | **Reducción de carga cognitiva extrínseca:** El inicio del juego no requiere correo ni contraseña; la credencial aparece después de una primera meta breve. | **Minimización de datos y protección de NNA:** No pedir nombre, apellido, iniciales, RUT, correo o número de lista. Los alias siguen siendo pseudónimos y no deben contener datos personales. |
+| **Separación por cursos y elección explícita: *Jugar sin guardar* vs *Guardar para retomar*** | **PK + CK (Flexibilidad didáctica):** Permite usar la aplicación en una sesión sin registro o en varias sesiones con cuentas pseudónimas. | **Segmentación y ritmo propio:** El progreso por nivel, fase y pregunta pendiente permite continuar otro día. | **Finalidad y transparencia:** El modo sin guardado no registra avance. El modo con cuenta muestra fechas de expiración y eliminación. |
+| **Fechas separadas de vencimiento (`expires_at`) y borrado definitivo (`delete_at`)** | **PK (Evaluación formativa):** Al cerrar el acceso, el docente conserva una ventana acotada para exportar el CSV de avance antes de la eliminación definitiva. | **Práctica de Recuperación Espaciada:** Facilita planificar sesiones de recuperación dentro de un periodo acotado y observar en qué niveles o preguntas hubo mayor dificultad. | **Limitación del plazo de conservación y derecho de supresión:** Al cumplirse `delete_at` (o cuando el docente elimina el curso o desactiva el guardado), `ON DELETE CASCADE` borra curso, cuentas, sesiones y progreso. |
+| **Alias únicos y etiquetas secuenciales de seguimiento** | **TPK:** El panel muestra alias y avance; la relación con identidad escolar, si se necesita, queda bajo responsabilidad del establecimiento y fuera de la app. | **Señalización consistente:** Mantiene un registro comprensible sin pedir datos reales antes de comenzar. | **Pseudonimización y minimización:** Las cuentas guardan alias, contraseña en hash y progreso; no son anónimas si el alias se vincula con una persona. |
 
 ### Estimación de escalabilidad en Supabase (Plan Gratuito de 500 MB)
 
@@ -112,12 +116,13 @@ Pendientes para el despliegue completo:
 2. Migrar datos y consultas de SQLite a una base administrada persistente, por ejemplo Postgres mediante Neon o Supabase.
 3. Crear migraciones del esquema, conexión con pooling y variables de entorno para credenciales.
 4. Revisar autenticación docente, limitación de intentos, cookies `Secure`, sesiones, CORS/CSRF y límites de solicitudes detrás de proxy.
-5. Definir respaldos, retención y eliminación de códigos/progresos; probar recuperación.
+5. Definir respaldos, retención y eliminación de cuentas/progresos; probar recuperación.
 6. Revisar privacidad: el juego apunta a cursos escolares, así que publicar solo los datos mínimos y evitar nombres de estudiantes.
 7. Confirmar autorización/licencias de fotos, portadas y música antes de difundir el sitio. Los archivos de imagen entregados se incorporan como medios del proyecto; el repositorio es público.
 8. Elegir dominio, región del servidor/base de datos, HTTPS y política de costos.
 9. Completar accesibilidad con teclado/lector de pantalla y probar móvil, navegadores y autoplay.
 10. Sincronizar patrones del minijuego con una canción, su BPM y el desplazamiento del primer pulso; BPM por sí solo no define las notas.
+11. Revisar la declaración de sitio dirigido a menores para los reproductores de YouTube; la ayuda oficial indica que los sitios o apps infantiles que insertan contenido deben identificarse como tales: [YouTube Help](https://support.google.com/youtube/answer/171780).
 11. Añadir integración continua para instalación reproducible, compilación y pruebas en cada pull request.
 12. Revisar hechos, claves de respuestas y contenido educativo antes de usar puntajes formalmente.
 
@@ -138,7 +143,7 @@ tests/           Pruebas API y de flujo
 
 ## Privacidad y seguridad
 
-El sitio no solicita identidad real; el docente crea códigos pseudónimos. El servidor guarda hash de códigos de estudiante, hash de tokens de sesión y progreso. Los códigos descargados son secretos del curso. La versión local escucha solo en la interfaz loopback por defecto. Antes de abrir acceso remoto, configurar HTTPS, almacenamiento persistente, secretos de despliegue y límites adecuados.
+El sitio no solicita identidad real. El docente comparte un código por curso; cada estudiante crea un alias inventado y una contraseña aleatoria después del nivel 1. El servidor guarda el hash de la contraseña, el token de sesión en hash y el progreso pseudónimo. El código de curso es un secreto compartido y debe entregarse solo a esa clase. La versión local escucha en la interfaz loopback por defecto; antes de abrir acceso remoto se necesita HTTPS, almacenamiento persistente, secretos de despliegue y límites adecuados.
 
 Para reportar una vulnerabilidad, no incluyas claves ni datos de estudiantes en issues públicos. Contacta al responsable del repositorio por un canal privado.
 

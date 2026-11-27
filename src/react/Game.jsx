@@ -79,7 +79,7 @@ function YouTubePlayer({ video, paused, muted }) {
   </div>;
 }
 
-export function Game({ role, initialProgress, student, debugLevel, onExit }) {
+export function Game({ role, initialProgress, student, debugLevel, enrollment, onFirstLevelComplete, welcomePassword, onCredentialClose, onExit }) {
   const [progress, setProgress] = useState(() => initialProgress || freshProgress());
   const progressRef = useRef(progress);
   const saveQueue = useRef(Promise.resolve());
@@ -116,6 +116,7 @@ export function Game({ role, initialProgress, student, debugLevel, onExit }) {
         .then(() => setSaveError(''))
         .catch((cause) => setSaveError(cause.message));
     }
+    return next;
   }
 
   function showHome() {
@@ -219,7 +220,7 @@ export function Game({ role, initialProgress, student, debugLevel, onExit }) {
     const previous = progressRef.current;
     const ids = [...new Set([...previous.discoveredIds, artist.id])];
     const finalLevel = currentIdx === ARTISTS.length - 1;
-    commitProgress({
+    const completedProgress = commitProgress({
       discoveredIds: ids,
       maxUnlockedIdx: Math.max(previous.maxUnlockedIdx, Math.min(ARTISTS.length - 1, currentIdx + 1)),
       campaignCompleted: previous.campaignCompleted || finalLevel,
@@ -231,6 +232,16 @@ export function Game({ role, initialProgress, student, debugLevel, onExit }) {
         completedAt: Date.now(),
       } },
     });
+    if (role === 'enroll' && currentIdx === 0) {
+      const createAccount = () => {
+        setModal({ kind: 'loading', badge: '🔐 CUENTA', title: 'Creando tu acceso…', body: '<p>Guardando el nivel que acabas de completar.</p>', buttonText: 'Un momento…', onClose: () => {} });
+        onFirstLevelComplete(completedProgress).catch((cause) => {
+          setModal({ badge: '⚠️ NO SE PUDO GUARDAR', title: 'Inténtalo otra vez', body: `<p>${cause.message}</p><p>Tu avance sigue abierto en este navegador.</p>`, buttonText: 'Reintentar', onClose: createAccount });
+        });
+      };
+      createAccount();
+      return;
+    }
     if (finalLevel) {
       setModal({
         badge: '🏆 CAMPAÑA COMPLETADA', title: '¡Rompiste el algoritmo!',
@@ -346,7 +357,14 @@ export function Game({ role, initialProgress, student, debugLevel, onExit }) {
         <div className="school-pill">🏫 Colegio Particular San Nicolás de Maipú • 7° Básico</div>
         <h1 className="game-title">ROMPE EL ALGORITMO</h1>
         <p className="game-subtitle">Descubre 12 proyectos musicales liderados por mujeres, desde AKRIILA en Maipú hasta escenarios del mundo.</p>
-        <p className="session-label">{role === 'student' ? `Jugando como ${student.label}` : role === 'debug' ? 'Modo de prueba docente' : 'Prueba sin guardado'}</p>
+        <p className="session-label">{role === 'student' ? `Jugando como ${student.label}` : role === 'debug' ? 'Modo de prueba docente' : role === 'enroll' ? 'Nivel 1 para activar tu cuenta' : 'Prueba sin guardado'}</p>
+        {welcomePassword && <section className="credential-reveal" role="status">
+          <h2>¡Tu contraseña está lista!</h2>
+          <p>Usuario: <strong>{student?.username}</strong></p>
+          <p>Contraseña (anótala): <code>{welcomePassword}</code></p>
+          <p>Guárdala para retomar el juego otro día. Si la pierdes, pide ayuda a tu docente.</p>
+          <button className="secondary-btn" type="button" onClick={onCredentialClose}>Ya la anoté</button>
+        </section>}
         <div className="home-actions">
           <button className="primary-btn hero-btn" type="button" onClick={() => startLevel(nextIdx, { resume: true })}>
             ▶ {progress.checkpoint ? `Retomar ${nextArtist.name}` : `Jugar nivel ${nextArtist.level}: ${nextArtist.name}`}

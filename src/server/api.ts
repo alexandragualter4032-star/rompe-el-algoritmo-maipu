@@ -7,13 +7,20 @@ import {
   deleteCourseCompletely,
   deleteSessionByHash,
   generateStudentCodes,
+  authenticateStudentByUsername,
+  createStudentAccount,
   getActiveSession,
   hash,
   integer,
   listCourses,
   listStudents,
   normalizeCode,
+  sanitizeUsername,
+  issueCourseJoinCode,
+  validateCourseJoinCode,
+  isUsernameAvailable,
   performStudentAction,
+  resetStudentPassword,
   sanitizeAlias,
   setCourseSaveMode,
   updateStudentProgress,
@@ -105,6 +112,15 @@ export async function handleApi(request: Request): Promise<Response> {
       return json({ error: 'Demasiados intentos. Espera unos minutos.' }, 429);
     }
     const data = await body(request);
+    if (typeof data?.username === 'string' || typeof data?.password === 'string') {
+      const username = sanitizeUsername(data?.username);
+      const password = normalizeCode(data?.password);
+      if (!username || password.length !== 10) return json({ error: 'Revisa tu usuario y contraseña.' }, 400);
+      const found = await authenticateStudentByUsername(username, hash(password));
+      if (!found) return json({ error: 'Usuario o contraseña incorrectos, vencidos o desactivados.' }, 401);
+      const setCookie = await createSession('student', found.student.id, found.student.courseId, request);
+      return json({ role: 'student', student: found.student, progress: found.progress }, 200, setCookie);
+    }
     const code = normalizeCode(data?.code);
     if (code.length !== 10) return json({ error: 'Revisa el código de estudiante.' }, 400);
     const found = await authenticateStudentByCode(hash(code));
@@ -113,6 +129,32 @@ export async function handleApi(request: Request): Promise<Response> {
     }
     const setCookie = await createSession('student', found.student.id, found.student.courseId, request);
     return json({ role: 'student', student: found.student, progress: found.progress }, 200, setCookie);
+  }
+
+  if (path === '/api/student/register' && method === 'POST') {
+    if (tooManyAttempts(request, 'student-register', 12)) return json({ error: 'Demasiados intentos. Espera unos minutos.' }, 429);
+    const data = await body(request);
+    const username = sanitizeUsername(data?.username);
+    const joinCode = normalizeCode(data?.joinCode);
+    if (!username) return json({ error: 'El usuario debe tener 3 a 20 caracteres: letras sin tilde, números, guion o guion bajo. Usa un alias que no revele tu identidad.' }, 400);
+    if (joinCode.length !== 10) return json({ error: 'Revisa el código de curso.' }, 400);
+    const account = await createStudentAccount(hash(joinCode), username, data?.progress);
+    if ('error' in account) return json({ error: account.error }, 400);
+    const setCookie = await createSession('student', account.student.id, account.student.courseId, request);
+    return json({ role: 'student', student: account.student, progress: account.progress, password: account.password }, 201, setCookie);
+  }
+
+  if (path === '/api/student/check-course' && method === 'POST') {
+    if (tooManyAttempts(request, 'student-course', 20)) return json({ error: 'Demasiados intentos. Espera unos minutos.' }, 429);
+    const data = await body(request);
+    const username = sanitizeUsername(data?.username);
+    if (!username) return json({ error: 'El usuario debe tener 3 a 20 caracteres: letras sin tilde, números, guion o guion bajo.' }, 400);
+    const joinCode = normalizeCode(data?.joinCode);
+    if (joinCode.length !== 10 || !(await validateCourseJoinCode(hash(joinCode)))) {
+      return json({ error: 'Código de curso incorrecto, vencido o sin guardado activo. Pide ayuda a tu docente.' }, 400);
+    }
+    if (!(await isUsernameAvailable(username))) return json({ error: 'Ese usuario ya existe. Prueba otro alias inventado antes de empezar.' }, 409);
+    return json({ ok: true });
   }
 
   if (path === '/api/logout' && method === 'POST') {
@@ -163,6 +205,13 @@ export async function handleApi(request: Request): Promise<Response> {
       }
     }
 
+    const inviteMatch = path.match(/^\/api\/admin\/courses\/([A-Za-z0-9_-]+)\/invite-code$/);
+    if (inviteMatch && method === 'POST') {
+      const joinCode = await issueCourseJoinCode(inviteMatch[1]);
+      if (!joinCode) return json({ error: 'Curso no encontrado.' }, 404);
+      return json({ joinCode });
+    }
+
     const courseModeMatch = path.match(/^\/api\/admin\/courses\/([A-Za-z0-9_-]+)\/mode$/);
     if (courseModeMatch && method === 'POST') {
       const courseId = courseModeMatch[1];
@@ -187,6 +236,13 @@ export async function handleApi(request: Request): Promise<Response> {
       const courseId = url.searchParams.get('courseId') || undefined;
       const [students, courses] = await Promise.all([listStudents(courseId), listCourses()]);
       return json({ students, courses });
+    }
+
+    const passwordReset = path.match(/^\/api\/admin\/students\/(\d+)\/new-password$/);
+    if (passwordReset && method === 'POST') {
+      const password = await resetStudentPassword(Number(passwordReset[1]));
+      if (!password) return json({ error: 'No se encontró una cuenta activa para ese estudiante.' }, 404);
+      return json({ password });
     }
 
     if (path === '/api/admin/codes' && method === 'POST') {

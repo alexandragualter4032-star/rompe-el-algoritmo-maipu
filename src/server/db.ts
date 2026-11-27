@@ -70,6 +70,12 @@ export function newCode() {
   return `${raw.slice(0, 5)}-${raw.slice(5)}`;
 }
 
+export function sanitizeUsername(value: unknown): string | null {
+  if (typeof value !== 'string') return null;
+  const cleaned = value.trim().toLowerCase();
+  return /^[a-z0-9_-]{3,20}$/.test(cleaned) ? cleaned : null;
+}
+
 export function normalizeCode(value: unknown) {
   return typeof value === 'string' ? value.toUpperCase().replace(/[\s-]/g, '') : '';
 }
@@ -165,6 +171,7 @@ async function getPg() {
         expires_at BIGINT NOT NULL,
         delete_at BIGINT NOT NULL
       );
+      ALTER TABLE courses ADD COLUMN IF NOT EXISTS join_code_hash TEXT UNIQUE;
       CREATE TABLE IF NOT EXISTS student_codes (
         id BIGSERIAL PRIMARY KEY,
         course_id TEXT NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
@@ -175,6 +182,9 @@ async function getPg() {
         revoked_at BIGINT,
         UNIQUE (course_id, label)
       );
+      ALTER TABLE student_codes ADD COLUMN IF NOT EXISTS username TEXT;
+      CREATE UNIQUE INDEX IF NOT EXISTS student_codes_course_username_idx ON student_codes(course_id, lower(username)) WHERE username IS NOT NULL;
+      CREATE UNIQUE INDEX IF NOT EXISTS student_codes_username_global_idx ON lower(username) WHERE username IS NOT NULL;
       CREATE TABLE IF NOT EXISTS progress (
         student_id BIGINT PRIMARY KEY REFERENCES student_codes(id) ON DELETE CASCADE,
         progress_json JSONB NOT NULL,
@@ -241,6 +251,7 @@ async function getSqlite() {
       created_at INTEGER NOT NULL,
       expires_at INTEGER NOT NULL,
       revoked_at INTEGER,
+      username TEXT,
       UNIQUE(course_id, label)
     );
     CREATE TABLE IF NOT EXISTS progress (
@@ -259,6 +270,18 @@ async function getSqlite() {
     CREATE INDEX IF NOT EXISTS sessions_student_idx ON sessions(student_id);
     CREATE INDEX IF NOT EXISTS courses_delete_at_idx ON courses(delete_at);
   `);
+
+  const courseColumns = db.query('PRAGMA table_info(courses)').all() as any[];
+  if (!courseColumns.some((column) => column.name === 'join_code_hash')) {
+    db.exec('ALTER TABLE courses ADD COLUMN join_code_hash TEXT');
+  }
+  db.exec('CREATE UNIQUE INDEX IF NOT EXISTS courses_join_code_idx ON courses(join_code_hash) WHERE join_code_hash IS NOT NULL');
+  const studentColumns = db.query('PRAGMA table_info(student_codes)').all() as any[];
+  if (!studentColumns.some((column) => column.name === 'username')) {
+    db.exec('ALTER TABLE student_codes ADD COLUMN username TEXT');
+  }
+  db.exec('CREATE UNIQUE INDEX IF NOT EXISTS student_codes_course_username_idx ON student_codes(course_id, lower(username)) WHERE username IS NOT NULL');
+  db.exec('CREATE UNIQUE INDEX IF NOT EXISTS student_codes_username_global_idx ON student_codes(lower(username)) WHERE username IS NOT NULL');
 
   // Crear curso inicial por defecto si no hay cursos
   const countRow = db.query('SELECT COUNT(*) AS total FROM courses').get() as any;
@@ -355,7 +378,7 @@ export async function getActiveSession(tokenHash: string, role: 'admin' | 'stude
     if (role === 'admin') return { admin: true };
 
     const students = await sql`
-      SELECT sc.id, sc.course_id, sc.label, sc.expires_at, sc.revoked_at,
+      SELECT sc.id, sc.course_id, sc.label, sc.username, sc.expires_at, sc.revoked_at,
              c.alias AS course_alias, c.save_mode, c.delete_at,
              p.progress_json
       FROM student_codes sc
@@ -376,6 +399,7 @@ export async function getActiveSession(tokenHash: string, role: 'admin' | 'stude
         courseId: String(student.course_id),
         courseAlias: String(student.course_alias),
         label: String(student.label),
+        username: student.username ? String(student.username) : null,
         expiresAt: Number(student.expires_at),
         deleteAt: Number(student.delete_at),
       },
@@ -389,7 +413,7 @@ export async function getActiveSession(tokenHash: string, role: 'admin' | 'stude
   if (role === 'admin') return { admin: true };
 
   const student: any = db.query(`
-    SELECT sc.id, sc.course_id, sc.label, sc.expires_at, sc.revoked_at,
+    SELECT sc.id, sc.course_id, sc.label, sc.username, sc.expires_at, sc.revoked_at,
            c.alias AS course_alias, c.save_mode, c.delete_at,
            p.progress_json
     FROM student_codes sc
@@ -407,6 +431,7 @@ export async function getActiveSession(tokenHash: string, role: 'admin' | 'stude
       courseId: String(student.course_id),
       courseAlias: String(student.course_alias),
       label: String(student.label),
+      username: student.username ? String(student.username) : null,
       expiresAt: Number(student.expires_at),
       deleteAt: Number(student.delete_at),
     },
@@ -473,6 +498,145 @@ export async function authenticateStudentByCode(codeHash: string) {
     },
     progress: cleanProgress(student.progress_json ? JSON.parse(student.progress_json) : initialProgress()),
   };
+}
+
+export async function issueCourseJoinCode(courseId: string) {
+  const rawCode = newCode();
+  const codeHash = hash(normalizeCode(rawCode));
+  if (databaseUrl) {
+    const sql = await getPg();
+    const rows = await sql`UPDATE courses SET join_code_hash = ${codeHash} WHERE id = ${courseId} RETURNING id`;
+    return rows.length ? rawCode : null;
+  }
+  const db = await getSqlite();
+  const result = db.query('UPDATE courses SET join_code_hash = ? WHERE id = ?').run(codeHash, courseId);
+  return result.changes > 0 ? rawCode : null;
+}
+
+export async function validateCourseJoinCode(joinCodeHash: string) {
+  const now = Date.now();
+  if (databaseUrl) {
+    const sql = await getPg();
+    const rows = await sql`SELECT id FROM courses WHERE join_code_hash = ${joinCodeHash} AND save_mode = 'save_to_resume' AND expires_at > ${now} AND delete_at > ${now}`;
+    return rows.length > 0;
+  }
+  const db = await getSqlite();
+  return Boolean(db.query(`SELECT id FROM courses WHERE join_code_hash = ? AND save_mode = 'save_to_resume' AND expires_at > ? AND delete_at > ?`).get(joinCodeHash, now, now));
+}
+
+export async function isUsernameAvailable(username: string) {
+  if (databaseUrl) {
+    const sql = await getPg();
+    const rows = await sql`SELECT id FROM student_codes WHERE lower(username) = ${username} LIMIT 1`;
+    return rows.length === 0;
+  }
+  const db = await getSqlite();
+  return !db.query('SELECT id FROM student_codes WHERE lower(username) = ? LIMIT 1').get(username);
+}
+
+export async function createStudentAccount(joinCodeHash: string, username: string, progressInput: any) {
+  await purgeExpiredData();
+  const now = Date.now();
+  const progress = cleanProgress(progressInput);
+  if (!progress.discoveredIds.includes('akrilla') || !progress.scores[0]) return { error: 'Completa el nivel 1 antes de crear la cuenta.' as const };
+
+  if (databaseUrl) {
+    const sql = await getPg();
+    return await sql.begin(async (tx) => {
+      const courses = await tx`SELECT * FROM courses WHERE join_code_hash = ${joinCodeHash} FOR UPDATE`;
+      const course = courses[0];
+      if (!course || course.save_mode !== 'save_to_resume' || Number(course.expires_at) <= now || Number(course.delete_at) <= now) {
+        return { error: 'Código de curso inválido, vencido o sin guardado activo.' as const };
+      }
+      const duplicate = await tx`SELECT id FROM student_codes WHERE lower(username) = ${username}`;
+      if (duplicate.length) return { error: 'Ese usuario ya está ocupado. Prueba otro alias inventado.' as const };
+      const label = `Estudiante ${Number(course.next_student_seq)}`;
+      const password = newCode();
+      const inserted = await tx`
+        INSERT INTO student_codes(course_id, label, code_hash, created_at, expires_at, username)
+        VALUES (${course.id}, ${label}, ${hash(normalizeCode(password))}, ${now}, ${course.expires_at}, ${username})
+        RETURNING id
+      `;
+      const studentId = Number(inserted[0].id);
+      await tx`INSERT INTO progress(student_id, progress_json, updated_at) VALUES (${studentId}, ${tx.json(progress as any)}, ${now})`;
+      await tx`UPDATE courses SET next_student_seq = next_student_seq + 1 WHERE id = ${course.id}`;
+      return {
+        password,
+        student: { id: studentId, courseId: String(course.id), courseAlias: String(course.alias), label, username, expiresAt: Number(course.expires_at), deleteAt: Number(course.delete_at) },
+        progress,
+      };
+    });
+  }
+
+  const db = await getSqlite();
+  const create = db.transaction(() => {
+    const course: any = db.query('SELECT * FROM courses WHERE join_code_hash = ?').get(joinCodeHash);
+    if (!course || course.save_mode !== 'save_to_resume' || course.expires_at <= now || course.delete_at <= now) {
+      return { error: 'Código de curso inválido, vencido o sin guardado activo.' as const };
+    }
+    const duplicate = db.query('SELECT id FROM student_codes WHERE lower(username) = ?').get(username);
+    if (duplicate) return { error: 'Ese usuario ya está ocupado. Prueba otro alias inventado.' as const };
+    const label = `Estudiante ${course.next_student_seq}`;
+    const password = newCode();
+    const result = db.query(`INSERT INTO student_codes(course_id, label, code_hash, created_at, expires_at, username)
+      VALUES (?, ?, ?, ?, ?, ?)`).run(course.id, label, hash(normalizeCode(password)), now, course.expires_at, username);
+    const studentId = Number(result.lastInsertRowid);
+    db.query('INSERT INTO progress(student_id, progress_json, updated_at) VALUES (?, ?, ?)').run(studentId, JSON.stringify(progress), now);
+    db.query('UPDATE courses SET next_student_seq = next_student_seq + 1 WHERE id = ?').run(course.id);
+    return {
+      password,
+      student: { id: studentId, courseId: String(course.id), courseAlias: String(course.alias), label, username, expiresAt: Number(course.expires_at), deleteAt: Number(course.delete_at) },
+      progress,
+    };
+  });
+  return create();
+}
+
+export async function authenticateStudentByUsername(username: string, passwordHash: string) {
+  await purgeExpiredData();
+  const now = Date.now();
+  let student: any;
+  if (databaseUrl) {
+    const sql = await getPg();
+    const rows = await sql`
+      SELECT sc.id, sc.course_id, sc.label, sc.username, sc.expires_at, sc.revoked_at,
+             c.alias AS course_alias, c.save_mode, c.delete_at, p.progress_json
+      FROM student_codes sc JOIN courses c ON c.id = sc.course_id
+      LEFT JOIN progress p ON p.student_id = sc.id
+      WHERE lower(sc.username) = ${username} AND sc.code_hash = ${passwordHash}
+    `;
+    student = rows[0];
+  } else {
+    const db = await getSqlite();
+    student = db.query(`
+      SELECT sc.id, sc.course_id, sc.label, sc.username, sc.expires_at, sc.revoked_at,
+             c.alias AS course_alias, c.save_mode, c.delete_at, p.progress_json
+      FROM student_codes sc JOIN courses c ON c.id = sc.course_id
+      LEFT JOIN progress p ON p.student_id = sc.id
+      WHERE lower(sc.username) = ? AND sc.code_hash = ?
+    `).get(username, passwordHash);
+  }
+  if (!student || student.revoked_at || Number(student.expires_at) <= now || Number(student.delete_at) <= now || student.save_mode !== 'save_to_resume') return null;
+  const rawProgress = typeof student.progress_json === 'string' ? JSON.parse(student.progress_json) : (student.progress_json ?? initialProgress());
+  return {
+    student: { id: Number(student.id), courseId: String(student.course_id), courseAlias: String(student.course_alias), label: String(student.label), username: String(student.username), expiresAt: Number(student.expires_at), deleteAt: Number(student.delete_at) },
+    progress: cleanProgress(rawProgress),
+  };
+}
+
+export async function resetStudentPassword(studentId: number) {
+  const password = newCode();
+  const passwordHash = hash(normalizeCode(password));
+  if (databaseUrl) {
+    const sql = await getPg();
+    const rows = await sql`UPDATE student_codes SET code_hash = ${passwordHash} WHERE id = ${studentId} AND username IS NOT NULL AND revoked_at IS NULL RETURNING id`;
+    if (rows.length) await sql`DELETE FROM sessions WHERE student_id = ${studentId}`;
+    return rows.length ? password : null;
+  }
+  const db = await getSqlite();
+  const result = db.query('UPDATE student_codes SET code_hash = ? WHERE id = ? AND username IS NOT NULL AND revoked_at IS NULL').run(passwordHash, studentId);
+  if (result.changes) db.query('DELETE FROM sessions WHERE student_id = ?').run(studentId);
+  return result.changes ? password : null;
 }
 
 export async function updateStudentProgress(studentId: number, cleanedProgress: ReturnType<typeof cleanProgress>) {
@@ -545,6 +709,8 @@ export async function createCourse(input: { alias: string; saveMode: 'no_save' |
   const expiresAt = now + input.expireDays * 24 * 3600_000;
   const deleteAt = now + Math.max(input.expireDays, input.deleteDays) * 24 * 3600_000;
   const id = newCourseId();
+  const joinCode = input.saveMode === 'save_to_resume' ? newCode() : null;
+  const joinCodeHash = joinCode ? hash(normalizeCode(joinCode)) : null;
 
   if (databaseUrl) {
     const sql = await getPg();
@@ -553,8 +719,8 @@ export async function createCourse(input: { alias: string; saveMode: 'no_save' |
       throw new Error(`Ya existe un curso con el alias "${input.alias}". Selecciónalo en la lista o usa otro identificador.`);
     }
     await sql`
-      INSERT INTO courses (id, alias, save_mode, next_student_seq, created_at, expires_at, delete_at)
-      VALUES (${id}, ${input.alias}, ${input.saveMode}, 1, ${now}, ${expiresAt}, ${deleteAt})
+      INSERT INTO courses (id, alias, save_mode, next_student_seq, created_at, expires_at, delete_at, join_code_hash)
+      VALUES (${id}, ${input.alias}, ${input.saveMode}, 1, ${now}, ${expiresAt}, ${deleteAt}, ${joinCodeHash})
     `;
   } else {
     const db = await getSqlite();
@@ -563,14 +729,15 @@ export async function createCourse(input: { alias: string; saveMode: 'no_save' |
       throw new Error(`Ya existe un curso con el alias "${input.alias}". Selecciónalo en la lista o usa otro identificador.`);
     }
     db.query(`
-      INSERT INTO courses (id, alias, save_mode, next_student_seq, created_at, expires_at, delete_at)
-      VALUES (?, ?, ?, 1, ?, ?, ?)
-    `).run(id, input.alias, input.saveMode, now, expiresAt, deleteAt);
+      INSERT INTO courses (id, alias, save_mode, next_student_seq, created_at, expires_at, delete_at, join_code_hash)
+      VALUES (?, ?, ?, 1, ?, ?, ?, ?)
+    `).run(id, input.alias, input.saveMode, now, expiresAt, deleteAt, joinCodeHash);
   }
 
   return {
     id,
     alias: input.alias,
+    joinCode,
     saveMode: input.saveMode,
     createdAt: now,
     expiresAt,
@@ -590,7 +757,7 @@ export async function setCourseSaveMode(courseId: string, saveMode: 'no_save' | 
       // Al pasar a modo sin guardado, se borran inmediatamente todos los códigos, sesiones y progresos existentes del curso
       await sql`DELETE FROM sessions WHERE course_id = ${courseId}`;
       await sql`DELETE FROM student_codes WHERE course_id = ${courseId}`;
-      await sql`UPDATE courses SET save_mode = 'no_save', next_student_seq = 1 WHERE id = ${courseId}`;
+      await sql`UPDATE courses SET save_mode = 'no_save', next_student_seq = 1, join_code_hash = NULL WHERE id = ${courseId}`;
     } else {
       const exp = expireDays ? now + expireDays * 24 * 3600_000 : Number(rows[0].expires_at);
       const del = deleteDays ? now + Math.max(expireDays ?? 1, deleteDays) * 24 * 3600_000 : Math.max(exp, Number(rows[0].delete_at));
@@ -605,7 +772,7 @@ export async function setCourseSaveMode(courseId: string, saveMode: 'no_save' | 
   if (saveMode === 'no_save') {
     db.query('DELETE FROM sessions WHERE course_id = ?').run(courseId);
     db.query('DELETE FROM student_codes WHERE course_id = ?').run(courseId);
-    db.query("UPDATE courses SET save_mode = 'no_save', next_student_seq = 1 WHERE id = ?").run(courseId);
+    db.query("UPDATE courses SET save_mode = 'no_save', next_student_seq = 1, join_code_hash = NULL WHERE id = ?").run(courseId);
   } else {
     const exp = expireDays ? now + expireDays * 24 * 3600_000 : Number(row.expires_at);
     const del = deleteDays ? now + Math.max(expireDays ?? 1, deleteDays) * 24 * 3600_000 : Math.max(exp, Number(row.delete_at));
@@ -632,7 +799,7 @@ export async function listStudents(courseId?: string | null) {
     const sql = await getPg();
     const rows = courseId
       ? await sql`
-          SELECT sc.id, sc.course_id, sc.label, sc.created_at, sc.expires_at, sc.revoked_at,
+          SELECT sc.id, sc.course_id, sc.label, sc.username, sc.created_at, sc.expires_at, sc.revoked_at,
                  c.alias AS course_alias, c.delete_at,
                  p.progress_json,
                  (SELECT COUNT(*)::int FROM sessions t WHERE t.student_id = sc.id AND t.expires_at > ${now}) AS active_sessions
@@ -643,7 +810,7 @@ export async function listStudents(courseId?: string | null) {
           ORDER BY sc.id DESC
         `
       : await sql`
-          SELECT sc.id, sc.course_id, sc.label, sc.created_at, sc.expires_at, sc.revoked_at,
+          SELECT sc.id, sc.course_id, sc.label, sc.username, sc.created_at, sc.expires_at, sc.revoked_at,
                  c.alias AS course_alias, c.delete_at,
                  p.progress_json,
                  (SELECT COUNT(*)::int FROM sessions t WHERE t.student_id = sc.id AND t.expires_at > ${now}) AS active_sessions
@@ -661,6 +828,7 @@ export async function listStudents(courseId?: string | null) {
         courseId: String(row.course_id),
         courseAlias: String(row.course_alias),
         label: String(row.label),
+        username: row.username ? String(row.username) : null,
         createdAt: Number(row.created_at),
         expiresAt: Number(row.expires_at),
         deleteAt: Number(row.delete_at),
@@ -673,7 +841,7 @@ export async function listStudents(courseId?: string | null) {
 
   const db = await getSqlite();
   const queryStr = `
-    SELECT sc.id, sc.course_id, sc.label, sc.created_at, sc.expires_at, sc.revoked_at,
+    SELECT sc.id, sc.course_id, sc.label, sc.username, sc.created_at, sc.expires_at, sc.revoked_at,
            c.alias AS course_alias, c.delete_at,
            p.progress_json,
            (SELECT COUNT(*) FROM sessions t WHERE t.student_id = sc.id AND t.expires_at > ?) AS active_sessions
@@ -689,6 +857,7 @@ export async function listStudents(courseId?: string | null) {
     courseId: String(row.course_id),
     courseAlias: String(row.course_alias),
     label: String(row.label),
+    username: row.username ? String(row.username) : null,
     createdAt: Number(row.created_at),
     expiresAt: Number(row.expires_at),
     deleteAt: Number(row.delete_at),

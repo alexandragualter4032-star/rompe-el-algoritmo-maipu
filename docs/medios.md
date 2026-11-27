@@ -4,15 +4,15 @@ Los reproductores enlazan videos o listas de YouTube publicados por artistas, ca
 
 | Nivel | Artista | Contenido reproducido | Fuente |
 | --- | --- | --- | --- |
-| 1 | AKRIILA | *epistolares; de mi, para ti*, álbum completo | [AKRIILA](https://www.youtube.com/watch?v=-BDQEPBs7J0) |
-| 2 | Princesa Alba | «besitos, cuídate», visualizador oficial; enlace adicional al álbum completo | [Princesa Alba](https://www.youtube.com/watch?v=YR1kd_6adE4), [lista del álbum](https://www.youtube.com/playlist?list=OLAK5uy_kR-tNnZqmPseZ31U0hCA7ll8fyGu8WS6w) |
+| 1 | AKRIILA | «Mal Comunicada» ft. Latin Mafia | [AKRIILA](https://www.youtube.com/watch?v=kn2B2S3VFrI) |
+| 2 | Princesa Alba | «Tus Estaciones» (video oficial, canal PrincesaAlbaVEVO) | [Princesa Alba](https://www.youtube.com/watch?v=bJkeO_zWJrs), [lista del álbum](https://www.youtube.com/playlist?list=OLAK5uy_kR-tNnZqmPseZ31U0hCA7ll8fyGu8WS6w) |
 | 3 | Soulfia | «Ten Cuidao’», single | [Soulfia](https://www.youtube.com/watch?v=uEPlTgRC2-A) |
 | 4 | Ana Tijoux | «1977» | [Nacional Records](https://www.youtube.com/watch?v=yiQ7S38nKog) |
 | 5 | Javiera Mena | «Hasta la verdad», de *Mena*; la portada mostrada es *Esquemas Juveniles* | [Javiera Mena](https://www.youtube.com/watch?v=OORCSsbHU6Y) |
 | 6 | Francisca Valenzuela | «Buen Soldado» | [Francisca Valenzuela](https://www.youtube.com/watch?v=9WQHGQR69JI) |
 | 7 | Mon Laferte | «Si tú me quisieras», de *Mon Laferte, Vol. 1* | [Mon Laferte](https://www.youtube.com/watch?v=y73MCzGi3s4) |
 | 8 | Rubio | «IR», video oficial; portada mostrada de *Pez* | [RUBIO](https://www.youtube.com/watch?v=JAp31z8WWqw) |
-| 9 | chini.png | «Venenos»; portada de *El día libre de Polux* | [chini.png](https://www.youtube.com/watch?v=pLsB8OtfpJU) |
+| 9 | chini.png | «No midas las palabras!» | [chini.png](https://www.youtube.com/watch?v=sdQQdwG_1LQ) |
 | 10 | Snail Mail | «Pristine»; portada de *Lush* | [Matador Records](https://www.youtube.com/watch?v=s7tnTucP1UM) |
 | 11 | Paramore | Playlist de *After Laughter* | [playlist](https://youtube.com/playlist?list=PLZ1s4Pon2Ch9FHr--ORsKmLzn6LTLEnlt) |
 | 12 | tricot | Playlist de *T H E* | [playlist](https://youtube.com/playlist?list=PLRvZ7cdgjmKRTu1WDbvLmHQtQfy2wdWsX) |

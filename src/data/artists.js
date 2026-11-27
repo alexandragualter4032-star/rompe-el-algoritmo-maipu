@@ -8,7 +8,7 @@
     genre: 'Urbano / Trap / Reggaetón Experimental',
     tagline: 'Desde las calles de Maipú para el mundo: rompiendo el molde del género urbano.',
     albumTitle: 'Epistolares',
-    video: { provider: 'youtube', id: '-BDQEPBs7J0', title: 'epistolares; de mi, para ti (álbum completo)' },
+    video: { provider: 'youtube', id: 'kn2B2S3VFrI', title: 'Mal Comunicada (ft. Latin Mafia)' },
     themeClass: 'theme-akrilla',
     colors: {
       primary: '#ff2e63',
@@ -47,7 +47,7 @@
     genre: 'Pop Urbano',
     tagline: 'Brillo, cancha y pop chileno hecho con autogestión y actitud.',
     albumTitle: 'Besitos, cuídate',
-    video: { provider: 'youtube', id: 'YR1kd_6adE4', title: 'besitos, cuídate (visualizador oficial)',
+    video: { provider: 'youtube', id: 'bJkeO_zWJrs', title: 'Tus Estaciones (video oficial)',
       playlistUrl: 'https://www.youtube.com/playlist?list=OLAK5uy_kR-tNnZqmPseZ31U0hCA7ll8fyGu8WS6w' },
     themeClass: 'theme-princesaalba',
     colors: {
@@ -323,7 +323,7 @@
     genre: 'Art-Rock / Indie Pictórico',
     tagline: 'Pintura, guitarras indie y poesía visual que no encaja en listas comerciales.',
     albumTitle: 'El Día Libre de Polux',
-    video: { provider: 'youtube', id: 'pLsB8OtfpJU', title: 'Venenos (video oficial)' },
+    video: { provider: 'youtube', id: 'sdQQdwG_1LQ', title: 'No midas las palabras' },
     themeClass: 'theme-chinipng',
     colors: {
       primary: '#ff9f1c',

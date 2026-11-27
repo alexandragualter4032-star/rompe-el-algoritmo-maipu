@@ -24,17 +24,20 @@ CREATE TABLE IF NOT EXISTS courses (
   created_at BIGINT NOT NULL,
   expires_at BIGINT NOT NULL,
   delete_at BIGINT NOT NULL,
+  join_code_hash TEXT UNIQUE,
   CONSTRAINT courses_delete_after_expire_chk CHECK (delete_at >= expires_at)
 );
 
 CREATE INDEX IF NOT EXISTS courses_delete_at_idx ON courses(delete_at);
+CREATE UNIQUE INDEX IF NOT EXISTS courses_join_code_idx ON courses(join_code_hash) WHERE join_code_hash IS NOT NULL;
 
--- 3. Códigos individuales pseudónimos de estudiantes (solo hash SHA-256 y etiqueta neutra secuencial)
+-- 3. Cuentas pseudónimas por curso (alias inventado y contraseña aleatoria en hash)
 CREATE TABLE IF NOT EXISTS student_codes (
   id BIGSERIAL PRIMARY KEY,
   course_id TEXT NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
   label TEXT NOT NULL CHECK (label ~ '^[A-Za-zÁÉÍÓÚáéíóúÑñ]+ [0-9]{1,4}$'),
   code_hash TEXT NOT NULL UNIQUE CHECK (char_length(code_hash) = 64),
+  username TEXT,
   created_at BIGINT NOT NULL,
   expires_at BIGINT NOT NULL,
   revoked_at BIGINT,
@@ -43,6 +46,8 @@ CREATE TABLE IF NOT EXISTS student_codes (
 
 CREATE INDEX IF NOT EXISTS student_codes_course_idx ON student_codes(course_id);
 CREATE INDEX IF NOT EXISTS student_codes_expires_idx ON student_codes(expires_at);
+CREATE UNIQUE INDEX IF NOT EXISTS student_codes_course_username_idx ON student_codes(course_id, lower(username)) WHERE username IS NOT NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS student_codes_username_global_idx ON student_codes(lower(username)) WHERE username IS NOT NULL;
 
 -- 4. Progreso de campaña y punto de retorno (checkpoint de segmentación multimedia)
 CREATE TABLE IF NOT EXISTS progress (
