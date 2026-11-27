@@ -6,8 +6,8 @@ Este documento define una ruta para pasar del prototipo local a una versión web
 
 El docente debe elegir el modo de trabajo para cada curso, dentro de las reglas que autorice el establecimiento:
 
-1. **Práctica sin guardado** — opción inicial recomendada. No se crean códigos personales ni se registra avance en el servidor. Al cerrar o recargar la página, la partida se pierde.
-2. **Retomar otro día** — el docente activa el guardado y entrega el código de invitación del curso. El estudiante elige un alias inventado y juega el nivel 1; al superarlo se crea la cuenta, se guarda el progreso y se entrega una contraseña aleatoria que debe anotar.
+1. **Práctica sin guardado** — dinámica recomendada para la clase. No se crean códigos ni cuentas, ni se registra avance en el servidor. Al cerrar o recargar la página, la partida se pierde.
+2. **Retomar otro día** — opción técnica para cuando el beneficio de continuar en varias sesiones justifique el tiempo de gestión. El docente activa el guardado y entrega el código de invitación del curso. El estudiante elige un alias inventado y juega el nivel 1; al superarlo se crea la cuenta, se guarda el progreso y se entrega una contraseña aleatoria que debe anotar.
 
 La pantalla docente debe explicar esta diferencia antes de crear códigos. Si el guardado está activo, debe mostrar el vencimiento y la fecha en que se borrarán los datos. Desactivar el guardado debe requerir confirmar qué pasará con el progreso existente; la opción más simple es borrarlo.
 
@@ -18,9 +18,9 @@ Un código aleatorio reduce la exposición directa, pero si el docente conserva 
 ## Estado actual del prototipo
 
 - Bun sirve una API y una base SQLite local en `data/game.sqlite`.
-- El modo **Jugar sin guardar** no conserva avance. **Guardar para retomar** pide código de curso y alias; crea la cuenta solo después de superar el nivel 1.
+- **Jugar sin guardar** es el modo recomendado en el aula: no pide códigos ni crea cuentas y no conserva avance. **Guardar para retomar** es opcional y pide código de curso y alias; crea la cuenta solo después de superar el nivel 1.
 - El servidor guarda el alias, el hash de la contraseña, una etiqueta neutra y el progreso. La contraseña aparece al estudiante una vez; el panel docente puede generar una nueva.
-- No se reparten códigos individuales. Se comparte un solo código de invitación por curso; cada cuenta usa un alias único y una contraseña propia, que se genera tras superar el nivel 1.
+- En la dinámica recomendada no se reparten códigos. Si el docente elige el guardado opcional, se comparte un código de invitación por curso; cada cuenta usa un alias único y una contraseña propia, que se genera tras superar el nivel 1.
 - Los registros de códigos individuales creados antes de este cambio pueden permanecer en SQLite hasta que se borre el curso o esos registros. El panel ya no genera ni entrega nuevos códigos individuales.
 - La purga por fecha de borrado y el despliegue web con base persistente siguen pendientes. Bun/SQLite local solo guarda datos en el equipo donde corre.
 - El panel separa cursos, pero aún usa una sola cuenta docente global.
@@ -29,7 +29,7 @@ Un código aleatorio reduce la exposición directa, pero si el docente conserva 
 
 - Definir con el establecimiento quién administra el sitio y qué modo de guardado está permitido.
 - Elegir retención corta y explícita para el avance guardado; por ejemplo, hasta una fecha de cierre del curso. El valor definitivo lo establece el establecimiento.
-- Definir quién entrega el único código de invitación del curso, cómo se renueva y quién puede reiniciar contraseñas.
+- Si se habilita el modo opcional de guardado, definir quién entrega y renueva el código de invitación del curso y quién puede reiniciar contraseñas.
 - Confirmar quién puede ver el progreso y cómo docentes/estudiantes pueden solicitar corrección o eliminación.
 - Preparar un aviso breve para estudiantes y apoderados que explique finalidad, datos guardados, fecha de borrado y contacto responsable.
 - Si se necesita evaluación nominal, mantener la tabla identidad ↔ alias fuera del sistema, bajo control del establecimiento.
@@ -50,7 +50,8 @@ Aplicar claves foráneas, índices, restricciones y migraciones versionadas. No 
 
 - Crear un curso en el panel docente con modo **sin guardar** o **guardar para retomar**.
 - Con modo sin guardar, no crear códigos ni enviar avances a la API; mantener el estado solo durante la sesión del navegador.
-- Con guardado activo, entregar a la clase un único código de invitación y mostrar la fecha de vencimiento y de borrado.
+- El modo sin guardado es el punto de partida recomendado: no mostrar ni pedir códigos y mantener el estado solo durante la sesión del navegador.
+- Si se habilita el guardado opcional, entregar a la clase un único código de invitación y mostrar la fecha de vencimiento y de borrado.
 - El estudiante elige un alias inventado, completa el nivel 1 y recibe una contraseña aleatoria. Guardar el nivel 1 en la misma operación que crea la cuenta.
 - Limitar intentos de acceso y almacenar solo el hash de la contraseña.
 - No aceptar nombres ni números de lista como alias.

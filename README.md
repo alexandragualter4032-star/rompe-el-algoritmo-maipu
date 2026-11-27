@@ -2,7 +2,7 @@
 
 Juego educativo de música y pensamiento crítico. Sus 12 niveles presentan proyectos musicales liderados por mujeres; cada nivel combina cuestionario, retroalimentación, material audiovisual y minijuego de ritmo.
 
-**Estado:** prototipo funcional en desarrollo. El workflow de Pages está preparado; falta que una persona administradora habilite GitHub Actions como fuente de publicación. La aplicación completa con progreso se ejecuta localmente con Bun.
+**Estado:** prototipo funcional en desarrollo. Se ejecuta localmente con Bun; Vercel y una base de datos persistente siguen pendientes.
 
 ## Funcionalidades
 
@@ -12,7 +12,7 @@ Juego educativo de música y pensamiento crítico. Sus 12 niveles presentan proy
 - Reproductores incrustados de YouTube para canciones, discos o playlists. El navegador puede impedir autoplay.
 - Minijuego de ritmo con controles de teclado y pantalla táctil. Sus notas aún no están sincronizadas con BPM ni con las grabaciones.
 - Modo de prueba, sin guardar avance.
-- Panel docente: creación de cursos, códigos de invitación, seguimiento, exportación CSV, renovación de contraseñas y depuración de niveles.
+- Panel docente: práctica sin guardado, además de herramientas opcionales para cursos, progreso, exportación CSV y depuración.
 - Persistencia actual mediante Bun y SQLite local.
 - Diseño adaptable y soporte para `prefers-reduced-motion`.
 
@@ -54,9 +54,13 @@ Vite usa `http://localhost:5175/` y envía las llamadas `/api` al servidor confi
 
 En el primer inicio, el servidor genera `data/admin.key`. Inicia sesión en **Docente / administración** usando esa clave. Guárdala fuera del repositorio. La base `data/game.sqlite` contiene cuentas y avances; ambos archivos están ignorados por Git.
 
-El menú ofrece **Jugar sin guardar** o **Guardar para retomar**. Para guardar, el docente entrega un código de curso; el estudiante usa un alias inventado y completa el nivel 1. Al terminar, la aplicación crea su cuenta, guarda ese avance y muestra una contraseña aleatoria una sola vez. Debe anotarla. El docente puede generar otra contraseña si se pierde; la anterior deja de funcionar. Las cuentas pueden retomar desde su último avance. Las sesiones docentes duran ocho horas y las estudiantiles hasta siete días.
+### Uso recomendado en una clase
 
-No ingresar nombres reales, apellidos, iniciales, RUT, correo ni números de lista como alias. La cuenta queda asociada a un pseudónimo y al curso, por lo que el progreso es seudónimo. El código de curso permite inscribirse y debe compartirse solo con esa clase.
+La dinámica principal es **Jugar sin guardar**, similar a una actividad de Kahoot: el curso entra y juega sin crear cuentas ni repartir códigos. No se registra el avance en el servidor y se pierde al cerrar o recargar la página. Así se reduce el tiempo de organización dentro de la clase y no se recopilan datos de estudiantes.
+
+El prototipo todavía incluye **Guardar para retomar** como opción técnica para sesiones en varios días. Ese flujo requiere que el docente active el guardado y comparta un código de curso; cada estudiante crea un alias inventado y, tras completar el nivel 1, recibe una contraseña aleatoria. La cuenta permite retomar el avance. Por el tiempo que requiere gestionar códigos y contraseñas, esta opción no forma parte de la dinámica recomendada para el curso. Las sesiones docentes duran ocho horas y las estudiantiles hasta siete días.
+
+Si se prueba el modo opcional con guardado, no ingresar nombres reales, apellidos, iniciales, RUT, correo ni números de lista como alias. La cuenta queda asociada a un pseudónimo y al curso, por lo que el progreso es seudónimo, no anónimo. Los códigos de curso son parte de ese flujo opcional y deben compartirse solo con la clase correspondiente.
 
 La purga automática al vencer la fecha de borrado y la migración a PostgreSQL para Vercel aún están pendientes. En local, los datos se guardan en SQLite dentro de `data/game.sqlite`.
 
@@ -87,8 +91,8 @@ La revisión basada en el capítulo de Richard E. Mayer y en práctica de recupe
 
 | Decisión de diseño y base de datos | Justificación TPACK (Tecnología, Pedagogía y Contenido) | Aprendizaje Multimedia (Mayer, 2002) y Práctica de Recuperación (Karpicke & Roediger, 2008) | Marco Legal Chileno (Ley 21.719 y Ley 21.855 sobre protección de NNA) |
 | --- | --- | --- | --- |
-| **Una invitación por curso; alias y contraseña individual después del nivel 1** | **TK + PK (Gestión de aula):** El docente comparte un único código con toda la clase. El estudiante crea su alias y recibe contraseña solo después del primer nivel, reduciendo el reparto de credenciales individuales. | **Reducción de carga cognitiva extrínseca:** El inicio del juego no requiere correo ni contraseña; la credencial aparece después de una primera meta breve. | **Minimización de datos y protección de NNA:** No pedir nombre, apellido, iniciales, RUT, correo o número de lista. Los alias siguen siendo pseudónimos y no deben contener datos personales. |
-| **Separación por cursos y elección explícita: *Jugar sin guardar* vs *Guardar para retomar*** | **PK + CK (Flexibilidad didáctica):** Permite usar la aplicación en una sesión sin registro o en varias sesiones con cuentas pseudónimas. | **Segmentación y ritmo propio:** El progreso por nivel, fase y pregunta pendiente permite continuar otro día. | **Finalidad y transparencia:** El modo sin guardado no registra avance. El modo con cuenta muestra fechas de expiración y eliminación. |
+| **Modo principal: *Jugar sin guardar*** | **TK + PK (Gestión de aula):** El curso comienza sin repartir códigos ni administrar cuentas, ahorrando tiempo para la actividad musical. | **Reducción de carga cognitiva extrínseca:** El inicio no requiere recordar credenciales ni completar registro antes de jugar. | **Minimización de datos y protección de NNA:** La práctica no crea cuentas ni conserva avance en el servidor. |
+| **Opción técnica: *Guardar para retomar*** | **PK + CK (Flexibilidad didáctica):** Permite explorar continuidad entre sesiones si el docente decide que el beneficio compensa la gestión adicional. | **Segmentación y ritmo propio:** El progreso por nivel, fase y pregunta pendiente permite continuar otro día. | **Finalidad y transparencia:** Requiere código de curso, alias y contraseña; el avance es seudónimo y debe tener vencimiento y eliminación definidos. No es el flujo recomendado para el uso habitual en aula. |
 | **Fechas separadas de vencimiento (`expires_at`) y borrado definitivo (`delete_at`)** | **PK (Evaluación formativa):** Al cerrar el acceso, el docente conserva una ventana acotada para exportar el CSV de avance antes de la eliminación definitiva. | **Práctica de Recuperación Espaciada:** Facilita planificar sesiones de recuperación dentro de un periodo acotado y observar en qué niveles o preguntas hubo mayor dificultad. | **Limitación del plazo de conservación y derecho de supresión:** Al cumplirse `delete_at` (o cuando el docente elimina el curso o desactiva el guardado), `ON DELETE CASCADE` borra curso, cuentas, sesiones y progreso. |
 | **Alias únicos y etiquetas secuenciales de seguimiento** | **TPK:** El panel muestra alias y avance; la relación con identidad escolar, si se necesita, queda bajo responsabilidad del establecimiento y fuera de la app. | **Señalización consistente:** Mantiene un registro comprensible sin pedir datos reales antes de comenzar. | **Pseudonimización y minimización:** Las cuentas guardan alias, contraseña en hash y progreso; no son anónimas si el alias se vincula con una persona. |
 
@@ -143,7 +147,7 @@ tests/           Pruebas API y de flujo
 
 ## Privacidad y seguridad
 
-El sitio no solicita identidad real. El docente comparte un código por curso; cada estudiante crea un alias inventado y una contraseña aleatoria después del nivel 1. El servidor guarda el hash de la contraseña, el token de sesión en hash y el progreso pseudónimo. El código de curso es un secreto compartido y debe entregarse solo a esa clase. La versión local escucha en la interfaz loopback por defecto; antes de abrir acceso remoto se necesita HTTPS, almacenamiento persistente, secretos de despliegue y límites adecuados.
+En el modo recomendado para aula no se pide identidad, no se usan códigos y no se guarda progreso en el servidor. El modo opcional para retomar sí usa código de curso, alias inventado y contraseña; guarda hashes de contraseñas y sesiones junto con progreso pseudónimo. Antes de activar ese modo en un despliegue público se deben definir almacenamiento persistente, plazos de conservación, eliminación y controles de acceso. La versión local escucha en la interfaz loopback por defecto.
 
 Para reportar una vulnerabilidad, no incluyas claves ni datos de estudiantes en issues públicos. Contacta al responsable del repositorio por un canal privado.
 
