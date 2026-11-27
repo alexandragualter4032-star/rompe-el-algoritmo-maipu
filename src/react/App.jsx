@@ -124,10 +124,6 @@ export function App() {
       <button className="secondary-btn" type="button" onClick={() => { setScreen('login'); setError(''); }}>Retomar una partida guardada</button>
       <button className="text-btn" type="button" onClick={() => { setScreen('admin'); setError(''); }}>Acceso docente</button>
     </div>
-    <a className="github-project-link" href="https://github.com/alexandragualter4032-star/rompe-el-algoritmo-maipu" target="_blank" rel="noreferrer" aria-label="Ver el proyecto en GitHub (se abre en una pestaña nueva)">
-      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 .8a11.2 11.2 0 0 0-3.54 21.83c.56.1.76-.24.76-.54v-2.1c-3.1.67-3.76-1.32-3.76-1.32-.5-1.29-1.24-1.63-1.24-1.63-1.02-.7.08-.69.08-.69 1.12.08 1.7 1.15 1.7 1.15 1 .1.74 2.19 3.48 1.56.1-.73.4-1.23.7-1.51-2.48-.28-5.1-1.24-5.1-5.52 0-1.22.44-2.22 1.15-3-.12-.29-.5-1.43.11-2.98 0 0 .94-.3 3.08 1.15a10.7 10.7 0 0 1 5.6 0c2.14-1.45 3.08-1.15 3.08-1.15.61 1.55.23 2.69.11 2.98.72.78 1.15 1.78 1.15 3 0 4.29-2.62 5.23-5.12 5.51.4.35.75 1.03.75 2.08v3.07c0 .3.2.65.77.54A11.2 11.2 0 0 0 12 .8Z"/></svg>
-      Ver proyecto en GitHub
-    </a>
   </>);
 
   if (screen === 'register') return showAuthCard(<>
@@ -147,6 +143,10 @@ export function App() {
   return showAuthCard(<>
     <h2>{screen === 'admin' ? 'Acceso docente' : 'Retomar una partida'}</h2>
     {screen !== 'admin' && <p className="auth-note">Ingresa el usuario y la contraseña que guardaste. Si aún no tienes una cuenta, consulta a tu docente: crearla requiere un código de curso.</p>}
+    {screen === 'admin' && <a className="github-project-link" href="https://github.com/alexandragualter4032-star/rompe-el-algoritmo-maipu" target="_blank" rel="noreferrer" aria-label="Ver proyecto en GitHub (se abre en una pestaña nueva)" title="Ver proyecto en GitHub">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 .8a11.2 11.2 0 0 0-3.54 21.83c.56.1.76-.24.76-.54v-2.1c-3.1.67-3.76-1.32-3.76-1.32-.5-1.29-1.24-1.63-1.24-1.63-1.02-.7.08-.69.08-.69 1.12.08 1.7 1.15 1.7 1.15 1 .1.74 2.19 3.48 1.56.1-.73.4-1.23.7-1.51-2.48-.28-5.1-1.24-5.1-5.52 0-1.22.44-2.22 1.15-3-.12-.29-.5-1.43.11-2.98 0 0 .94-.3 3.08 1.15a10.7 10.7 0 0 1 5.6 0c2.14-1.45 3.08-1.15 3.08-1.15.61 1.55.23 2.69.11 2.98.72.78 1.15 1.78 1.15 3 0 4.29-2.62 5.23-5.12 5.51.4.35.75 1.03.75 2.08v3.07c0 .3.2.65.77.54A11.2 11.2 0 0 0 12 .8Z"/></svg>
+      <span>Ver proyecto en GitHub</span>
+    </a>}
     <form onSubmit={login} className="auth-form">
       {screen === 'admin' ? <>
         <label htmlFor="admin-key">Clave de administración</label>
