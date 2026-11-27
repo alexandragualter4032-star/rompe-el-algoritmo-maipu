@@ -303,6 +303,9 @@ body {
 }
 .entry-actions > button { width: 100%; }
 .auth-card .text-btn { margin-top: 0.2rem; }
+.github-project-link { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; margin-top: 1rem; color: var(--text-muted); font-size: 0.9rem; text-decoration: none; }
+.github-project-link:hover, .github-project-link:focus-visible { color: var(--text-main); text-decoration: underline; }
+.github-project-link svg { width: 1.15rem; height: 1.15rem; }
 .auth-note { font-size: 0.95rem; line-height: 1.5; }
 
 .rhythm-controls-help {

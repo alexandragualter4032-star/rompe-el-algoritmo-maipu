@@ -1,4 +1,5 @@
 import { randomBytes } from 'node:crypto';
+import { hasOffensiveUsernameTerm } from '../shared/usernames.js';
 import {
   authenticateStudentByCode,
   cleanProgress,
@@ -138,6 +139,7 @@ export async function handleApi(request: Request): Promise<Response> {
     const username = sanitizeUsername(data?.username);
     const joinCode = normalizeCode(data?.joinCode);
     if (!username) return json({ error: 'El usuario debe tener 3 a 20 caracteres: letras sin tilde, números, guion o guion bajo. Usa un alias que no revele tu identidad.' }, 400);
+      if (hasOffensiveUsernameTerm(username)) return json({ error: 'Ese alias no está permitido. Elige uno respetuoso y que no revele tu identidad.' }, 400);
     if (joinCode.length !== 10) return json({ error: 'Revisa el código de curso.' }, 400);
     const account = await createStudentAccount(hash(joinCode), username, data?.progress);
     if ('error' in account) return json({ error: account.error }, 400);
@@ -150,6 +152,7 @@ export async function handleApi(request: Request): Promise<Response> {
     const data = await body(request);
     const username = sanitizeUsername(data?.username);
     if (!username) return json({ error: 'El usuario debe tener 3 a 20 caracteres: letras sin tilde, números, guion o guion bajo.' }, 400);
+    if (hasOffensiveUsernameTerm(username)) return json({ error: 'Ese alias no está permitido. Elige uno respetuoso y que no revele tu identidad.' }, 400);
     const joinCode = normalizeCode(data?.joinCode);
     if (joinCode.length !== 10 || !(await validateCourseJoinCode(hash(joinCode)))) {
       return json({ error: 'Código de curso incorrecto, vencido o sin guardado activo. Pide ayuda a tu docente.' }, 400);

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { api } from './api.js';
 import { AdminPanel } from './AdminPanel.jsx';
 import { Game } from './Game.jsx';
+import { hasOffensiveUsernameTerm } from '../shared/usernames.js';
 
 const staticDemo = import.meta.env.VITE_STATIC_DEMO === 'true';
 
@@ -48,6 +49,10 @@ export function App() {
     const cleanCode = joinCode.toUpperCase().replace(/[\s-]/g, '');
     if (!/^[a-z0-9_-]{3,20}$/.test(cleanUser)) {
       setError('Usa un alias de 3 a 20 caracteres: letras sin tilde, números, guion o guion bajo. No uses tu nombre real.');
+      return;
+    }
+    if (hasOffensiveUsernameTerm(cleanUser)) {
+      setError('Ese alias no está permitido. Elige uno respetuoso y que no revele tu identidad.');
       return;
     }
     if (cleanCode.length !== 10) {
@@ -119,6 +124,10 @@ export function App() {
       <button className="secondary-btn" type="button" onClick={() => { setScreen('login'); setError(''); }}>Retomar una partida guardada</button>
       <button className="text-btn" type="button" onClick={() => { setScreen('admin'); setError(''); }}>Acceso docente</button>
     </div>
+    <a className="github-project-link" href="https://github.com/alexandragualter4032-star/rompe-el-algoritmo-maipu" target="_blank" rel="noreferrer" aria-label="Ver el proyecto en GitHub (se abre en una pestaña nueva)">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 .8a11.2 11.2 0 0 0-3.54 21.83c.56.1.76-.24.76-.54v-2.1c-3.1.67-3.76-1.32-3.76-1.32-.5-1.29-1.24-1.63-1.24-1.63-1.02-.7.08-.69.08-.69 1.12.08 1.7 1.15 1.7 1.15 1 .1.74 2.19 3.48 1.56.1-.73.4-1.23.7-1.51-2.48-.28-5.1-1.24-5.1-5.52 0-1.22.44-2.22 1.15-3-.12-.29-.5-1.43.11-2.98 0 0 .94-.3 3.08 1.15a10.7 10.7 0 0 1 5.6 0c2.14-1.45 3.08-1.15 3.08-1.15.61 1.55.23 2.69.11 2.98.72.78 1.15 1.78 1.15 3 0 4.29-2.62 5.23-5.12 5.51.4.35.75 1.03.75 2.08v3.07c0 .3.2.65.77.54A11.2 11.2 0 0 0 12 .8Z"/></svg>
+      Ver proyecto en GitHub
+    </a>
   </>);
 
   if (screen === 'register') return showAuthCard(<>
@@ -127,7 +136,7 @@ export function App() {
     <form onSubmit={beginEnrollment} className="auth-form">
       <label htmlFor="course-code">Código de curso que te dio tu docente</label>
       <input id="course-code" value={joinCode} onChange={(event) => setJoinCode(event.target.value)} autoComplete="off" required />
-      <label htmlFor="new-username">Alias inventado (3 a 20 caracteres)</label>
+      <label htmlFor="new-username">Alias inventado (3 a 20 caracteres, sin groserías ni datos personales)</label>
       <input id="new-username" value={username} onChange={(event) => setUsername(event.target.value)} autoComplete="off" minLength={3} maxLength={20} required />
       {error && <p className="auth-error" role="alert">{error}</p>}
       <button className="primary-btn" disabled={busy}>▶ Comenzar nivel 1</button>
