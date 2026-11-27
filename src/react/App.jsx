@@ -3,6 +3,7 @@ import { api } from './api.js';
 import { AdminPanel } from './AdminPanel.jsx';
 import { Game } from './Game.jsx';
 import { hasOffensiveUsernameTerm } from '../shared/usernames.js';
+import { setGameContent } from '../data/contentStore.js';
 
 const staticDemo = import.meta.env.VITE_STATIC_DEMO === 'true';
 
@@ -22,7 +23,10 @@ export function App() {
 
   useEffect(() => {
     if (staticDemo) return;
-    api('/api/me').then(setAuth).catch(() => setAuth({ role: 'guest' }));
+    api('/api/me').then((result) => {
+      if (result.content) setGameContent(result.content);
+      setAuth(result);
+    }).catch(() => setAuth({ role: 'guest' }));
   }, []);
 
   async function login(event) {

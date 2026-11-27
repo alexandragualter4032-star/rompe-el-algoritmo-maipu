@@ -197,6 +197,11 @@ async function getPg() {
         student_id BIGINT REFERENCES student_codes(id) ON DELETE CASCADE,
         expires_at BIGINT NOT NULL
       );
+      CREATE TABLE IF NOT EXISTS game_content (
+        id INTEGER PRIMARY KEY CHECK (id = 1),
+        content_json JSONB NOT NULL,
+        updated_at BIGINT NOT NULL
+      );
     `);
     const existingCourses = await pgSql`SELECT COUNT(*)::int AS total FROM courses`;
     if (existingCourses[0].total === 0) {
@@ -265,6 +270,11 @@ async function getSqlite() {
       course_id TEXT REFERENCES courses(id) ON DELETE CASCADE,
       student_id INTEGER REFERENCES student_codes(id) ON DELETE CASCADE,
       expires_at INTEGER NOT NULL
+    );
+    CREATE TABLE IF NOT EXISTS game_content (
+      id INTEGER PRIMARY KEY CHECK(id = 1),
+      content_json TEXT NOT NULL,
+      updated_at INTEGER NOT NULL
     );
     CREATE INDEX IF NOT EXISTS student_codes_course_idx ON student_codes(course_id);
     CREATE INDEX IF NOT EXISTS sessions_student_idx ON sessions(student_id);
@@ -657,6 +667,37 @@ export async function updateStudentProgress(studentId: number, cleanedProgress: 
     VALUES (?, ?, ?)
     ON CONFLICT(student_id) DO UPDATE SET progress_json = excluded.progress_json, updated_at = excluded.updated_at
   `).run(studentId, JSON.stringify(cleanedProgress), now);
+}
+
+export async function getSavedGameContent() {
+  if (databaseUrl) {
+    const sql = await getPg();
+    const rows = await sql`SELECT content_json FROM game_content WHERE id = 1`;
+    return rows[0]?.content_json ?? null;
+  }
+  const db = await getSqlite();
+  const row = db.query('SELECT content_json FROM game_content WHERE id = 1').get() as any;
+  if (!row) return null;
+  try { return JSON.parse(row.content_json); } catch { return null; }
+}
+
+export async function saveGameContent(content: unknown) {
+  const now = Date.now();
+  if (databaseUrl) {
+    const sql = await getPg();
+    await sql`
+      INSERT INTO game_content (id, content_json, updated_at)
+      VALUES (1, ${sql.json(content as any)}, ${now})
+      ON CONFLICT (id) DO UPDATE SET content_json = EXCLUDED.content_json, updated_at = EXCLUDED.updated_at
+    `;
+    return now;
+  }
+  const db = await getSqlite();
+  db.query(`
+    INSERT INTO game_content (id, content_json, updated_at) VALUES (1, ?, ?)
+    ON CONFLICT(id) DO UPDATE SET content_json = excluded.content_json, updated_at = excluded.updated_at
+  `).run(JSON.stringify(content), now);
+  return now;
 }
 
 export async function listCourses() {

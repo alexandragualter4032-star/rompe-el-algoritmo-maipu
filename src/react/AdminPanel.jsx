@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { ARTISTS } from '../data/artists.js';
+import { getGameContent } from '../data/contentStore.js';
 import { api } from './api.js';
+import { GameContentEditor } from './GameContentEditor.jsx';
 
 function escapeCsvCell(value) {
   const safe = String(value ?? '');
@@ -65,6 +66,7 @@ function downloadExcelXml(filename, sheetName, rows) {
 }
 
 export function AdminPanel({ onDebug, onLogout }) {
+  const { artists: ARTISTS } = getGameContent();
   const [courses, setCourses] = useState([]);
   const [selectedCourseId, setSelectedCourseId] = useState('');
   const [students, setStudents] = useState([]);
@@ -432,6 +434,8 @@ export function AdminPanel({ onDebug, onLogout }) {
           <p className="admin-hint">Puedes volver al panel desde el menú del juego de prueba.</p>
         </section>
       </div>
+
+      <GameContentEditor />
 
       <section className="admin-card">
         <div className="admin-table-heading">

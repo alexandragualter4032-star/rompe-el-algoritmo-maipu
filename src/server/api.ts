@@ -27,7 +27,11 @@ import {
   setCourseSaveMode,
   updateStudentProgress,
   verifyAdminKey,
+  getSavedGameContent,
+  saveGameContent,
 } from './db';
+import { ARTISTS } from '../data/artists.js';
+import { QUESTIONS } from '../data/questions.js';
 
 function json(data: unknown, status = 200, cookieHeader?: string) {
   const headers = new Headers({
@@ -65,8 +69,48 @@ async function createSession(role: 'admin' | 'student', studentId: number | null
 async function body(request: Request) {
   if (!request.headers.get('content-type')?.startsWith('application/json')) return null;
   const text = await request.text();
-  if (text.length > 16384) return null;
+  if (text.length > 524288) return null;
   try { return JSON.parse(text); } catch { return null; }
+}
+
+function validMediaUrl(value: unknown) {
+  if (typeof value !== 'string' || value.length > 2048) return false;
+  if (/^(\.\/images\/|\/images\/)(?!.*(?:^|\/)\.\.(?:\/|$))[A-Za-z0-9_./-]+\.(?:png|jpe?g|webp|gif)$/i.test(value)) return true;
+  try { return new URL(value).protocol === 'https:'; } catch { return false; }
+}
+
+function cleanGameContent(input: any) {
+  if (!input || !Array.isArray(input.artists) || !input.questions || typeof input.questions !== 'object') return null;
+  const artistsById = new Map(ARTISTS.map((artist) => [artist.id, artist]));
+  if (input.artists.length !== ARTISTS.length) return null;
+  const artists = [];
+  const questions: Record<string, any[]> = {};
+  for (const original of ARTISTS) {
+    const artist = input.artists.find((item: any) => item?.id === original.id);
+    if (!artist || !artist.files || !validMediaUrl(artist.files.photo)) return null;
+    const coverKey = original.files.singleCover ? 'singleCover' : 'albumCover';
+    if (!validMediaUrl(artist.files[coverKey])) return null;
+    const videoId = artist.video?.id;
+    const playlistId = artist.video?.playlistId;
+    if (!(typeof videoId === 'string' && /^[A-Za-z0-9_-]{6,80}$/.test(videoId)) && !(typeof playlistId === 'string' && /^[A-Za-z0-9_-]{6,100}$/.test(playlistId))) return null;
+    artists.push({ ...original, files: { ...original.files, photo: artist.files.photo, face: artist.files.photo, [coverKey]: artist.files[coverKey] }, video: { ...original.video, ...(videoId ? { id: videoId } : { id: undefined }), title: String(artist.video.title || original.video.title).slice(0, 120), ...(playlistId ? { playlistId } : { playlistId: undefined }) } });
+    const items = input.questions[original.id];
+    if (!Array.isArray(items) || items.length < 1 || items.length > 20) return null;
+    questions[original.id] = [];
+    for (const item of items) {
+      if (!item || typeof item.id !== 'string' || item.id.length > 80) return null;
+      if (![item.context, item.question, item.feedback].every((v) => typeof v === 'string' && v.length > 0 && v.length <= 1200)) return null;
+      if (!Array.isArray(item.options) || item.options.length < 3 || item.options.length > 6 || !item.options.every((v: unknown) => typeof v === 'string' && v.length > 0 && v.length <= 500)) return null;
+      if (!Number.isInteger(item.correctIndex) || item.correctIndex < 0 || item.correctIndex >= item.options.length) return null;
+      const clean: any = { id: item.id, context: item.context, question: item.question, options: item.options, correctIndex: item.correctIndex, feedback: item.feedback };
+      if (item.source && typeof item.source.title === 'string' && item.source.title.length <= 160) {
+        try { if (new URL(item.source.url).protocol === 'https:') clean.source = { title: item.source.title, url: item.source.url }; } catch { /* omit invalid optional source */ }
+      }
+      questions[original.id].push(clean);
+    }
+  }
+  if (Object.keys(input.questions).some((id) => !artistsById.has(id))) return null;
+  return { artists, questions };
 }
 
 const attemptsMap = new Map<string, number[]>();
@@ -86,16 +130,18 @@ export async function handleApi(request: Request): Promise<Response> {
   const method = request.method;
 
   if (path === '/api/me' && method === 'GET') {
-    if (await session(request, 'admin')) return json({ role: 'admin' });
+    const content = (await getSavedGameContent()) || { artists: ARTISTS, questions: QUESTIONS };
+    if (await session(request, 'admin')) return json({ role: 'admin', content });
     const current: any = await session(request, 'student');
     if (current) {
       return json({
         role: 'student',
         student: current.student,
         progress: current.progress,
+        content,
       });
     }
-    return json({ role: 'guest' });
+    return json({ role: 'guest', content });
   }
 
   if (path === '/api/admin/login' && method === 'POST') {
@@ -185,6 +231,14 @@ export async function handleApi(request: Request): Promise<Response> {
   if (path.startsWith('/api/admin/')) {
     if (!(await session(request, 'admin'))) {
       return json({ error: 'Acceso de administración requerido.' }, 401);
+    }
+
+    if (path === '/api/admin/game-content' && method === 'PUT') {
+      const data = await body(request);
+      const content = cleanGameContent(data?.content);
+      if (!content) return json({ error: 'El contenido no es válido. Revisa imágenes, enlaces y preguntas.' }, 400);
+      await saveGameContent(content);
+      return json({ ok: true, content });
     }
 
     if (path === '/api/admin/courses' && method === 'GET') {

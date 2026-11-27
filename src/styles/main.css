@@ -30,6 +30,25 @@ body {
   display: none !important;
 }
 
+.game-content-editor { margin: 1.25rem 0; }
+.game-content-editor > p { color: var(--text-muted); line-height: 1.5; margin: .4rem 0 1rem; }
+.content-editor-media, .content-editor-source, .content-editor-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .8rem; margin: 1rem 0; }
+.content-editor-media label, .content-editor-source label, .content-editor-question > label, .content-editor-options label { display: grid; gap: .35rem; min-width: 0; color: var(--text-muted); font-size: .9rem; }
+.content-editor-media input, .content-editor-source input, .content-editor-question textarea { width: 100%; min-width: 0; padding: .65rem .75rem; color: var(--text-main); background: rgba(0,0,0,.24); border: 1px solid rgba(255,255,255,.2); border-radius: .55rem; font: inherit; }
+.content-editor-question textarea { resize: vertical; line-height: 1.45; }
+.content-editor-media .admin-hint { grid-column: 1 / -1; }
+.content-question-heading { display: flex; align-items: center; justify-content: space-between; gap: .8rem; margin-top: 1.4rem; }
+.content-editor-questions { display: grid; gap: 1rem; margin: 1rem 0; }
+.content-editor-question { min-width: 0; padding: 1rem; border: 1px solid rgba(255,255,255,.2); border-radius: .8rem; background: rgba(255,255,255,.025); }
+.content-editor-question legend { padding: 0 .45rem; font-weight: 800; color: var(--secondary); }
+.content-question-controls { display: flex; flex-wrap: wrap; gap: .5rem; justify-content: flex-end; margin-bottom: .8rem; }
+.content-question-controls button, .content-option-actions button, .content-editor-question > button { border: 1px solid rgba(255,255,255,.24); background: rgba(255,255,255,.08); color: var(--text-main); border-radius: .45rem; padding: .4rem .6rem; cursor: pointer; }
+.content-question-controls button:disabled, .content-option-actions button:disabled { opacity: .45; cursor: not-allowed; }
+.content-option-actions { display: flex; gap: .4rem; }
+.content-editor-options strong { color: var(--accent); }
+.content-editor-source { padding-top: .8rem; border-top: 1px solid rgba(255,255,255,.12); }
+@media (max-width: 680px) { .content-editor-media, .content-editor-source, .content-editor-options { grid-template-columns: 1fr; } .content-question-heading { align-items: flex-start; flex-direction: column; } }
+
 :focus-visible {
   outline: 3px solid var(--accent);
   outline-offset: 3px;

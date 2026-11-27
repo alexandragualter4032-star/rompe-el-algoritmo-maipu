@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { ARTISTS } from '../data/artists.js';
+import { getGameContent } from '../data/contentStore.js';
 import { soundEngine } from '../audio/soundEngine.js';
 import { Phase1Controller } from '../components/phase1.js';
 import { Phase2Controller } from '../components/phase2.js';
@@ -82,6 +82,7 @@ function YouTubePlayer({ video, paused, muted }) {
 }
 
 export function Game({ role, initialProgress, student, debugLevel, enrollment, onFirstLevelComplete, welcomePassword, onCredentialClose, onExit }) {
+  const { artists: ARTISTS } = getGameContent();
   const [progress, setProgress] = useState(() => initialProgress || freshProgress());
   const progressRef = useRef(progress);
   const saveQueue = useRef(Promise.resolve());

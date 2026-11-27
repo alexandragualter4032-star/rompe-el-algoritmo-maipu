@@ -1,8 +1,13 @@
-import { QUESTIONS } from '../data/questions.js';
+import { getGameContent } from '../data/contentStore.js';
 import { soundEngine } from '../audio/soundEngine.js';
 import { createArtistImage, getPhotoFallbackSvg } from './placeholders.js';
 import { DvdFloater } from './dvdFloater.js';
 import { WILDCARD_DEFS, getWildcardRules, openWildcardMinigame } from './wildcards.js';
+
+function escapeHtml(value) {
+  return String(value ?? '').replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;').replaceAll("'", '&#39;');
+}
 
 export class Phase1Controller {
   constructor({
@@ -29,7 +34,7 @@ export class Phase1Controller {
     this.onComplete = onComplete;
     this.onProgress = onProgress;
 
-    this.questions = [...(QUESTIONS[artist.id] || [])];
+    this.questions = [...(getGameContent().questions[artist.id] || [])];
     this.optionOrders = this.questions.map((question) => {
       const order = question.options.map((_, index) => index);
       for (let index = order.length - 1; index > 0; index -= 1) {
@@ -152,7 +157,7 @@ export class Phase1Controller {
 
           <div class="context-box">
             <div class="box-label">💡 Contexto</div>
-            <p>${q.context}</p>
+            <p>${escapeHtml(q.context)}</p>
             <div id="extra-hint-box" class="extra-hint ${this.shieldActive ? '' : 'hidden'}">
               🛡️ <strong>Pista protectora:</strong> ${this.wildcardRules.hintText} Tu próximo intento fallido no consume tu oportunidad.
             </div>
@@ -160,7 +165,7 @@ export class Phase1Controller {
 
           <div class="question-box">
             <div class="box-label">❓ Pregunta directa</div>
-            <h3>${q.question}</h3>
+            <h3>${escapeHtml(q.question)}</h3>
             <div id="active-buffs" class="active-buffs">
               ${this.doublePointsActive ? '<span class="buff-pill">🎧 Puntos x2 activo</span>' : ''}
               ${this.shieldActive ? '<span class="buff-pill">📤 Escudo activo</span>' : ''}
@@ -213,7 +218,7 @@ export class Phase1Controller {
       btn.type = 'button';
       btn.className = 'option-btn';
       btn.dataset.index = String(idx);
-      btn.innerHTML = `<span class="opt-letter">${String.fromCharCode(65 + visualIndex)}</span><span>${optText}</span>`;
+      btn.innerHTML = `<span class="opt-letter">${String.fromCharCode(65 + visualIndex)}</span><span>${escapeHtml(optText)}</span>`;
 
       if (this.eliminatedOptions.has(idx)) {
         btn.disabled = true;
@@ -243,7 +248,7 @@ export class Phase1Controller {
       this.addVisibility(pts);
 
       feedbackEl.className = 'q-feedback success';
-      feedbackEl.innerHTML = `✅ ${q.feedback} <strong>(+${pts} Visibilidad)</strong>`;
+      feedbackEl.innerHTML = `✅ ${escapeHtml(q.feedback)}${this.sourceMarkup(q)} <strong>(+${pts} Visibilidad)</strong>`;
       feedbackEl.classList.remove('hidden');
 
       setTimeout(() => this.advanceQuestion(), 1450);
@@ -278,12 +283,21 @@ export class Phase1Controller {
         this.addVisibility(effortPts);
 
         feedbackEl.className = 'q-feedback info';
-        feedbackEl.innerHTML = `💡 Respuesta correcta marcada arriba. ${q.feedback} <strong>(+${effortPts} Visibilidad por aprender)</strong>`;
+        feedbackEl.innerHTML = `💡 Respuesta correcta marcada arriba. ${escapeHtml(q.feedback)}${this.sourceMarkup(q)} <strong>(+${effortPts} Visibilidad por aprender)</strong>`;
         feedbackEl.classList.remove('hidden');
 
         setTimeout(() => this.advanceQuestion(), 2100);
       }
     }
+  }
+
+  sourceMarkup(question) {
+    if (!question.source || !/^https:\/\//i.test(question.source.url || '')) return '';
+    try {
+      const url = new URL(question.source.url);
+      if (url.protocol !== 'https:') return '';
+      return ` <a href="${escapeHtml(url.href)}" target="_blank" rel="noopener noreferrer">Fuente: ${escapeHtml(question.source.title || 'consultar')}</a>`;
+    } catch { return ''; }
   }
 
   advanceQuestion() {
