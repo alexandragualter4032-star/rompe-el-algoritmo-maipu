@@ -119,8 +119,10 @@ export function App() {
   if (screen === 'entry') return showAuthCard(<>
     <h2>¿Listo para jugar?</h2>
     <div className="entry-actions">
-      <button className="primary-btn" type="button" onClick={() => setDemo(true)}>▶ Jugar ahora</button>
-      <p className="auth-note">Sin cuenta ni códigos. El avance se reinicia cuando sales.</p>
+      <button className="primary-btn" type="button" onClick={() => { setScreen('register'); setError(''); }}>▶ Crear cuenta con código de curso</button>
+      <p className="auth-note">Completa el nivel 1 y recibirás una contraseña para guardar tu avance y retomarlo después.</p>
+      <button className="secondary-btn" type="button" onClick={() => setDemo(true)}>Jugar sin guardar</button>
+      <p className="auth-note">Práctica de una sesión: no crea cuenta y el avance se pierde al salir.</p>
       <button className="secondary-btn" type="button" onClick={() => { setScreen('login'); setError(''); }}>Retomar una partida guardada</button>
       <button className="text-btn" type="button" onClick={() => { setScreen('admin'); setError(''); }}>Acceso docente</button>
     </div>
