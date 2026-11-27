@@ -9,7 +9,7 @@ Juego educativo de música y pensamiento crítico. Sus 12 niveles presentan proy
 - Interfaz en React y Vite.
 - Doce niveles, cinco preguntas por nivel y progresión de campaña.
 - Imágenes de artistas y portadas de los doce niveles. La ruta oculta cada portada hasta descubrir a la artista.
-- Reproductores incrustados de YouTube para canciones, discos o playlists. El navegador puede impedir autoplay.
+- Reproductores incrustados de YouTube para canciones, discos o playlists; repiten el video o la playlist al terminar. El navegador puede impedir autoplay.
 - Minijuego de ritmo con controles de teclado y pantalla táctil. Sus notas aún no están sincronizadas con BPM ni con las grabaciones.
 - Modo de prueba, sin guardar avance.
 - Panel docente: práctica sin guardado, además de herramientas opcionales para cursos, progreso, exportación CSV y depuración.

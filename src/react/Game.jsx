@@ -54,6 +54,8 @@ function GameStage({ kind, artist, checkpoint, runId, answeredIds, dvdLayer, wil
 function YouTubePlayer({ video, paused, muted }) {
   const player = useRef(null);
   const params = new URLSearchParams({ autoplay: '1', playsinline: '1', enablejsapi: '1', origin: location.origin });
+  params.set('loop', '1');
+  if (video.id) params.set('playlist', video.id);
   if (video.playlistId) {
     params.set('listType', 'playlist');
     params.set('list', video.playlistId);
@@ -72,7 +74,7 @@ function YouTubePlayer({ video, paused, muted }) {
 
   return <div className="level-media-player">
     <div className="media-player-heading"><strong>🎵 Escucha {video.title}</strong>
-      <span>Si no comienza, pulsa ▶ o <a href={original} target="_blank" rel="noopener noreferrer">ábrelo en YouTube</a>.
+      <span>Al terminar, la música vuelve a empezar. Si no comienza, pulsa ▶ o <a href={original} target="_blank" rel="noopener noreferrer">ábrelo en YouTube</a>.
         {video.playlistUrl && <> <a href={video.playlistUrl} target="_blank" rel="noopener noreferrer">Escuchar álbum completo</a>.</>}</span></div>
     <iframe ref={player} src={source} title={video.title} allow="autoplay; encrypted-media; picture-in-picture"
       referrerPolicy="strict-origin-when-cross-origin" allowFullScreen />
