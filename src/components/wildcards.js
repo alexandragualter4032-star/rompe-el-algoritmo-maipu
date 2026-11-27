@@ -6,8 +6,7 @@ export const WILDCARD_DEFS = [
     name: 'Compartir',
     effectLabel: 'Pista extra / Escudo',
     icon: '📤',
-    minigameTitle: '¡Atrapa 3 íconos musicales!',
-    minigameDesc: 'Haz clic en 3 notas que caen antes de que se acabe el tiempo (5s).',
+    minigameTitle: '¡Atrapa íconos musicales!',
   },
   {
     id: 'playlist',
@@ -15,7 +14,6 @@ export const WILDCARD_DEFS = [
     effectLabel: 'Elimina 2 opciones',
     icon: '➕',
     minigameTitle: '¡Detén la barra en la zona verde!',
-    minigameDesc: 'Presiona "¡DETENER!" cuando el marcador pase por el centro verde (4s).',
   },
   {
     id: 'stream',
@@ -23,29 +21,81 @@ export const WILDCARD_DEFS = [
     effectLabel: 'Puntos x2',
     icon: '🎧',
     minigameTitle: '¡Rompe el Algoritmo!',
-    minigameDesc: 'Haz clic 3 veces seguidas en el botón antes de que desaparezca (4.5s).',
   },
 ];
 
-export function openWildcardMinigame(wildcardId, modalOverlay, isPausedFn, onResult) {
+export function getWildcardRules(levelNumber = 1) {
+  const band = Math.min(2, Math.floor((Math.max(1, levelNumber) - 1) / 4));
+  return {
+    band,
+    cooldownSec: [30, 34, 38][band],
+    maxUses: [3, 2, 2][band],
+    eliminateCount: band === 0 ? 2 : 1,
+    catchTarget: [3, 4, 4][band],
+    catchDurationMs: [5000, 4700, 4500][band],
+    catchSpawnMs: [650, 600, 600][band],
+    catchSpeed: [75, 85, 90][band],
+    timingHalfWidth: [16, 13, 11][band],
+    timingSpeed: [135, 145, 155][band],
+    streamClicks: [3, 4, 4][band],
+    streamDurationMs: [4500, 4300, 4200][band],
+    streamOffset: [40, 50, 60][band],
+    hintText: [
+      'Relaciona el contexto con una acción concreta que amplíe las oportunidades para artistas.',
+      'Compara las alternativas con una evidencia específica del contexto.',
+      'Distingue la causa de sus consecuencias y elige solo lo que el contexto respalda.',
+    ][band],
+  };
+}
+
+export function openWildcardMinigame(wildcardId, modalOverlay, isPausedFn, onResult, levelNumber = 1) {
   const def = WILDCARD_DEFS.find((w) => w.id === wildcardId);
   if (!def) return;
+  const rules = getWildcardRules(levelNumber);
+  const effectLabel = wildcardId === 'playlist'
+    ? `Elimina ${rules.eliminateCount} ${rules.eliminateCount === 1 ? 'opción' : 'opciones'}`
+    : def.effectLabel;
+  const descriptions = {
+    share: `Atrapa ${rules.catchTarget} íconos musicales antes de que se acabe el tiempo.`,
+    playlist: 'Detén la barra dentro de la zona verde central.',
+    stream: `Pulsa ${rules.streamClicks} veces el botón mientras se mueve antes de que se acabe el tiempo.`,
+  };
 
   modalOverlay.classList.remove('hidden');
   modalOverlay.innerHTML = `
-    <div class="modal-card wildcard-modal">
-      <div class="wildcard-badge">${def.icon} ${def.name} — ${def.effectLabel}</div>
-      <h2>${def.minigameTitle}</h2>
-      <p>${def.minigameDesc}</p>
+    <div class="modal-card wildcard-modal" role="dialog" aria-modal="true" aria-labelledby="wildcard-title" aria-describedby="wildcard-description">
+      <div class="wildcard-badge">${def.icon} ${def.name} — ${effectLabel}</div>
+      <h2 id="wildcard-title">${wildcardId === 'share' ? '¡Atrapa íconos musicales!' : wildcardId === 'stream' ? '¡Rompe el Algoritmo!' : def.minigameTitle}</h2>
+      <p id="wildcard-description">${descriptions[wildcardId] || def.minigameDesc}</p>
       <div class="mg-timer-bar"><div id="mg-timer-fill" class="mg-timer-fill"></div></div>
       <div id="mg-arena" class="mg-arena"></div>
-      <div id="mg-status" class="mg-status"></div>
+      <div id="mg-status" class="mg-status" role="status" aria-live="polite" tabindex="-1"></div>
     </div>
   `;
 
   const arena = modalOverlay.querySelector('#mg-arena');
   const timerFill = modalOverlay.querySelector('#mg-timer-fill');
   const statusEl = modalOverlay.querySelector('#mg-status');
+  const dialogEl = modalOverlay.querySelector('[role="dialog"]');
+  const focusableControls = () => [...dialogEl.querySelectorAll('button:not(:disabled)')];
+  const trapTab = (event) => {
+    if (event.key !== 'Tab') return;
+    const controls = focusableControls();
+    if (controls.length === 0) {
+      event.preventDefault();
+      return;
+    }
+    const first = controls[0];
+    const last = controls[controls.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  };
+  dialogEl.addEventListener('keydown', trapTab);
 
   let finished = false;
   const finish = (won) => {
@@ -53,17 +103,20 @@ export function openWildcardMinigame(wildcardId, modalOverlay, isPausedFn, onRes
     finished = true;
     soundEngine.playSfx(won ? 'win' : 'wrong');
     statusEl.textContent = won
-      ? `✅ ¡Logrado! Activaste: ${def.effectLabel}`
+      ? `✅ ¡Logrado! Activaste: ${effectLabel}`
       : '😅 ¡Casi! No se activó esta vez.';
     statusEl.className = `mg-status ${won ? 'win' : 'lose'}`;
+    dialogEl.querySelectorAll('button').forEach((button) => { button.disabled = true; });
+    statusEl.focus();
     setTimeout(() => {
+      dialogEl.removeEventListener('keydown', trapTab);
       modalOverlay.classList.add('hidden');
       modalOverlay.innerHTML = '';
       onResult(won);
     }, 900);
   };
 
-  const durationMs = wildcardId === 'share' ? 5000 : wildcardId === 'playlist' ? 4000 : 4500;
+  const durationMs = wildcardId === 'share' ? rules.catchDurationMs : wildcardId === 'playlist' ? 4000 : rules.streamDurationMs;
   let elapsed = 0;
   let last = performance.now();
 
@@ -85,18 +138,19 @@ export function openWildcardMinigame(wildcardId, modalOverlay, isPausedFn, onRes
   requestAnimationFrame(tickTimer);
 
   if (wildcardId === 'share') {
-    runCatchMinigame(arena, isPausedFn, () => finish(true));
+    runCatchMinigame(arena, isPausedFn, rules, () => finish(true));
   } else if (wildcardId === 'playlist') {
-    runTimingBarMinigame(arena, isPausedFn, (won) => finish(won));
+    runTimingBarMinigame(arena, isPausedFn, rules, (won) => finish(won));
   } else {
-    runBreakAlgorithmMinigame(arena, isPausedFn, () => finish(true));
+    runBreakAlgorithmMinigame(arena, isPausedFn, rules, () => finish(true));
   }
+  requestAnimationFrame(() => focusableControls()[0]?.focus());
 }
 
-function runCatchMinigame(arena, isPausedFn, onWin) {
+function runCatchMinigame(arena, isPausedFn, rules, onWin) {
   let caught = 0;
   arena.innerHTML = `
-    <div class="mg-catch-counter">Atrapados: <strong id="mg-caught">0</strong> / 3</div>
+    <div class="mg-catch-counter">Atrapados: <strong id="mg-caught">0</strong> / ${rules.catchTarget}</div>
     <div id="mg-drop-zone" class="mg-drop-zone"></div>
   `;
   const counterEl = arena.querySelector('#mg-caught');
@@ -109,11 +163,12 @@ function runCatchMinigame(arena, isPausedFn, onWin) {
     item.type = 'button';
     item.className = 'mg-falling-icon';
     item.textContent = icons[Math.floor(Math.random() * icons.length)];
+    item.setAttribute('aria-label', 'Atrapar nota musical');
     item.style.left = `${10 + Math.random() * 78}%`;
     item.style.top = '-20px';
 
     let y = -20;
-    const speed = 75 + Math.random() * 45;
+    const speed = rules.catchSpeed + Math.random() * 45;
     let alive = true;
 
     item.addEventListener('click', () => {
@@ -123,7 +178,7 @@ function runCatchMinigame(arena, isPausedFn, onWin) {
       caught += 1;
       counterEl.textContent = String(caught);
       soundEngine.playSfx('hit');
-      if (caught >= 3) {
+      if (caught >= rules.catchTarget) {
         onWin();
       }
     });
@@ -156,10 +211,10 @@ function runCatchMinigame(arena, isPausedFn, onWin) {
       return;
     }
     if (!isPausedFn()) spawnIcon();
-  }, 650);
+  }, rules.catchSpawnMs);
 }
 
-function runTimingBarMinigame(arena, isPausedFn, onDone) {
+function runTimingBarMinigame(arena, isPausedFn, rules, onDone) {
   arena.innerHTML = `
     <div class="mg-bar-track">
       <div class="mg-bar-green"></div>
@@ -180,7 +235,7 @@ function runTimingBarMinigame(arena, isPausedFn, onDone) {
     const dt = (now - last) / 1000;
     last = now;
     if (!isPausedFn()) {
-      pos += dir * 135 * dt;
+      pos += dir * rules.timingSpeed * dt;
       if (pos >= 95) {
         pos = 95;
         dir = -1;
@@ -197,15 +252,15 @@ function runTimingBarMinigame(arena, isPausedFn, onDone) {
   stopBtn.addEventListener('click', () => {
     if (stopped || isPausedFn()) return;
     stopped = true;
-    const won = pos >= 34 && pos <= 66;
+    const won = pos >= 50 - rules.timingHalfWidth && pos <= 50 + rules.timingHalfWidth;
     onDone(won);
   });
 }
 
-function runBreakAlgorithmMinigame(arena, isPausedFn, onWin) {
+function runBreakAlgorithmMinigame(arena, isPausedFn, rules, onWin) {
   let clicks = 0;
   arena.innerHTML = `
-    <div class="mg-catch-counter">Clics: <strong id="mg-clicks">0</strong> / 3</div>
+    <div class="mg-catch-counter">Clics: <strong id="mg-clicks">0</strong> / ${rules.streamClicks}</div>
     <button id="mg-break-btn" type="button" class="mg-break-btn">⚡ ROMPER ALGORITMO</button>
   `;
   const clicksEl = arena.querySelector('#mg-clicks');
@@ -216,8 +271,8 @@ function runBreakAlgorithmMinigame(arena, isPausedFn, onWin) {
     clicks += 1;
     clicksEl.textContent = String(clicks);
     soundEngine.playSfx('hit');
-    btn.style.transform = `translate(${Math.round((Math.random() - 0.5) * 80)}px, ${Math.round((Math.random() - 0.5) * 35)}px)`;
-    if (clicks >= 3) {
+    btn.style.transform = `translate(${Math.round((Math.random() - 0.5) * rules.streamOffset * 2)}px, ${Math.round((Math.random() - 0.5) * rules.streamOffset)}px)`;
+    if (clicks >= rules.streamClicks) {
       onWin();
     }
   });

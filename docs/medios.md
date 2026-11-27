@@ -7,7 +7,7 @@ Los reproductores enlazan videos o listas de YouTube publicados por artistas, ca
 | 1 | AKRIILA | «Mal Comunicada» ft. Latin Mafia | [AKRIILA](https://www.youtube.com/watch?v=kn2B2S3VFrI) |
 | 2 | Princesa Alba | «Tus Estaciones» (video oficial, canal PrincesaAlbaVEVO) | [Princesa Alba](https://www.youtube.com/watch?v=bJkeO_zWJrs), [lista del álbum](https://www.youtube.com/playlist?list=OLAK5uy_kR-tNnZqmPseZ31U0hCA7ll8fyGu8WS6w) |
 | 3 | Soulfia | «Ten Cuidao’», single | [Soulfia](https://www.youtube.com/watch?v=uEPlTgRC2-A) |
-| 4 | Ana Tijoux | «1977» | [Nacional Records](https://www.youtube.com/watch?v=yiQ7S38nKog) |
+| 4 | Ana Tijoux | «La Rosa de los Vientos», con Makiza | [YouTube](https://www.youtube.com/watch?v=ly7b1Gw3geg) |
 | 5 | Javiera Mena | «Hasta la verdad», de *Mena*; la portada mostrada es *Esquemas Juveniles* | [Javiera Mena](https://www.youtube.com/watch?v=OORCSsbHU6Y) |
 | 6 | Francisca Valenzuela | «Buen Soldado» | [Francisca Valenzuela](https://www.youtube.com/watch?v=9WQHGQR69JI) |
 | 7 | Mon Laferte | «Si tú me quisieras», de *Mon Laferte, Vol. 1* | [Mon Laferte](https://www.youtube.com/watch?v=y73MCzGi3s4) |
@@ -26,6 +26,7 @@ La portada del nivel de Soulfia corresponde al [single «Ten Cuidao’»](https:
 - `public/images/soulfia_ten_cuidao.jpg`: portada del single obtenida de [Apple Music](https://music.apple.com/cl/album/ten-cuidao-single/1884072465) para la versión local.
 - `public/images/soulfia_foto.jpg`: archivo proporcionado para este proyecto.
 - `public/images/anatijoux_1977.jpg` y `public/images/anatijoux_foto.jpg`: archivos proporcionados para este proyecto.
+- `public/images/anatijoux_aerolineas_makiza.jpg`: portada de *Aerolíneas*, proporcionada para mostrar también la etapa de Ana Tijoux en Makiza.
 - `public/images/javieramena_esquemas_juveniles.jpg` y `public/images/javieramena_foto.jpg`: archivos proporcionados para este proyecto. La portada es de *Esquemas Juveniles*; el video enlazado pertenece a *Mena*.
 - `public/images/rubio_pez.jpg` y `public/images/rubio_foto.jpg`: archivos proporcionados para este proyecto. La canción enlazada es «IR» y la portada mostrada corresponde a *Pez*.
 - `public/images/franciscavalenzuela_buen_soldado.jpg` y `public/images/franciscavalenzuela_foto.jpg`: archivos proporcionados para este proyecto.
@@ -37,7 +38,7 @@ La portada del nivel de Soulfia corresponde al [single «Ten Cuidao’»](https:
 
 ## Fotos y portadas
 
-Los doce niveles ya tienen foto de artista y portada de disco o single en `public/images/`. Los archivos fueron proporcionados por el usuario.
+Los doce niveles ya tienen foto de artista y portada de disco o single en `public/images/`. La ficha de Ana Tijoux muestra además *Aerolíneas*, por su participación en Makiza. Los archivos fueron proporcionados por el usuario.
 
 Las notas del minijuego de ritmo aún no siguen el BPM ni los golpes de estos videos. Para sincronizar cada nivel hace falta seleccionar un fragmento concreto, medir su pulso y diseñar una secuencia de notas. Las listas y álbumes completos contienen canciones con tempos diferentes.
 

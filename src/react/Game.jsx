@@ -169,7 +169,7 @@ export function Game({ role, initialProgress, student, debugLevel, enrollment, o
       body: `<p>Lee el contexto y responde cinco preguntas. Tienes dos intentos por pregunta.</p>
           <p>Al acertar sumas puntos de <strong>Visibilidad</strong>: representan el apoyo que das para que más personas descubran a esta artista.</p>
           <p>Toca el rostro que aparece para conocer un dato y sumar puntos extra.</p>
-          <p>Después de 30 segundos puedes probar una ayuda por nivel: una pista protectora, quitar dos opciones o duplicar los puntos de una respuesta.</p>`,
+          <p>Tras un breve tiempo se habilitan ayudas de un solo uso. Para obtenerlas debes superar minijuegos, que se vuelven gradualmente más exigentes en los niveles posteriores.</p>`,
         buttonText: checkpoint ? 'Seguir jugando' : 'Iniciar nivel',
         onClose: () => { setMediaActive(true); setRunId((value) => value + 1); setScreen('questions'); },
       });

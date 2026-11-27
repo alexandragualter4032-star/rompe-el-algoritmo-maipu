@@ -5,6 +5,7 @@ import {
   createCourse,
   createSessionRecord,
   deleteCourseCompletely,
+  deleteAllStudents,
   deleteSessionByHash,
   generateStudentCodes,
   authenticateStudentByUsername,
@@ -230,6 +231,11 @@ export async function handleApi(request: Request): Promise<Response> {
       const deleted = await deleteCourseCompletely(courseId);
       if (!deleted) return json({ error: 'Curso no encontrado.' }, 404);
       return json({ ok: true, courses: await listCourses() });
+    }
+
+    if (path === '/api/admin/students' && method === 'DELETE') {
+      const deletedCount = await deleteAllStudents();
+      return json({ ok: true, deletedCount });
     }
 
     if (path === '/api/admin/students' && method === 'GET') {

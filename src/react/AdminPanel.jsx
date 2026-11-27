@@ -269,6 +269,24 @@ export function AdminPanel({ onDebug, onLogout }) {
     }
   }
 
+  async function handleDeleteAllStudents() {
+    if (students.length === 0) return;
+    if (!window.confirm(`Se eliminarán ${students.length} cuentas de todos los cursos, junto con sus avances y sesiones. Los cursos seguirán existiendo. Esta acción es irreversible. ¿Continuar?`)) return;
+    if (window.prompt('Para confirmar, escribe BORRAR:') !== 'BORRAR') return;
+    setBusy(true);
+    setError('');
+    try {
+      const result = await api('/api/admin/students', 'DELETE');
+      setNotice(`Se eliminaron ${result.deletedCount} cuentas de todos los cursos y sus datos asociados.`);
+      setRenewedCredential(null);
+      await refresh('');
+    } catch (cause) {
+      setError(cause.message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function action(id, kind) {
     if (kind === 'reset' && !window.confirm('¿Reiniciar todo el avance de esta cuenta?')) return;
     if (kind === 'revoke' && !window.confirm('¿Desactivar esta cuenta y cerrar sus sesiones?')) return;
@@ -320,15 +338,15 @@ export function AdminPanel({ onDebug, onLogout }) {
       </section>
 
       <section className="admin-card" aria-labelledby="privacy-note-title">
-        <h2 id="privacy-note-title">Privacidad, TPACK y modo de trabajo por curso</h2>
-        <p>
-          <strong>1. Práctica sin guardar (recomendado para 1 sesión):</strong> No se crea una cuenta ni se registra avance en el servidor. Al cerrar o recargar, la partida se pierde.
-        </p>
-        <p>
-          <strong>2. Guardar para retomar (máximo 30 días):</strong> Comparte un solo código de curso. Cada estudiante elige un alias inventado; al superar el nivel 1 recibe una contraseña personal. El acceso vence en la fecha indicada y los datos se borran al llegar la fecha de eliminación.
-        </p>
+        <h2 id="privacy-note-title">Guía rápida para usar en clase</h2>
+        <ol className="teacher-quick-guide">
+          <li><strong>Elige cómo jugar.</strong> Para una sesión, usa el modo sin guardado: no crea cuentas y el avance se pierde al cerrar o recargar.</li>
+          <li><strong>Si continuarán otro día, activa el guardado.</strong> Comparte el enlace o código del curso. Cada estudiante crea un alias inventado y, después de superar el nivel 1, obtiene su contraseña para retomar.</li>
+          <li><strong>Prueba antes de la clase.</strong> Usa los controles de prueba de niveles para revisar preguntas, imágenes y audio.</li>
+          <li><strong>Al terminar, revisa las cuentas.</strong> Puedes borrar una cuenta o usar «Borrar todos los estudiantes» al final de la lista. La eliminación pide confirmación.</li>
+        </ol>
         <p className="admin-hint">
-          No usar nombres reales, apellidos, iniciales, RUT, correo ni número de lista como usuario. El alias debe ser inventado. Si necesitas vincular avance e identidad, conserva esa relación en privado, fuera de la aplicación y de GitHub.
+          Por privacidad, no pidas nombres, apellidos, iniciales, RUT, correo ni número de lista. Si necesitas relacionar un alias con un estudiante, conserva esa relación en privado fuera de la aplicación.
         </p>
       </section>
 
@@ -429,9 +447,12 @@ export function AdminPanel({ onDebug, onLogout }) {
             <button type="button" className="secondary-btn" onClick={() => downloadExcelXml(`informe-${currentCourse?.alias || 'curso'}.xls`, currentCourse?.alias || 'Avance', buildProgressReportRows())}>
               Descargar informe Excel (.xls)
             </button>
+            <button type="button" className="danger-btn" disabled={busy || students.length === 0} onClick={handleDeleteAllStudents}>
+              Borrar todos los estudiantes ({students.length})
+            </button>
           </div>
         </div>
-        <div className="admin-table-wrap"><table><thead><tr><th>Estudiante (pseudónimo)</th><th>Avance</th><th>Retomar</th><th>Vigencia / Borrado</th><th>Acciones</th></tr></thead>
+        <div className="admin-table-wrap" tabIndex={0} aria-label="Tabla de avance del curso. Desplázate horizontalmente para ver todas las columnas."><table><thead><tr><th>Estudiante (pseudónimo)</th><th>Avance</th><th>Retomar</th><th>Vigencia / Borrado</th><th>Acciones</th></tr></thead>
           <tbody>{visibleStudents.map((item) => {
             const checkpoint = item.progress.checkpoint;
             const status = item.revokedAt ? 'Desactivado' : item.expiresAt <= Date.now() ? 'Vencido' : `Vence ${date(item.expiresAt)}`;

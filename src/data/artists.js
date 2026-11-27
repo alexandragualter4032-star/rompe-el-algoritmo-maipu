@@ -127,7 +127,14 @@
     genre: 'Hip-Hop / Rap Consciente',
     tagline: 'Rimas con historia, memoria y fuerza frente a una industria dominada por hombres.',
     albumTitle: '1977',
-    video: { provider: 'youtube', id: 'yiQ7S38nKog', title: '1977 (video oficial)' },
+    video: { provider: 'youtube', id: 'ly7b1Gw3geg', title: 'La Rosa de los Vientos (Makiza)' },
+    additionalAlbums: [
+      {
+        title: 'Aerolíneas',
+        label: 'Makiza · álbum de grupo',
+        cover: './images/anatijoux_aerolineas_makiza.jpg',
+      },
+    ],
     themeClass: 'theme-anatijoux',
     colors: {
       primary: '#f77f00',

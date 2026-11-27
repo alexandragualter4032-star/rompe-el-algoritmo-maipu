@@ -792,6 +792,17 @@ export async function deleteCourseCompletely(courseId: string): Promise<boolean>
   return Number(info.changes ?? 0) > 0;
 }
 
+export async function deleteAllStudents(): Promise<number> {
+  if (databaseUrl) {
+    const sql = await getPg();
+    const deleted = await sql`DELETE FROM student_codes RETURNING id`;
+    return deleted.length;
+  }
+  const db = await getSqlite();
+  const result = db.query('DELETE FROM student_codes').run();
+  return Number(result.changes ?? 0);
+}
+
 export async function listStudents(courseId?: string | null) {
   await purgeExpiredData();
   const now = Date.now();

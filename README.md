@@ -12,7 +12,7 @@ Juego educativo de música y pensamiento crítico. Sus 12 niveles presentan proy
 - Reproductores incrustados de YouTube para canciones, discos o playlists; repiten el video o la playlist al terminar. El navegador puede impedir autoplay.
 - Minijuego de ritmo con controles de teclado y pantalla táctil. Sus notas aún no están sincronizadas con BPM ni con las grabaciones.
 - Modo de prueba, sin guardar avance.
-- Panel docente: práctica sin guardado, además de herramientas opcionales para cursos, progreso, exportación CSV y depuración.
+- Panel docente: gestión opcional de cursos y progreso, exportación CSV, depuración y borrado de cuentas individuales o de todos los estudiantes con confirmación.
 - Bun y SQLite para uso local; el despliegue Vercel usa la API serverless y tiene configurada una conexión PostgreSQL mediante variables protegidas.
 - Diseño adaptable y soporte para `prefers-reduced-motion`.
 

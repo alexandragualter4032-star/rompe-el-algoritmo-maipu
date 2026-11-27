@@ -58,7 +58,7 @@ Aplicar claves foráneas, índices, restricciones y migraciones versionadas. No 
 - Limitar intentos de acceso y almacenar solo el hash de la contraseña.
 - No aceptar nombres ni números de lista como alias.
 - Ejecutar un borrado automático al alcanzar la fecha definida. El vencimiento de un código y el borrado de sus datos son operaciones separadas.
-- Permitir al docente borrar una cuenta o curso y revocar sesiones asociadas.
+- Permitir al docente borrar una cuenta, todas las cuentas de estudiantes o un curso; estas acciones eliminan sesiones y progreso asociados.
 - No exportar contraseñas. El informe de progreso puede incluir alias pseudónimos, nunca nombres reales.
 
 ## Fase 4 — Validar el despliegue Vercel existente
