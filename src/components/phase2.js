@@ -73,10 +73,11 @@ export class Phase2Controller {
           <div class="song-time-wrap">
             <span>⏱️ Tiempo restante: <strong id="r-time-left">${this.artist.rhythm.durationSec}s</strong></span>
           </div>
-          <div id="r-feedback-banner" class="r-feedback-banner" role="status" aria-live="polite">Prepárate...</div>
+          <div id="r-feedback-banner" class="r-feedback-banner" role="status" aria-live="polite">Prepárate…</div>
         </div>
 
         <div class="rhythm-board-wrap">
+          <p class="rhythm-controls-help" id="rhythm-instructions">Pulsa A, S, K o L en el teclado, o activa el botón de cada carril cuando la nota llegue a la línea.</p>
           <div id="rhythm-countdown" class="rhythm-countdown">3</div>
           <div id="rhythm-track" class="rhythm-track" style="height: ${this.trackHeight}px">
             <div class="hit-zone-bar" style="top: ${this.hitLineY - 22}px"></div>
@@ -85,7 +86,9 @@ export class Phase2Controller {
                 (lane, i) => `
                 <div class="lane" data-lane="${i}">
                   <div class="lane-notes" id="lane-notes-${i}"></div>
-                  <button type="button" class="lane-receptor" data-lane="${i}">
+                  <button type="button" class="lane-receptor" data-lane="${i}"
+                    aria-label="Carril ${lane.label}, lado ${lane.hand.toLowerCase()}; activar al llegar la nota"
+                    aria-describedby="rhythm-instructions" aria-keyshortcuts="${lane.label}">
                     <span class="key-cap">${lane.label}</span>
                     <small>${lane.hand}</small>
                   </button>
@@ -109,7 +112,7 @@ export class Phase2Controller {
     );
 
     this.container.querySelectorAll('.lane-receptor').forEach((btn) => {
-      btn.addEventListener('pointerdown', () => {
+      btn.addEventListener('click', () => {
         const laneIdx = Number(btn.dataset.lane);
         this.triggerLane(laneIdx);
       });

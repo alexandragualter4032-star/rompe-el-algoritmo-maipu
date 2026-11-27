@@ -30,6 +30,11 @@ body {
   display: none !important;
 }
 
+:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
+
 /* Top Global Bar */
 .top-bar {
   position: sticky;
@@ -207,17 +212,38 @@ body {
 }
 
 .home-actions {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 1rem;
-  margin-bottom: 2.5rem;
+  display: grid;
+  justify-items: center;
+  gap: 0.75rem;
+  margin: 1.5rem 0;
+}
+
+.home-actions > .primary-btn,
+.home-actions > .secondary-btn,
+.home-actions > .infinite-btn {
+  width: min(100%, 480px);
 }
 
 .hero-btn {
   font-size: 1.15rem;
   padding: 1rem 2rem;
 }
+
+.home-exit,
+.text-btn {
+  min-height: 44px;
+  border: 0;
+  padding: 0.55rem 0.85rem;
+  color: var(--text-muted);
+  background: transparent;
+  font: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+}
+
+.home-exit:hover,
+.text-btn:hover { color: var(--text-main); }
 
 .infinite-btn {
   display: flex;
@@ -249,13 +275,50 @@ body {
 .campaign-strip {
   background: var(--bg-card);
   border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 22px;
-  padding: 1.4rem;
+  border-radius: 16px;
+  padding: 1rem 1.2rem;
 }
 
-.campaign-strip h3 {
-  font-family: var(--font-display);
-  margin-bottom: 1rem;
+.campaign-summary {
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  cursor: pointer;
+  text-align: left;
+  list-style: none;
+}
+
+.campaign-summary::-webkit-details-marker { display: none; }
+.campaign-summary::after {
+  content: "+";
+  color: var(--secondary);
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+.campaign-strip[open] .campaign-summary::after { content: "−"; }
+.campaign-summary > span:first-child { display: grid; gap: 0.2rem; }
+.campaign-summary strong { font-family: var(--font-display); }
+.campaign-summary small { color: var(--text-muted); font-size: 0.9rem; }
+.campaign-count { color: var(--secondary); font-weight: 700; }
+.campaign-strip[open] .level-chips { margin-top: 1rem; }
+
+.entry-actions {
+  display: grid;
+  gap: 0.6rem;
+  max-width: 440px;
+  margin: 0 auto;
+}
+.entry-actions > button { width: 100%; }
+.auth-card .text-btn { margin-top: 0.2rem; }
+.auth-note { font-size: 0.95rem; line-height: 1.5; }
+
+.rhythm-controls-help {
+  margin: 0 0 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+  font-size: 0.95rem;
 }
 
 .level-chips {
@@ -1272,12 +1335,14 @@ body {
   bottom: 12px;
   left: 10%;
   width: 80%;
+  min-height: 56px;
   padding: 0.45rem 0;
   border-radius: 12px;
   border: 2px solid rgba(255, 255, 255, 0.32);
   background: rgba(20, 20, 35, 0.85);
   color: #fff;
   cursor: pointer;
+  touch-action: manipulation;
   display: flex;
   flex-direction: column;
   align-items: center;

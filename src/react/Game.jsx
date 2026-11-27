@@ -164,8 +164,10 @@ export function Game({ role, initialProgress, student, debugLevel, enrollment, o
       setModal({
         badge: `📡 FASE 1 • ${levelArtist.name}`,
         title: checkpoint ? 'Retoma tu cuestionario' : 'Conoce a la artista',
-        body: `<p>Lee el contexto y responde cinco preguntas. Puedes intentarlo dos veces por pregunta.</p>
-          <p>El rostro flotante cuenta datos extra. Los tres comodines se habilitan después de 30 segundos.</p>`,
+      body: `<p>Lee el contexto y responde cinco preguntas. Tienes dos intentos por pregunta.</p>
+          <p>Al acertar sumas puntos de <strong>Visibilidad</strong>: representan el apoyo que das para que más personas descubran a esta artista.</p>
+          <p>Toca el rostro que aparece para conocer un dato y sumar puntos extra.</p>
+          <p>Después de 30 segundos puedes probar una ayuda por nivel: una pista protectora, quitar dos opciones o duplicar los puntos de una respuesta.</p>`,
         buttonText: checkpoint ? 'Seguir jugando' : 'Iniciar nivel',
         onClose: () => { setMediaActive(true); setRunId((value) => value + 1); setScreen('questions'); },
       });
@@ -356,8 +358,8 @@ export function Game({ role, initialProgress, student, debugLevel, enrollment, o
       {screen === 'home' && <div className="home-screen">
         <div className="school-pill">🏫 Colegio Particular San Nicolás de Maipú • 7° Básico</div>
         <h1 className="game-title">ROMPE EL ALGORITMO</h1>
-        <p className="game-subtitle">Descubre 12 proyectos musicales liderados por mujeres, desde AKRIILA en Maipú hasta escenarios del mundo.</p>
-        <p className="session-label">{role === 'student' ? `Jugando como ${student.label}` : role === 'debug' ? 'Modo de prueba docente' : role === 'enroll' ? 'Nivel 1 para activar tu cuenta' : 'Prueba sin guardado'}</p>
+        <p className="game-subtitle">Sal de tus recomendaciones habituales: descubre 12 proyectos musicales liderados por mujeres, desde AKRIILA en Maipú hasta artistas de otros lugares del mundo.</p>
+        <p className="session-label">{role === 'student' ? `Jugando como ${student.label}` : role === 'debug' ? 'Modo de prueba docente' : role === 'enroll' ? 'Nivel 1 para activar tu cuenta' : 'Práctica de esta sesión'}</p>
         {welcomePassword && <section className="credential-reveal" role="status">
           <h2>¡Tu contraseña está lista!</h2>
           <p>Usuario: <strong>{student?.username}</strong></p>
@@ -370,15 +372,19 @@ export function Game({ role, initialProgress, student, debugLevel, enrollment, o
             ▶ {progress.checkpoint ? `Retomar ${nextArtist.name}` : `Jugar nivel ${nextArtist.level}: ${nextArtist.name}`}
           </button>
           <button className="secondary-btn" type="button" onClick={() => { soundEngine.stopTrack(); setScreen('gallery'); }}>
-            🏆 Artistas descubiertas ({discovered.size}/12)
+            Artistas descubiertas ({discovered.size}/12)
           </button>
-          <button className={`infinite-btn ${progress.campaignCompleted ? 'unlocked' : 'locked'}`} type="button"
-            disabled={!progress.campaignCompleted} onClick={() => {
+          {progress.campaignCompleted && <button className="infinite-btn unlocked" type="button" onClick={() => {
               setInfiniteMode(true); setInfiniteStreak(0); startInfiniteSong(Math.floor(Math.random() * ARTISTS.length));
-            }}>♾️ Modo infinito {progress.campaignCompleted ? `· récord ${progress.bestInfiniteStreak}` : '· completa la campaña'}</button>
-          <button className="secondary-btn" type="button" onClick={onExit}>{role === 'debug' ? '⬅ Volver al panel' : 'Salir'}</button>
+            }}>Modo infinito · récord {progress.bestInfiniteStreak}</button>}
+          <button className="text-btn home-exit" type="button" onClick={onExit}>{role === 'debug' ? 'Volver al panel docente' : 'Salir del juego'}</button>
         </div>
-        <div className="campaign-strip"><h3>🗺️ Ruta de la campaña</h3><div className="level-chips">
+        <details className="campaign-strip">
+          <summary className="campaign-summary">
+            <span><strong>Ruta de la campaña</strong><small>Descubre las portadas en orden</small></span>
+            <span className="campaign-count">{discovered.size} de 12</span>
+          </summary>
+          <div className="level-chips">
           {ARTISTS.map((item, index) => {
             const unlocked = role === 'debug' || index <= progress.maxUnlockedIdx;
             const done = discovered.has(item.id);
@@ -394,7 +400,8 @@ export function Game({ role, initialProgress, student, debugLevel, enrollment, o
               {done && <small>{item.featuredSingle || item.featuredAlbum || item.albumTitle}</small>}
               {item.isMaipuLocal && <em>Maipú</em>}</button>;
           })}
-        </div></div>
+          </div>
+        </details>
       </div>}
 
       {screen === 'gallery' && <div className="gallery-screen">

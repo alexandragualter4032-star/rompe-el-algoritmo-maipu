@@ -158,7 +158,8 @@ export class Phase1Controller {
           </div>
 
           <div class="wildcards-bar">
-            <div class="wildcards-title">⚡ Comodines estratégicos (1 uso por nivel):</div>
+            <div class="wildcards-title">Ayudas del juego</div>
+            <p class="wildcards-help">Se activan tras 30 s; cada una se usa una vez por nivel: pista protectora, quitar dos opciones o duplicar puntos.</p>
             <div id="wildcards-grid" class="wildcards-grid"></div>
           </div>
         </section>

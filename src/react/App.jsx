@@ -112,14 +112,12 @@ export function App() {
   </>);
 
   if (screen === 'entry') return showAuthCard(<>
-    <h2>¿Cómo quieres jugar?</h2>
-    <div className="auth-form">
-      <button className="primary-btn" type="button" onClick={() => setDemo(true)}>▶ Jugar sin guardar</button>
-      <p className="auth-note">No pide usuario ni contraseña. El avance se pierde al salir.</p>
-      <button className="secondary-btn" type="button" onClick={() => { setScreen('register'); setError(''); }}>Guardar para retomar</button>
-      <p className="auth-note">Elige un alias y completa el nivel 1. Al terminar recibirás una contraseña.</p>
-      <button className="secondary-btn" type="button" onClick={() => { setScreen('login'); setError(''); }}>Ya tengo usuario y contraseña</button>
-      <button className="secondary-btn" type="button" onClick={() => { setScreen('admin'); setError(''); }}>Docente / administración</button>
+    <h2>¿Listo para jugar?</h2>
+    <div className="entry-actions">
+      <button className="primary-btn" type="button" onClick={() => setDemo(true)}>▶ Jugar ahora</button>
+      <p className="auth-note">Sin cuenta ni códigos. El avance se reinicia cuando sales.</p>
+      <button className="secondary-btn" type="button" onClick={() => { setScreen('login'); setError(''); }}>Retomar una partida guardada</button>
+      <button className="text-btn" type="button" onClick={() => { setScreen('admin'); setError(''); }}>Acceso docente</button>
     </div>
   </>);
 
@@ -138,7 +136,8 @@ export function App() {
   </>);
 
   return showAuthCard(<>
-    <h2>{screen === 'admin' ? 'Acceso docente' : 'Entrar para retomar'}</h2>
+    <h2>{screen === 'admin' ? 'Acceso docente' : 'Retomar una partida'}</h2>
+    {screen !== 'admin' && <p className="auth-note">Ingresa el usuario y la contraseña que guardaste. Si aún no tienes una cuenta, consulta a tu docente: crearla requiere un código de curso.</p>}
     <form onSubmit={login} className="auth-form">
       {screen === 'admin' ? <>
         <label htmlFor="admin-key">Clave de administración</label>
@@ -151,6 +150,7 @@ export function App() {
       </>}
       {error && <p className="auth-error" role="alert">{error}</p>}
       <button className="primary-btn" disabled={busy}>{busy ? 'Entrando…' : 'Entrar'}</button>
+      {screen !== 'admin' && <button className="secondary-btn" type="button" onClick={() => { setScreen('register'); setError(''); }}>Crear cuenta con código de curso</button>}
       <button className="secondary-btn" type="button" onClick={() => { setScreen('entry'); setError(''); }}>Volver</button>
     </form>
   </>);
