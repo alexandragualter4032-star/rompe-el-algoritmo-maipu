@@ -184,7 +184,7 @@ async function getPg() {
       );
       ALTER TABLE student_codes ADD COLUMN IF NOT EXISTS username TEXT;
       CREATE UNIQUE INDEX IF NOT EXISTS student_codes_course_username_idx ON student_codes(course_id, lower(username)) WHERE username IS NOT NULL;
-      CREATE UNIQUE INDEX IF NOT EXISTS student_codes_username_global_idx ON lower(username) WHERE username IS NOT NULL;
+      CREATE UNIQUE INDEX IF NOT EXISTS student_codes_username_global_idx ON student_codes ((lower(username))) WHERE username IS NOT NULL;
       CREATE TABLE IF NOT EXISTS progress (
         student_id BIGINT PRIMARY KEY REFERENCES student_codes(id) ON DELETE CASCADE,
         progress_json JSONB NOT NULL,
