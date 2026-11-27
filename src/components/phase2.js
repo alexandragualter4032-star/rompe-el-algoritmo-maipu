@@ -49,12 +49,14 @@ export class Phase2Controller {
 
   render() {
     const minPct = this.artist.rhythm.minApprovalPct;
+    const musicTitle = this.artist.featuredSingle || this.artist.video?.title
+      || this.artist.featuredAlbum || this.artist.albumTitle;
     this.container.innerHTML = `
       <div class="phase2-layout">
         <div class="rhythm-sidebar">
           <div id="rhythm-art" class="rhythm-art-box"></div>
           <h3>${this.artist.name}</h3>
-          <p class="rhythm-song-tag">🎵 ${this.artist.featuredSingle || this.artist.featuredAlbum || this.artist.albumTitle}</p>
+          <p class="rhythm-song-tag">🎵 ${musicTitle}</p>
           <div class="rhythm-stats">
             <div class="stat-box"><span>Combo</span><strong id="r-combo">0</strong></div>
             <div class="stat-box"><span>Aciertos</span><strong id="r-hits">0</strong></div>

@@ -1,4 +1,4 @@
-# Próximos pasos: guardado, base de datos y Vercel
+# Estado y próximos pasos: guardado, base de datos y Vercel
 
 Este documento define una ruta para pasar del prototipo local a una versión web que pueda guardar progreso de forma clara y limitada. El principio central es **no pedir nombres en la aplicación**.
 
@@ -18,11 +18,13 @@ Un código aleatorio reduce la exposición directa, pero si el docente conserva 
 ## Estado actual del prototipo
 
 - Bun sirve una API y una base SQLite local en `data/game.sqlite`.
+- Vercel ya tiene una publicación de producción para revisión y una función API (`api/index.ts`). El proyecto está vinculado a la cuenta de Diego, pero no a un repositorio GitHub (`repository: null`); los despliegues se hacen manualmente con la CLI.
+- El entorno de producción tiene configuradas variables protegidas `DATABASE_URL` y `ADMIN_KEY`. La conexión, el esquema y los flujos de guardado deben validarse con datos ficticios antes de usarlos con estudiantes.
 - **Jugar sin guardar** es el modo recomendado en el aula: no pide códigos ni crea cuentas y no conserva avance. **Guardar para retomar** es opcional y pide código de curso y alias; crea la cuenta solo después de superar el nivel 1.
 - El servidor guarda el alias, el hash de la contraseña, una etiqueta neutra y el progreso. La contraseña aparece al estudiante una vez; el panel docente puede generar una nueva.
 - En la dinámica recomendada no se reparten códigos. Si el docente elige el guardado opcional, se comparte un código de invitación por curso; cada cuenta usa un alias único y una contraseña propia, que se genera tras superar el nivel 1.
 - Los registros de códigos individuales creados antes de este cambio pueden permanecer en SQLite hasta que se borre el curso o esos registros. El panel ya no genera ni entrega nuevos códigos individuales.
-- La purga por fecha de borrado y el despliegue web con base persistente siguen pendientes. Bun/SQLite local solo guarda datos en el equipo donde corre.
+- La purga automática por fecha, las copias de seguridad y la prueba de restauración siguen pendientes. Bun/SQLite local solo guarda datos en el equipo donde corre.
 - El panel separa cursos, pero aún usa una sola cuenta docente global.
 
 ## Fase 1 — Cerrar el diseño antes de migrar
@@ -59,19 +61,17 @@ Aplicar claves foráneas, índices, restricciones y migraciones versionadas. No 
 - Permitir al docente borrar una cuenta o curso y revocar sesiones asociadas.
 - No exportar contraseñas. El informe de progreso puede incluir alias pseudónimos, nunca nombres reales.
 
-## Fase 4 — Migrar la API y desplegar
+## Fase 4 — Validar el despliegue Vercel existente
 
-1. Crear una base PostgreSQL de desarrollo con datos ficticios y aplicar las migraciones.
-2. Sustituir las consultas SQLite por consultas PostgreSQL con parámetros y conexión agrupada/pooling.
-3. Adaptar las rutas de `src/server/api.ts` a funciones compatibles con Vercel, conservando validación, autenticación y límites de solicitudes.
-4. Probar la sesión docente/estudiante, recuperación de avance, expiración, revocación y borrado con datos ficticios.
-5. Conectar el repositorio en Vercel y la base mediante un proveedor del Marketplace. Guardar credenciales únicamente en variables de entorno.
-6. Configurar HTTPS, cookies seguras, protección contra abuso, respaldos y una rutina comprobable de restauración.
-7. Desplegar primero una vista previa privada; revisar costos, región de funciones/base y política del establecimiento antes de habilitar el uso del curso.
-8. Publicar el aviso de privacidad y probar con un curso piloto usando códigos ficticios antes de cargar progreso real.
-9. Revisar la declaración de sitio dirigido a menores de YouTube: la ayuda oficial indica que los sitios o apps infantiles que insertan contenido deben identificarse como tales. Ver [YouTube: insertar videos y playlists](https://support.google.com/youtube/answer/171780).
+1. Verificar que `DATABASE_URL` conecta a la base esperada y que el esquema/migraciones están aplicados. No copiar secretos a Git ni pegarlos en la terminal compartida.
+2. Probar el modo sin guardado y el modo opcional con curso y estudiantes ficticios: acceso, guardar, retomar, expiración, revocación y borrado.
+3. Implementar purga automática por `delete_at`, respaldos y una restauración comprobable.
+4. Revisar autenticación, cookies seguras, límites de solicitudes en funciones serverless y la configuración de proxy antes de guardar progreso real.
+5. Para despliegues automáticos, conectar el repositorio en **Vercel → Settings → Git**. La persona dueña o administradora de GitHub debe autorizar Vercel; si no, seguir publicando manualmente con la CLI.
+6. Publicar aviso de privacidad y obtener revisión del establecimiento antes de usar progreso identificable o seudónimo de estudiantes.
+7. Revisar la declaración de sitio dirigido a menores de YouTube: la ayuda oficial indica que los sitios o apps infantiles que insertan contenido deben identificarse como tales. Ver [YouTube: insertar videos y playlists](https://support.google.com/youtube/answer/171780).
 
-Vercel ofrece funciones con runtime Bun, pero la aplicación actual usa un servidor Bun continuo y SQLite local: hay que adaptar la API. Las funciones tienen sistema de archivos de solo lectura (salvo `/tmp`, que es temporal), por lo que SQLite local no sirve como base persistente para este despliegue. Vercel conecta PostgreSQL mediante integraciones del Marketplace, como Neon o Supabase. Ver [runtime Bun](https://vercel.com/docs/functions/runtimes/bun), [sistema de archivos de Functions](https://vercel.com/docs/functions/runtimes) y [almacenamiento de Vercel Marketplace](https://vercel.com/docs/marketplace-storage).
+La función `api/index.ts` usa el runtime Bun y el adaptador PostgreSQL configurado por `DATABASE_URL`. Las funciones tienen sistema de archivos de solo lectura (salvo `/tmp`, que es temporal), por lo que SQLite local no sirve como base persistente en Vercel. Ver [runtime Bun](https://vercel.com/docs/functions/runtimes/bun), [sistema de archivos de Functions](https://vercel.com/docs/functions/runtimes) y [almacenamiento de Vercel Marketplace](https://vercel.com/docs/marketplace-storage).
 
 ## Criterios para considerar lista la versión con progreso
 
@@ -139,16 +139,16 @@ bunx supabase db push --remote
 
 `--dry-run` no aplica cambios. `db push` sí cambia la base remota; confirmar el nombre del proyecto y el SQL antes de ejecutarlo. No apuntar a producción hasta tener una migración revisada y un respaldo probado. Para levantar Supabase localmente se necesita Docker; no hace falta si se trabajará solo con un proyecto de desarrollo alojado.
 
-### Vincular Vercel y hacer una vista previa
+### Despliegue manual y conexión automática a GitHub
 
-Cuando la API se haya adaptado a funciones Vercel, autenticar y vincular el directorio:
+Este directorio ya está vinculado al proyecto Vercel `rompe-el-algoritmo-maipu` mediante `.vercel/project.json`. El proyecto no tiene conexión GitHub. Para automatizar, abrir **Vercel → Settings → Git → Connect Git Repository**; la persona dueña o administradora del repo debe autorizar la integración. Sin esa autorización, publicar desde esta copia local:
 
 ```bash
-bunx vercel login
-bunx vercel link
+bun run build
+bunx vercel --prod
 ```
 
-Crear variables de entorno backend solo en Vercel. Si se usa una conexión PostgreSQL, copiar desde Supabase **Connect → Transaction pooler** y guardarla como `DATABASE_URL`. No escribir la contraseña de la base en el código ni en variables `VITE_*`; la conexión debe quedar disponible solo en la API servidor. Para funciones serverless se recomienda el pooler de transacciones; configurar el driver con conexiones limitadas, SSL y sin prepared statements si el driver lo requiere.
+El proyecto ya tiene variables protegidas `DATABASE_URL` y `ADMIN_KEY` en Vercel Production. No imprimir sus valores ni escribirlos en el código o en variables `VITE_*`; la conexión debe quedar disponible solo en la API servidor.
 
 Se puede traer una copia local de variables a un archivo que Git ignora:
 
@@ -156,13 +156,13 @@ Se puede traer una copia local de variables a un archivo que Git ignora:
 bunx vercel env pull .env.local
 ```
 
-Desplegar primero una vista previa y verificar solo con códigos ficticios:
+Para una vista previa sin mover el alias de producción:
 
 ```bash
 bunx vercel
 ```
 
-Publicar producción solo después de revisar la vista previa, el proyecto de Supabase conectado, la retención/borrado y la configuración de seguridad:
+Publicar producción solo después de revisar el cambio, el proyecto destino, la base, la retención/borrado y la configuración de seguridad:
 
 ```bash
 bunx vercel --prod
@@ -180,7 +180,7 @@ agy --prompt-interactive
 
 Como primer mensaje, pedirle:
 
-> Lee `docs/base-de-datos-y-vercel.md` completo y revisa el estado de Git y la estructura actual antes de editar. Conserva dos modos: jugar sin guardar o guardar con cuenta. En el modo con guardado hay un código de invitación por curso; cada estudiante elige un alias inventado y, al completar el nivel 1, recibe una contraseña aleatoria. No agregues códigos individuales para repartir ni campos de identidad real. Primero migra el esquema y la API a PostgreSQL/Supabase; después adapta Bun/SQLite a Vercel Functions. No escribas secretos en archivos versionados ni apliques cambios remotos o despliegues de producción sin mostrarme antes el comando, el proyecto de destino y su efecto.
+> Lee `docs/base-de-datos-y-vercel.md` completo y revisa el estado de Git y la estructura actual antes de editar. El juego recomienda la práctica sin guardado para el aula; el modo opcional de retomar usa un código por curso, alias inventados y contraseña tras el nivel 1. El sitio ya está desplegado manualmente en Vercel; el proyecto no está conectado a GitHub y tiene variables protegidas `DATABASE_URL` y `ADMIN_KEY`. Verifica conexión/esquema y flujos con datos ficticios; completa purga y respaldos antes de guardar progreso real. No agregues códigos individuales ni campos de identidad real. No escribas secretos en archivos versionados ni cambies datos remotos o publiques producción sin mostrar antes el comando, el proyecto y su efecto.
 
 ## Siguiente decisión: asociar el progreso con evaluación
 

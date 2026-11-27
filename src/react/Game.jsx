@@ -379,29 +379,31 @@ export function Game({ role, initialProgress, student, debugLevel, enrollment, o
             }}>Modo infinito · récord {progress.bestInfiniteStreak}</button>}
           <button className="text-btn home-exit" type="button" onClick={onExit}>{role === 'debug' ? 'Volver al panel docente' : 'Salir del juego'}</button>
         </div>
-        <details className="campaign-strip">
-          <summary className="campaign-summary">
-            <span><strong>Ruta de la campaña</strong><small>Descubre las portadas en orden</small></span>
-            <span className="campaign-count">{discovered.size} de 12</span>
-          </summary>
+        <section className="campaign-strip" aria-labelledby="campaign-title">
+          <div className="campaign-heading">
+            <h2 id="campaign-title">Ruta de la campaña</h2>
+            <span className="campaign-count">{discovered.size} de 12 descubiertas</span>
+          </div>
+          <p className="campaign-help">Las portadas bloqueadas se revelan al completar cada nivel.</p>
           <div className="level-chips">
           {ARTISTS.map((item, index) => {
             const unlocked = role === 'debug' || index <= progress.maxUnlockedIdx;
             const done = discovered.has(item.id);
             return <button key={item.id} className={`level-chip ${done ? 'done' : unlocked ? 'open' : 'locked'}`}
-              type="button" disabled={!unlocked} onClick={() => startLevel(index)}>
+              type="button" disabled={!unlocked} aria-label={`Nivel ${item.level}: ${done ? `${item.name}, descubierta` : unlocked ? `${item.name}, disponible` : 'artista por descubrir, bloqueado'}`}
+              onClick={() => startLevel(index)}>
               <span className={`level-cover-wrap ${done ? 'revealed' : 'concealed'}`}>
                 <ArtistImage artist={item} src={item.files.singleCover || item.files.albumCover}
                   alt={done ? `Portada de ${item.featuredSingle || item.featuredAlbum || item.albumTitle}` : ''} className="level-cover-img" />
                 {!done && <span className="level-cover-lock" aria-hidden="true">🔒</span>}
               </span>
-              <span>{done ? '✅' : unlocked ? '🎵' : '🔒'} Nv.{item.level}</span>
+              <span className="level-chip-status">{done ? 'Descubierta' : unlocked ? 'Disponible' : 'Bloqueada'} · Nv. {item.level}</span>
               <strong>{done ? item.name : unlocked ? item.name : 'Por descubrir'}</strong>
               {done && <small>{item.featuredSingle || item.featuredAlbum || item.albumTitle}</small>}
               {item.isMaipuLocal && <em>Maipú</em>}</button>;
           })}
           </div>
-        </details>
+        </section>
       </div>}
 
       {screen === 'gallery' && <div className="gallery-screen">

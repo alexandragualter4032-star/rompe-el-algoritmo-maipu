@@ -2,7 +2,7 @@
 
 Juego educativo de música y pensamiento crítico. Sus 12 niveles presentan proyectos musicales liderados por mujeres; cada nivel combina cuestionario, retroalimentación, material audiovisual y minijuego de ritmo.
 
-**Estado:** prototipo funcional en desarrollo. Se ejecuta localmente con Bun; Vercel y una base de datos persistente siguen pendientes.
+**Estado:** prototipo funcional en desarrollo. Hay una versión pública de revisión en Vercel y ejecución local con Bun. El proyecto de Vercel no está conectado a GitHub; los despliegues son manuales. La validación del guardado y la política de retención siguen pendientes.
 
 ## Funcionalidades
 
@@ -13,7 +13,7 @@ Juego educativo de música y pensamiento crítico. Sus 12 niveles presentan proy
 - Minijuego de ritmo con controles de teclado y pantalla táctil. Sus notas aún no están sincronizadas con BPM ni con las grabaciones.
 - Modo de prueba, sin guardar avance.
 - Panel docente: práctica sin guardado, además de herramientas opcionales para cursos, progreso, exportación CSV y depuración.
-- Persistencia actual mediante Bun y SQLite local.
+- Bun y SQLite para uso local; el despliegue Vercel usa la API serverless y tiene configurada una conexión PostgreSQL mediante variables protegidas.
 - Diseño adaptable y soporte para `prefers-reduced-motion`.
 
 ## Requisitos
@@ -62,7 +62,7 @@ El prototipo todavía incluye **Guardar para retomar** como opción técnica par
 
 Si se prueba el modo opcional con guardado, no ingresar nombres reales, apellidos, iniciales, RUT, correo ni números de lista como alias. La cuenta queda asociada a un pseudónimo y al curso, por lo que el progreso es seudónimo, no anónimo. Los códigos de curso son parte de ese flujo opcional y deben compartirse solo con la clase correspondiente.
 
-La purga automática al vencer la fecha de borrado y la migración a PostgreSQL para Vercel aún están pendientes. En local, los datos se guardan en SQLite dentro de `data/game.sqlite`.
+La purga automática y la verificación de esquema, respaldo y retención de la base de Vercel aún están pendientes. En local, los datos se guardan en SQLite dentro de `data/game.sqlite`.
 
 No hace falta pedir nombres reales. El progreso es para retroalimentación: el servidor valida formato y sesión, pero el navegador envía el puntaje, así que no sirve como nota formal ni como ranking resistente a manipulación.
 
@@ -110,23 +110,24 @@ La revisión basada en el capítulo de Richard E. Mayer y en práctica de recupe
 
 ### Despliegue en Vercel
 
-Vercel es el destino previsto. El proyecto actual aún necesita adaptar la API y cambiar SQLite local por PostgreSQL persistente antes de activar el progreso en línea. Las funciones de Vercel tienen sistema de archivos de solo lectura, con `/tmp` temporal, así que ese disco no sirve para guardar progreso.
+El sitio ya tiene una publicación de producción para revisión: [rompe-el-algoritmo-maipu-sndmp.vercel.app](https://rompe-el-algoritmo-maipu-sndmp.vercel.app). Usa `api/index.ts` como función serverless y las variables protegidas `DATABASE_URL` y `ADMIN_KEY`. El proyecto no tiene un repositorio Git conectado (`repository: null`), por lo que un `git push` no publica cambios en Vercel; el despliegue se hace manualmente desde la raíz con `vercel --prod`.
+
+La base y el flujo de guardado requieren validación con datos ficticios antes de usarlos con estudiantes. Las funciones de Vercel tienen sistema de archivos de solo lectura, con `/tmp` temporal, así que ese disco no sirve para guardar progreso.
 
 La hoja de ruta detallada de base de datos, modo de guardado por curso y publicación está en [docs/base-de-datos-y-vercel.md](docs/base-de-datos-y-vercel.md).
 
-Pendientes para el despliegue completo:
+Pendientes antes de automatizar el despliegue y usar el modo con progreso en una clase:
 
-1. Migrar la API a funciones de Vercel y configurar el runtime elegido.
-2. Migrar datos y consultas de SQLite a una base administrada persistente, por ejemplo Postgres mediante Neon o Supabase.
-3. Crear migraciones del esquema, conexión con pooling y variables de entorno para credenciales.
-4. Revisar autenticación docente, limitación de intentos, cookies `Secure`, sesiones, CORS/CSRF y límites de solicitudes detrás de proxy.
-5. Definir respaldos, retención y eliminación de cuentas/progresos; probar recuperación.
-6. Revisar privacidad: el juego apunta a cursos escolares, así que publicar solo los datos mínimos y evitar nombres de estudiantes.
-7. Confirmar autorización/licencias de fotos, portadas y música antes de difundir el sitio. Los archivos de imagen entregados se incorporan como medios del proyecto; el repositorio es público.
-8. Elegir dominio, región del servidor/base de datos, HTTPS y política de costos.
-9. Completar accesibilidad con teclado/lector de pantalla y probar móvil, navegadores y autoplay.
-10. Sincronizar patrones del minijuego con una canción, su BPM y el desplazamiento del primer pulso; BPM por sí solo no define las notas.
-11. Revisar la declaración de sitio dirigido a menores para los reproductores de YouTube; la ayuda oficial indica que los sitios o apps infantiles que insertan contenido deben identificarse como tales: [YouTube Help](https://support.google.com/youtube/answer/171780).
+1. Conectar GitHub en Vercel → Settings → Git. La persona dueña o administradora del repositorio debe autorizar el acceso; si no, continuar con publicación manual.
+2. Verificar conexión, migraciones, cuentas y guardado en PostgreSQL usando datos ficticios.
+3. Implementar purga automática, respaldos y una restauración comprobable; definir retención con el establecimiento.
+4. Revisar autenticación docente, limitación de intentos en funciones serverless, cookies `Secure`, sesiones, CORS/CSRF y límites de solicitudes detrás de proxy.
+5. Revisar privacidad: el juego apunta a cursos escolares; evitar nombres de estudiantes y obtener revisión del establecimiento antes de guardar progreso real.
+6. Confirmar autorización/licencias de fotos, portadas y música antes de difundir el sitio. Los archivos de imagen entregados se incorporan como medios del proyecto; el repositorio es público.
+7. Elegir dominio, región del servidor/base de datos, HTTPS y política de costos.
+8. Completar accesibilidad con teclado/lector de pantalla y probar móvil, navegadores y autoplay.
+9. Sincronizar patrones del minijuego con una canción, su BPM y el desplazamiento del primer pulso; BPM por sí solo no define las notas.
+10. Revisar la declaración de sitio dirigido a menores para los reproductores de YouTube; la ayuda oficial indica que los sitios o apps infantiles que insertan contenido deben identificarse como tales: [YouTube Help](https://support.google.com/youtube/answer/171780).
 11. Añadir integración continua para instalación reproducible, compilación y pruebas en cada pull request.
 12. Revisar hechos, claves de respuestas y contenido educativo antes de usar puntajes formalmente.
 

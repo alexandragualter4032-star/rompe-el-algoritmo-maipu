@@ -102,7 +102,7 @@ export function App() {
   const showAuthCard = (children) => <main className="auth-screen"><div className="auth-card">
     <div className="school-pill">🏫 Colegio Particular San Nicolás de Maipú • 7° Básico</div>
     <h1 className="game-title">ROMPE EL ALGORITMO</h1>
-    <p className="game-subtitle">Descubre artistas, responde preguntas y haz que suene su música.</p>
+    <p className="game-subtitle">Romper el algoritmo es salir de las recomendaciones de siempre: descubre artistas, escucha su música y conoce sus historias.</p>
     {children}
   </div></main>;
 

@@ -197,9 +197,8 @@ body {
   font-size: clamp(2.4rem, 5vw, 4rem);
   font-weight: 900;
   letter-spacing: -0.02em;
-  background: linear-gradient(90deg, #ffffff, var(--secondary), var(--primary));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--secondary);
+  -webkit-text-fill-color: currentColor;
   margin-bottom: 0.75rem;
 }
 
@@ -279,30 +278,22 @@ body {
   padding: 1rem 1.2rem;
 }
 
-.campaign-summary {
-  min-height: 48px;
+.campaign-heading {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  cursor: pointer;
-  text-align: left;
-  list-style: none;
+  margin-bottom: 0.35rem;
 }
 
-.campaign-summary::-webkit-details-marker { display: none; }
-.campaign-summary::after {
-  content: "+";
-  color: var(--secondary);
-  font-size: 1.4rem;
-  font-weight: 700;
-}
-.campaign-strip[open] .campaign-summary::after { content: "−"; }
-.campaign-summary > span:first-child { display: grid; gap: 0.2rem; }
-.campaign-summary strong { font-family: var(--font-display); }
-.campaign-summary small { color: var(--text-muted); font-size: 0.9rem; }
+.campaign-heading h2 { font-family: var(--font-display); font-size: 1.25rem; }
 .campaign-count { color: var(--secondary); font-weight: 700; }
-.campaign-strip[open] .level-chips { margin-top: 1rem; }
+.campaign-help { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0.9rem; }
+
+.level-chip-status { color: var(--secondary); font-size: 0.78rem; font-weight: 700; }
+.level-chip > strong { font-size: 0.9rem; }
+.level-chip > small { color: var(--text-muted); font-size: 0.75rem; line-height: 1.3; }
+.level-chip > em { color: var(--accent); font-size: 0.75rem; font-style: normal; }
 
 .entry-actions {
   display: grid;
@@ -315,25 +306,27 @@ body {
 .auth-note { font-size: 0.95rem; line-height: 1.5; }
 
 .rhythm-controls-help {
+  position: relative;
+  z-index: 16;
   margin: 0 0 0.75rem;
-  color: var(--text-muted);
+  color: var(--text-main);
   line-height: 1.45;
   font-size: 0.95rem;
 }
 
 .level-chips {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 0.7rem;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 0.55rem;
 }
 
 .level-chip {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 0.2rem;
-  padding: 0.7rem 0.85rem;
-  border-radius: 14px;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.55rem 0.4rem;
+  border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.14);
   background: rgba(255, 255, 255, 0.05);
   color: var(--text-main);
@@ -346,8 +339,9 @@ body {
 .level-cover-wrap {
   position: relative;
   display: block;
-  width: 100%;
+  width: min(100%, 84px);
   aspect-ratio: 1;
+  margin: 0 auto 0.25rem;
   overflow: hidden;
   border-radius: 10px;
   background: rgba(0, 0, 0, 0.45);
@@ -363,6 +357,18 @@ body {
 .level-cover-wrap.concealed .level-cover-img {
   filter: blur(12px) brightness(0.38) grayscale(0.8);
   transform: scale(1.12);
+}
+
+@media (max-width: 900px) {
+  .level-chips { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+@media (max-width: 520px) {
+  .level-chips { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (max-width: 360px) {
+  .campaign-heading { align-items: flex-start; flex-direction: column; }
 }
 
 .level-cover-lock {
